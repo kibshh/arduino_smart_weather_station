@@ -1,6 +1,25 @@
 #include "display.h"
 
 
+display_displayFunction_t display_functions[] = 
+{
+  display_displayTemperature,
+  display_displayHumidity,
+  display_displayPressure,
+  display_displayTemperatureBPM,
+  display_displayAltitude,
+  display_displayLuminance,
+  display_displayVariousGasesPPM,
+  display_displayCOPPM,
+  display_displayUV,
+  display_displayRainingStatus,
+  display_displayDate,
+  display_displayTime
+};
+
+const int display_functions_size = sizeof(display_functions) / sizeof(display_functions[0]);
+
+
 LiquidCrystal_I2C lcd(DISPLAY_LCD_I2C_ADDDR, DISPLAY_LCD_WIDTH, DISPLAY_LCD_HEIGHT);
 
 void display_init()

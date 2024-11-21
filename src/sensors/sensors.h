@@ -7,10 +7,10 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BMP280.h>
 #include <BH1750.h>
-#include "mq135.h"
-#include "mq7.h"
-#include "uv.h"
-#include "rainsensor.h"
+#include "custom/mq135.h"
+#include "custom/mq7.h"
+#include "custom/uv.h"
+#include "custom/rainsensor.h"
 
 #define SENSORS_SEA_LEVEL_PRESSURE       (1013.25f)
 
