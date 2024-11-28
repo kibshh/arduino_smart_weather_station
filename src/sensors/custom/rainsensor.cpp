@@ -20,7 +20,10 @@ rainsensor_reading_t rainsensor_readRaining()
 #else
   reading.is_raining = rainsensor_isRainingDigital();
 #endif
-  reading.success = true;
+  if(!isnan(reading.is_raining))
+  {
+    reading.success = true;
+  }
   return reading;
 }
 
@@ -44,7 +47,7 @@ rainsensor_reading_t rainsensor_readRaining()
   boolean rainsensor_isRainingAnalog()
   {
     int analog_reading = analogRead(RAINSENSOR_PIN_ANALOG);
-    if(RAINSENSOR_ANALOG_THRESHOLD <= analog_reading)
+    if(RAINSENSOR_ANALOG_THRESHOLD >= analog_reading)
     {
       return true;
     }

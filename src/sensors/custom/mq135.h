@@ -14,7 +14,7 @@
 
 //#define MQ135_PARAMETER_A     
 //#define MQ135_PARAMETER_B     
-//#define MQ135_R_ZERO                
+//#define MQ135_R_ZERO        
 
 
 typedef struct

@@ -10,6 +10,8 @@
 #define RTC_COMPILE_DATE    __DATE__
 #define RTC_COMPILE_TIME    __TIME__
 
+#define RTC_I2C_ADDR        (0x68)
+
 #define RTC_MIN_YEAR        (2024u)
 #define RTC_MIN_MONTH       (1u)
 #define RTC_MAX_MONTH       (12u)
