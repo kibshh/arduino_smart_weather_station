@@ -1,23 +1,21 @@
 #include "display.h"
 
 
-display_displayFunction_t display_functions[] = 
+display_sensors_config_t display_sensors_config[] =
 {
-  display_displayTemperature,
-  display_displayHumidity,
-  display_displayPressure,
-  display_displayTemperatureBPM,
-  display_displayAltitude,
-  display_displayLuminance,
-  display_displayVariousGasesPPM,
-  display_displayCOPPM,
-  display_displayUV,
-  display_displayRainingStatus,
-  display_displayDate,
-  display_displayTime
-};
+  {"Temp",        "C",      sensors_getTemperature,       DISPLAY_1_DECIMAL},
+  {"Humidity",    "%",      sensors_getHumidity,          DISPLAY_1_DECIMAL},
+  {"Press",       "hPa",    sensors_getPressure,          DISPLAY_1_DECIMAL},
+  {"BPM Temp",    "C",      sensors_getTemperatureBMP,    DISPLAY_1_DECIMAL},
+  {"Altitude",    "m",      sensors_getAltitude,          DISPLAY_0_DECIMALS},
+  {"Luminance",   "lx",     sensors_getLuminance,         DISPLAY_0_DECIMALS},
+  {"Gases PPM",   "",       sensors_getVariousGasesPPM,   DISPLAY_0_DECIMALS},
+  {"CO PPM",      "",       sensors_getCOPPM,             DISPLAY_0_DECIMALS},
+  {"UV int",      "",       sensors_getUvIntensity,       DISPLAY_1_DECIMAL},
+  {"Raining",     "",       sensors_getRainingStatus,     DISPLAY_NO_DECIMALS},
+}
 
-const int display_functions_size = sizeof(display_functions) / sizeof(display_functions[0]);
+const int num_of_display_functions = sizeof(display_sensors_config) / sizeof(display_sensors_config[0]);
 
 
 LiquidCrystal_I2C lcd(DISPLAY_LCD_I2C_ADDDR, DISPLAY_LCD_WIDTH, DISPLAY_LCD_HEIGHT);
@@ -25,209 +23,50 @@ LiquidCrystal_I2C lcd(DISPLAY_LCD_I2C_ADDDR, DISPLAY_LCD_WIDTH, DISPLAY_LCD_HEIG
 void display_init()
 {
   lcd.begin(DISPLAY_LCD_WIDTH, DISPLAY_LCD_HEIGHT); // Initialize a 16x2 LCD
-
   lcd.setCursor(0, 0);
   lcd.backlight();
   lcd.noCursor();
 }
 
-void display_displayTemperature()
+void display_displayData(uint_8 current_sensor_index)
 {
   lcd.clear();
   lcd.setCursor(0, 0);
 
-  sensor_reading_t reading = sensors_getTemperature();
-  String temperature = String(reading.value, DISPLAY_1_DECIMAL);
+  current_sensor = display_sensors_config[current_sensor_index];
+
+  sensor_reading_t reading = current_sensor.function();
 
   if(true == reading.success)
   {
-    lcd.print("Temp: ");
-    lcd.print(temperature);
-    lcd.print("C");
-  }
-  else
-  {
-    lcd.print("Error temp");
-  }
-}
+    String val = "";
 
-void display_displayHumidity()
-{
-  lcd.clear();
-  lcd.setCursor(0, 0);
-
-  sensor_reading_t reading = sensors_getHumidity();
-  String humidity = String(reading.value, DISPLAY_1_DECIMAL);
-
-  if(true == reading.success)
-  {
-    lcd.print("Humidity: ");
-    lcd.print(humidity);
-    lcd.print("%");
-  }
-  else
-  {
-    lcd.print("Error humidity");
-  }
-}
-
-void display_displayPressure()
-{
-  lcd.clear();
-  lcd.setCursor(0, 0);
-
-  sensor_reading_t reading = sensors_getPressure();
-  String pressure = String(reading.value, DISPLAY_1_DECIMAL);
-
-  if(true == reading.success)
-  {
-    lcd.print("Press: ");
-    lcd.print(pressure);
-    lcd.print("hPa");
-  }
-  else
-  {
-    lcd.print("Error pressure");
-  }
-}
-
-void display_displayTemperatureBPM()
-{
-  lcd.clear();
-  lcd.setCursor(0, 0);
-
-  sensor_reading_t reading = sensors_getTemperatureBMP();
-  String temperature = String(reading.value, DISPLAY_1_DECIMAL);
-
-  if(true == reading.success)
-  {
-    lcd.print("BPM Temp: ");
-    lcd.print(temperature);
-    lcd.print("C");
-  }
-  else
-  {
-    lcd.print("Error BPM temp");
-  }
-}
-
-void display_displayAltitude()
-{
-  lcd.clear();
-  lcd.setCursor(0, 0);
-
-  sensor_reading_t reading = sensors_getAltitude();
-  String altitude = String(reading.value, DISPLAY_0_DECIMALS);
-
-  if(true == reading.success)
-  {
-    lcd.print("Altitude: ");
-    lcd.print(altitude);
-    lcd.print("m");
-  }
-  else
-  {
-    lcd.print("Error altitude");
-  }
-}
-
-void display_displayLuminance()
-{
-  lcd.clear();
-  lcd.setCursor(0, 0);
-
-  sensor_reading_t reading = sensors_getLuminance();
-  String luminance = String(reading.value, DISPLAY_0_DECIMALS);
-
-  if(true == reading.success)
-  {
-    lcd.print("Luminance: ");
-    lcd.print(luminance);
-    lcd.print("lx");
-  }
-  else
-  {
-    lcd.print("Error luminance");
-  }
-}
-
-void display_displayVariousGasesPPM()
-{
-  lcd.clear();
-  lcd.setCursor(0, 0);
-
-  sensor_reading_t reading = sensors_getVariousGasesPPM();
-  String ppm = String(reading.value, DISPLAY_0_DECIMALS);
-
-  if(true == reading.success)
-  {
-    lcd.print("Gases PPM: ");
-    lcd.print(ppm);
-  }
-  else
-  {
-    lcd.print("Error gases PPM");
-  }
-}
-
-void display_displayCOPPM()
-{
-  lcd.clear();
-  lcd.setCursor(0, 0);
-
-  sensor_reading_t reading = sensors_getCOPPM();
-  String ppm = String(reading.value, DISPLAY_0_DECIMALS);
-
-  if(true == reading.success)
-  {
-    lcd.print("CO PPM: ");
-    lcd.print(ppm);
-  }
-  else
-  {
-    lcd.print("Error CO PPM");
-  }
-}
-
-void display_displayUV()
-{
-  lcd.clear();
-  lcd.setCursor(0, 0);
-
-  sensor_reading_t reading = sensors_getUvIntensity();
-  String uv_intensity = String(reading.value, DISPLAY_1_DECIMAL);
-
-  if(true == reading.success)
-  {
-    lcd.print("UV int: ");
-    lcd.print(uv_intensity);
-  }
-  else
-  {
-    lcd.print("Error UV");
-  }
-}
-
-void display_displayRainingStatus()
-{
-  lcd.clear();
-  lcd.setCursor(0, 0);
-
-  String is_it_raining = "Error Raining";
-  sensor_reading_indicator_type_t reading = sensors_getRainingStatus();
-
-  if(true == reading.success)
-  {
-    if(true == reading.value)
+    if(DISPLAY_READING_VALUE == reading.measurement_type_switch)
     {
-      is_it_raining = "Raining";
+      val = String(reading.value, current_sensor.accuracy);
     }
     else
     {
-      is_it_raining = "Not Raining";
+      if(true == reading.indication)
+      {
+        val = "yes";
+      }
+      else
+      {
+        val = "no";
+      }
     }
+
+    lcd.print(current_sensor.sensor_type);
+    lcd.print(": ");
+    lcd.print(val);
+    lcd.print(current_sensor.measurement_unit);
   }
-  lcd.print(is_it_raining);
+  else
+  {
+    lcd.print("Error ");
+    lcd.print(current_sensor.sensor_type);
+  }
 }
 
 void display_displayDate()

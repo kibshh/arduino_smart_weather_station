@@ -63,18 +63,19 @@
 #define SENSORS_BH1750_I2C_ADDDR_VCC (0x5C)
 #define SENSORS_BH1750_I2C_ADDDR_GND (0x23)
 
+typedef enum
+{
+  DISPLAY_READING_VALUE,
+  DISPLAY_INDICATION
+}measurement_type_te;
 
 typedef struct
 {
-  boolean success;
   float value;
-}sensor_reading_t;
-
-typedef struct
-{
+  measurement_type_te measurement_type_switch;
   boolean success;
-  boolean value;
-}sensor_reading_indicator_type_t;
+  boolean indication;
+}sensor_reading_t;
 
 extern DHT dht;
 extern Adafruit_BMP280 bmp;
@@ -90,6 +91,6 @@ sensor_reading_t sensors_getLuminance();
 sensor_reading_t sensors_getVariousGasesPPM();
 sensor_reading_t sensors_getCOPPM();
 sensor_reading_t sensors_getUvIntensity();
-sensor_reading_indicator_type_t sensors_getRainingStatus();
+sensor_reading_t sensors_getRainingStatus();
 
 #endif

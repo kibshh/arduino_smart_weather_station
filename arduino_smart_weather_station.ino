@@ -19,7 +19,7 @@ void setup() {
   #ifdef MODE_GET_I2C_ADDR
     Serial.println("\nI2C Scanner");
   #else
-    Serial.println("\nWeather Station");
+    Serial.println("\nWeather Station\n");
   #endif
 }
 
@@ -36,9 +36,9 @@ void loop() {
     if(current_millis - previous_millis >= (unsigned long)DISPLAY_DISPLAY_INTERVAL_MS)
     {
       previous_millis = current_millis;
-      display_functions[current_display_function]();
+      display_displayData(current_display_function);
       current_display_function++;
-      current_display_function %= display_functions_size;
+      current_display_function %= num_of_display_functions;
     }
   #endif
 }
