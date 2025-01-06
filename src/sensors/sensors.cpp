@@ -31,7 +31,7 @@ void sensors_init()
 
 sensor_reading_t sensors_getTemperature()
 {
-  sensor_reading_t reading = {.measurement_type_switch=DISPLAY_READING_VALUE, .value=0.0, .success=false,};
+  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
   reading.value = dht.readTemperature(); // Celsius
 
   float temperature = reading.value;
@@ -49,7 +49,7 @@ sensor_reading_t sensors_getTemperature()
 
 sensor_reading_t sensors_getHumidity()
 {
-  sensor_reading_t reading = {.measurement_type_switch=DISPLAY_READING_VALUE, .value=0.0, .success=false,};
+  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
   reading.value = dht.readHumidity(); // Percent
 
   float humidity = reading.value;
@@ -67,7 +67,7 @@ sensor_reading_t sensors_getHumidity()
 
 sensor_reading_t sensors_getPressure()
 {
-  sensor_reading_t reading = {.measurement_type_switch=DISPLAY_READING_VALUE, .value=0.0, .success=false,};
+  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
   reading.value = bmp.readPressure() / 100.0F; // Converting to hPa
 
   float pressure = reading.value;
@@ -84,7 +84,7 @@ sensor_reading_t sensors_getPressure()
 
 sensor_reading_t sensors_getTemperatureBMP()
 {
-  sensor_reading_t reading = {.measurement_type_switch=DISPLAY_READING_VALUE, .value=0.0, .success=false,};
+  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
   reading.value = bmp.readTemperature(); // Celsius
 
   float temperature = reading.value;
@@ -101,7 +101,7 @@ sensor_reading_t sensors_getTemperatureBMP()
 
 sensor_reading_t sensors_getAltitude()
 {
-  sensor_reading_t reading = {.measurement_type_switch=DISPLAY_READING_VALUE, .value=0.0, .success=false,};
+  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
   reading.value = bmp.readAltitude(SENSORS_SEA_LEVEL_PRESSURE); // Celsius
 
   float altitude = reading.value;
@@ -118,7 +118,7 @@ sensor_reading_t sensors_getAltitude()
 
 sensor_reading_t sensors_getLuminance()
 {
-  sensor_reading_t reading = {.measurement_type_switch=DISPLAY_READING_VALUE, .value=0.0, .success=false,};
+  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
   reading.value = lightMeter.readLightLevel(); // lux
 
   float luminance = reading.value;
@@ -135,7 +135,7 @@ sensor_reading_t sensors_getLuminance()
 
 sensor_reading_t sensors_getVariousGasesPPM()
 {
-  sensor_reading_t reading = {.measurement_type_switch=DISPLAY_READING_VALUE, .value=0.0, .success=false,};
+  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
 
   mq135_ppm_reading_t ppm_reading = mq135_readPPM(); // PPM
 
@@ -149,7 +149,7 @@ sensor_reading_t sensors_getVariousGasesPPM()
 
 sensor_reading_t sensors_getCOPPM()
 {
-  sensor_reading_t reading = {.measurement_type_switch=DISPLAY_READING_VALUE, .value=0.0, .success=false,};
+  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
 
   mq7_ppm_reading_t ppm_reading = mq7_readPPM(); // CO PPM
 
@@ -163,7 +163,7 @@ sensor_reading_t sensors_getCOPPM()
 
 sensor_reading_t sensors_getUvIntensity()
 {
-  sensor_reading_t reading = {.measurement_type_switch=DISPLAY_READING_VALUE, .value=0.0, .success=false,};
+  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
 
   uv_reading_t uv_reading = uv_readUvIntensity(); // mW/cm^2 
 
@@ -175,9 +175,9 @@ sensor_reading_t sensors_getUvIntensity()
   return reading;  
 }
 
-sensor_reading_indicator_type_t sensors_getRainingStatus()
+sensor_reading_t sensors_getRainingStatus()
 {
-  sensor_reading_t reading = {.measurement_type_switch=DISPLAY_INDICATION, .success=false, .indication=false};
+  sensor_reading_t reading = {0.0, DISPLAY_INDICATION, false, false};
 
   rainsensor_reading_t raining_status = rainsensor_readRaining(); // true/false 
 

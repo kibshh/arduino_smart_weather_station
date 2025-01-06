@@ -13,7 +13,7 @@ display_sensors_config_t display_sensors_config[] =
   {"CO PPM",      "",       sensors_getCOPPM,             DISPLAY_0_DECIMALS},
   {"UV int",      "",       sensors_getUvIntensity,       DISPLAY_1_DECIMAL},
   {"Raining",     "",       sensors_getRainingStatus,     DISPLAY_NO_DECIMALS},
-}
+};
 
 const int num_of_display_functions = sizeof(display_sensors_config) / sizeof(display_sensors_config[0]);
 
@@ -28,14 +28,15 @@ void display_init()
   lcd.noCursor();
 }
 
-void display_displayData(uint_8 current_sensor_index)
+void display_displayData(uint8_t current_sensor_index)
 {
-  lcd.clear();
   lcd.setCursor(0, 0);
 
-  current_sensor = display_sensors_config[current_sensor_index];
+  display_sensors_config_t current_sensor = display_sensors_config[current_sensor_index];
 
   sensor_reading_t reading = current_sensor.function();
+
+  String display_string = "";
 
   if(true == reading.success)
   {
@@ -56,71 +57,38 @@ void display_displayData(uint_8 current_sensor_index)
         val = "no";
       }
     }
-
-    lcd.print(current_sensor.sensor_type);
-    lcd.print(": ");
-    lcd.print(val);
-    lcd.print(current_sensor.measurement_unit);
+    display_string = current_sensor.sensor_type + ": " + val + current_sensor.measurement_unit;
   }
   else
   {
-    lcd.print("Error ");
-    lcd.print(current_sensor.sensor_type);
+    display_string = "Error " + current_sensor.sensor_type;
   }
+  while (display_string.length() < DISPLAY_LCD_WIDTH) 
+  {
+    display_string += ' '; //Add spaces to fill to the end
+  }
+  lcd.print(display_string);
 }
 
-void display_displayDate()
+void display_updateTime()
 {
-  lcd.clear();
-  lcd.setCursor(0, 0);
+  lcd.setCursor(0, 1);
 
-  rtc_date_reading_t reading = rtc_getDate();
+  rtc_time_reading_t time_reading = rtc_getTime();
+  rtc_date_reading_t date_reading = rtc_getDate();
 
-  if(true == reading.success)
+  if(true == time_reading.success && true == date_reading.success)
   {
-    char formatter_month[DISPLAY_DATETIME_FORMATER_LEN];
-    char formatter_day[DISPLAY_DATETIME_FORMATER_LEN];
+    String time_string = (time_reading.currentTime.hour < 10 ? "0" : "") + String(time_reading.currentTime.hour) + ":" +
+                         (time_reading.currentTime.mins < 10 ? "0" : "") + String(time_reading.currentTime.mins) + " " +
+                         (date_reading.currentDate.day < 10 ? "0" : "") + String(date_reading.currentDate.day) + "/" +
+                         (date_reading.currentDate.month < 10 ? "0" : "") + String(date_reading.currentDate.month) + "/" +
+                         String(date_reading.currentDate.year);
 
-    sprintf(formatter_month, "%02d", reading.currentDate.month);
-    sprintf(formatter_day, "%02d", reading.currentDate.day);
-
-    lcd.print(reading.currentDate.year);
-    lcd.print("/");
-    lcd.print(formatter_month);
-    lcd.print("/");
-    lcd.print(formatter_day); 
-  }
-  else
-  {
-    lcd.print("Error date");
-  }
-}
-
-void display_displayTime()
-{
-  lcd.clear();
-  lcd.setCursor(0, 0);
-
-  rtc_time_reading_t reading = rtc_getTime();
-
-  if(true == reading.success)
-  {
-    char formatter_hour[DISPLAY_DATETIME_FORMATER_LEN];
-    char formatter_mins[DISPLAY_DATETIME_FORMATER_LEN];
-    char formatter_secs[DISPLAY_DATETIME_FORMATER_LEN];
-
-    sprintf(formatter_hour, "%02d", reading.currentTime.hour);
-    sprintf(formatter_mins, "%02d", reading.currentTime.mins);
-    sprintf(formatter_secs, "%02d", reading.currentTime.secs);
-
-    lcd.print(formatter_hour);
-    lcd.print(":");
-    lcd.print(formatter_mins);
-    lcd.print(":");
-    lcd.print(formatter_secs); 
+    lcd.print(time_string);
   }
   else
   {
     lcd.print("Error time");
-  }
+  }  
 }

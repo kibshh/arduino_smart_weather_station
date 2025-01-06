@@ -5,7 +5,7 @@
 //#define MODE_GET_I2C_ADDR
 #define BAUDRATE 9600
 
-int current_display_function = 0;
+uint8_t current_display_function = 0;
 unsigned long previous_millis = 0;
 
 void setup() {
@@ -33,12 +33,17 @@ void loop() {
       i2cScan_scanForAdress();
     }
   #else
+    if(current_millis - previous_millis >= (unsigned long)DISPLAY_TIME_DISPLAY_INTERVAL_MS)
+    {
+      display_updateTime();
+    }
     if(current_millis - previous_millis >= (unsigned long)DISPLAY_DISPLAY_INTERVAL_MS)
     {
       previous_millis = current_millis;
       display_displayData(current_display_function);
       current_display_function++;
       current_display_function %= num_of_display_functions;
+      display_updateTime();
     }
   #endif
 }

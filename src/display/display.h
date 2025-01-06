@@ -26,7 +26,8 @@
 
 #define DISPLAY_DATETIME_FORMATER_LEN (3u)
 
-#define DISPLAY_DISPLAY_INTERVAL_MS   (2000)
+#define DISPLAY_DISPLAY_INTERVAL_MS        (2000)  //2 seconds
+#define DISPLAY_TIME_DISPLAY_INTERVAL_MS   (30000) //30 seconds
 
 typedef sensor_reading_t (*display_sensorFunction_t)();
 
@@ -42,17 +43,9 @@ extern LiquidCrystal_I2C lcd;
 extern const int num_of_display_functions;
 
 void display_init();
-void display_displayTemperature();
-void display_displayHumidity();
-void display_displayPressure();
-void display_displayTemperatureBPM();
-void display_displayAltitude();
-void display_displayLuminance();
-void display_displayVariousGasesPPM();
-void display_displayCOPPM();
-void display_displayUV();
-void display_displayRainingStatus();
+void display_displayData(uint8_t current_sensor_index);
 void display_displayDate();
 void display_displayTime();
+void display_updateTime();
 
 #endif
