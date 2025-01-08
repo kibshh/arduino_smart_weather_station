@@ -9,8 +9,6 @@
 #define MQ135_LOAD_RESISTANCE_VAL           (10000) //Load resistance in ohms which is connected to from analog output of sensor to ground
 #define MQ135_ANALOG_INPUT_MAX              (1023)
 #define MQ135_ANALOG_INPUT_MIN              (0)
-#define MQ135_PPM_MINIMUM                   (0)
-#define MQ135_PPM_MAXIMUM                   (10000)
 
 //#define MQ135_PARAMETER_A     
 //#define MQ135_PARAMETER_B     

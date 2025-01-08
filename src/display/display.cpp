@@ -3,16 +3,16 @@
 
 display_sensors_config_t display_sensors_config[] =
 {
-  {"Temp",        "C",      sensors_getTemperature,       DISPLAY_1_DECIMAL},
-  {"Humidity",    "%",      sensors_getHumidity,          DISPLAY_1_DECIMAL},
-  {"Press",       "hPa",    sensors_getPressure,          DISPLAY_1_DECIMAL},
-  {"BPM Temp",    "C",      sensors_getTemperatureBMP,    DISPLAY_1_DECIMAL},
-  {"Altitude",    "m",      sensors_getAltitude,          DISPLAY_0_DECIMALS},
-  {"Luminance",   "lx",     sensors_getLuminance,         DISPLAY_0_DECIMALS},
-  {"Gases PPM",   "",       sensors_getVariousGasesPPM,   DISPLAY_0_DECIMALS},
-  {"CO PPM",      "",       sensors_getCOPPM,             DISPLAY_0_DECIMALS},
-  {"UV int",      "",       sensors_getUvIntensity,       DISPLAY_1_DECIMAL},
-  {"Raining",     "",       sensors_getRainingStatus,     DISPLAY_NO_DECIMALS},
+  {"Temp",        "C",      DHT11_TEMPERATURE,       DISPLAY_1_DECIMAL},
+  {"Humidity",    "%",      DHT11_HUMIDITY,          DISPLAY_1_DECIMAL},
+  {"Press",       "hPa",    BMP280_PRESSURE,         DISPLAY_1_DECIMAL},
+  {"BPM Temp",    "C",      BMP280_TEMPERATURE,      DISPLAY_1_DECIMAL},
+  {"Altitude",    "m",      BMP280_ALTITUDE,         DISPLAY_0_DECIMALS},
+  {"Luminance",   "lx",     BH1750_LUMINANCE,        DISPLAY_0_DECIMALS},
+  {"Gases PPM",   "",       MQ135_PPM,               DISPLAY_0_DECIMALS},
+  {"CO PPM",      "",       MQ7_COPPM,               DISPLAY_0_DECIMALS},
+  {"UV int",      "",       GYML8511_UV,             DISPLAY_1_DECIMAL},
+  {"Raining",     "",       ARDUINORAIN_RAINING,     DISPLAY_NO_DECIMALS},
 };
 
 const int num_of_display_functions = sizeof(display_sensors_config) / sizeof(display_sensors_config[0]);
@@ -34,7 +34,7 @@ void display_displayData(uint8_t current_sensor_index)
 
   display_sensors_config_t current_sensor = display_sensors_config[current_sensor_index];
 
-  sensor_reading_t reading = current_sensor.function();
+  sensor_reading_t reading = sensors_getReading(current_sensor.id);
 
   String display_string = "";
 

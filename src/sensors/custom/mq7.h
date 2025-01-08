@@ -16,8 +16,6 @@
 #define MQ7_HEATER_HIGH_TIMEOUT_MS        (60000u)    
 #define MQ7_5V_ANALOG_OUTPUT_HEATER       (1023u)      
 #define MQ7_1_4V_ANALOG_OUTPUT_HEATER     (71u)   
-#define MQ7_PPM_MINIMUM                   (10)
-#define MQ7_PPM_MAXIMUM                   (1000)  
 
 #define MQ7_CALCULATION_POW_BASE_CONSTANT (10)
 #define MQ7_CALCULATION_CONSTANT_1        (0.5)   //By datasheet

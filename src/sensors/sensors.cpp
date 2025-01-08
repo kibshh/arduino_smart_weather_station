@@ -1,5 +1,18 @@
 #include "sensors.h"
 
+sensor_sensors_config_t sensor_sensors_config[]
+{
+  {SENSORS_DHT11_TEMPERATURE_MIN,     SENSORS_DHT11_TEMPERATURE_MAX,    DHT11_TEMPERATURE,      dht.readTemperature,            SENSORS_NO_INDICATION_FUNCTION},
+  {SENSORS_DHT11_HUMIDITY_MIN,        SENSORS_DHT11_HUMIDITY_MAX,       DHT11_HUMIDITY,         dht.readHumidity,               SENSORS_NO_INDICATION_FUNCTION},
+  {SENSORS_BMP280_PRESSURE_MIN,       SENSORS_BMP280_PRESSURE_MAX,      BMP280_PRESSURE,        bmp.readPressure,               SENSORS_NO_INDICATION_FUNCTION},
+  {SENSORS_BMP280_TEMPERATURE_MIN,    SENSORS_BMP280_TEMPERATURE_MAX,   BMP280_TEMPERATURE,     bmp.readTemperature,            SENSORS_NO_INDICATION_FUNCTION},
+  {SENSORS_BMP280_ALTITUDE_MIN,       SENSORS_BMP280_ALTITUDE_MAX,      BMP280_ALTITUDE,        bmp.readAltitude,               SENSORS_NO_INDICATION_FUNCTION},
+  {SENSORS_BH1750_LUMINANCE_MIN,      SENSORS_BH1750_LUMINANCE_MAX,     BH1750_LUMINANCE,       lightMeter.readLightLevel,      SENSORS_NO_INDICATION_FUNCTION},
+  {SENSORS_MQ135_PPM_MIN,             SENSORS_MQ135_PPM_MAX,            MQ135_PPM,              mq135_readPPM,                  SENSORS_NO_INDICATION_FUNCTION},
+  {SENSORS_MQ7_PPM_MIN,               SENSORS_MQ7_PPM_MAX,              MQ7_COPPM,              mq7_readPPM,                    SENSORS_NO_INDICATION_FUNCTION},
+  {SENSORS_GYML8511_UV_MIN,           SENSORS_GYML8511_UV_MAX,          GYML8511_UV,            uv_readUvIntensity,             SENSORS_NO_INDICATION_FUNCTION},
+  {SENSORS_INDICATION_NO_MIN,         SENSORS_INDICATION_NO_MAX,        ARDUINORAIN_RAINING,    SENSORS_NO_VALUE_FUNCTION,      rainsensor_readRaining        }
+};
 
 //GLOBAL VARIABLES
 DHT dht(SENSORS_PIN_DHT, SENSORS_DHTTYPE);
@@ -28,164 +41,46 @@ void sensors_init()
   uv_init();
 }
 
-
-sensor_reading_t sensors_getTemperature()
+sensor_reading_t sensors_getReading(sensor_id_te id, sensor_measurement_type_te measurement_type)
 {
-  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
-  reading.value = dht.readTemperature(); // Celsius
+  sensor_reading_t reading;
+  reading.success = false;
 
-  float temperature = reading.value;
-
-  if(!isnan(temperature))
+  if(SENSORS_NO_SENSORS_CONFIGURED != sizeof(sensor_sensors_config))
   {
-    if((int)temperature > SENSORS_TEMPERATURE_MIN && (int)temperature < SENSORS_TEMPERATURE_MAX)
+    size_t sensor_config_len = sizeof(sensor_sensors_config) / sensor_sensors_config[0];
+    if(sensor_config_len > id)
     {
-      reading.success = true;    
+      sensor_sensors_config_t current_sensor = sensor_sensors_config[id];
+
+      if(id == sensor_sensors_config[id].sensor_id)
+      {
+        if(SENSORS_VALUE == measurement_type)
+        {
+          if(SENSORS_NO_VALUE_FUNCTION != current_sensor.sensor_value_function)
+          {
+            reading.measurement_type_switch = SENSORS_VALUE;
+            reading.value = current_sensor.sensor_value_function();
+            if(!isnan(reading.value))
+            {
+              if(reading.value > current_sensor.min_value && reading.value < current_sensor.max_value)
+              {
+                reading.success = true;
+              }
+            }
+          }
+        }
+        else
+        {
+          if(SENSORS_NO_INDICATION_FUNCTION != current_sensor.sensor_indication_function)
+          {
+            reading.measurement_type_switch = SENSORS_INDICATION;
+            reading.indication = current_sensor.sensor_indication_function();
+            reading.success = true;
+          }
+        }
+      }
     }
   }
   return reading;
 }
-
-
-sensor_reading_t sensors_getHumidity()
-{
-  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
-  reading.value = dht.readHumidity(); // Percent
-
-  float humidity = reading.value;
-
-  if(!isnan(humidity))
-  {
-    if((int)humidity > SENSORS_HUMIDITY_MIN && (int)humidity < SENSORS_HUMIDITY_MAX)
-    {
-      reading.success = true;    
-    }
-  }
-  return reading;
-}
-
-
-sensor_reading_t sensors_getPressure()
-{
-  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
-  reading.value = bmp.readPressure() / 100.0F; // Converting to hPa
-
-  float pressure = reading.value;
-
-  if(!isnan(pressure))
-  {
-    if((int)pressure > SENSORS_PRESSURE_MIN && (int)pressure < SENSORS_PRESSURE_MAX)
-    {
-      reading.success = true;    
-    }
-  }
-  return reading;
-}
-
-sensor_reading_t sensors_getTemperatureBMP()
-{
-  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
-  reading.value = bmp.readTemperature(); // Celsius
-
-  float temperature = reading.value;
-
-  if(!isnan(temperature))
-  {
-    if((int)temperature > SENSORS_TEMPERATURE_MIN && (int)temperature < SENSORS_TEMPERATURE_MAX)
-    {
-      reading.success = true;    
-    }
-  }
-  return reading;  
-}
-
-sensor_reading_t sensors_getAltitude()
-{
-  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
-  reading.value = bmp.readAltitude(SENSORS_SEA_LEVEL_PRESSURE); // Celsius
-
-  float altitude = reading.value;
-
-  if(!isnan(altitude))
-  {
-    if((int)altitude > SENSORS_ALTITUDE_MIN && (int)altitude < SENSORS_ALTITUDE_MAX)
-    {
-      reading.success = true;    
-    }
-  }
-  return reading;  
-}
-
-sensor_reading_t sensors_getLuminance()
-{
-  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
-  reading.value = lightMeter.readLightLevel(); // lux
-
-  float luminance = reading.value;
-
-  if(!isnan(luminance))
-  {
-    if((int)luminance > SENSORS_LUMINANCE_MIN && (int)luminance < SENSORS_LUMINANCE_MAX)
-    {
-      reading.success = true;    
-    }
-  }
-  return reading;  
-}
-
-sensor_reading_t sensors_getVariousGasesPPM()
-{
-  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
-
-  mq135_ppm_reading_t ppm_reading = mq135_readPPM(); // PPM
-
-  if(true == ppm_reading.success)
-  {
-    reading.value = ppm_reading.value;
-    reading.success = true;
-  }
-  return reading;
-}
-
-sensor_reading_t sensors_getCOPPM()
-{
-  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
-
-  mq7_ppm_reading_t ppm_reading = mq7_readPPM(); // CO PPM
-
-  if(true == ppm_reading.success)
-  {
-    reading.value = ppm_reading.value;
-    reading.success = true;
-  }
-  return reading;  
-}
-
-sensor_reading_t sensors_getUvIntensity()
-{
-  sensor_reading_t reading = {0.0, DISPLAY_READING_VALUE, false, false};
-
-  uv_reading_t uv_reading = uv_readUvIntensity(); // mW/cm^2 
-
-  if(true == uv_reading.success)
-  {
-    reading.value = uv_reading.value;
-    reading.success = true;
-  }
-  return reading;  
-}
-
-sensor_reading_t sensors_getRainingStatus()
-{
-  sensor_reading_t reading = {0.0, DISPLAY_INDICATION, false, false};
-
-  rainsensor_reading_t raining_status = rainsensor_readRaining(); // true/false 
-
-  if(true == raining_status.success)
-  {
-    reading.indication = raining_status.is_raining;
-    reading.success = true;
-  }
-  return reading;  
-}
-

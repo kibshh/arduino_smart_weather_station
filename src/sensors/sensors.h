@@ -11,19 +11,13 @@
 #include "custom/mq7.h"
 #include "custom/uv.h"
 #include "custom/rainsensor.h"
+#include "sensorsconfig.h"
+
+#define SENSORS_NO_SENSORS_CONFIGURED    (0u)
+#define SENSORS_NO_INDICATION_FUNCTION   (nullptr)
+#define SENSORS_NO_VALUE_FUNCTION        (nullptr)
 
 #define SENSORS_SEA_LEVEL_PRESSURE       (1013.25f)
-
-#define SENSORS_TEMPERATURE_MIN  (-20)
-#define SENSORS_TEMPERATURE_MAX  (50)
-#define SENSORS_HUMIDITY_MIN     (0)
-#define SENSORS_HUMIDITY_MAX     (100)
-#define SENSORS_PRESSURE_MAX     (1200)
-#define SENSORS_PRESSURE_MIN     (300)
-#define SENSORS_ALTITUDE_MAX     (9000)
-#define SENSORS_ALTITUDE_MIN     (-1000)
-#define SENSORS_LUMINANCE_MAX    (150000)
-#define SENSORS_LUMINANCE_MIN    (0)
 
 #define SENSORS_PIN_DHT          (2u)
 
@@ -65,32 +59,49 @@
 
 typedef enum
 {
-  DISPLAY_READING_VALUE,
-  DISPLAY_INDICATION
-}measurement_type_te;
+  SENSORS_VALUE,
+  SENSORS_INDICATION
+}sensor_measurement_type_te;
+
+typedef enum
+{
+  DHT11_TEMPERATURE = 0,
+  DHT11_HUMIDITY,
+  BMP280_PRESSURE,
+  BMP280_TEMPERATURE,
+  BMP280_ALTITUDE,
+  BH1750_LUMINANCE,
+  MQ135_PPM,
+  MQ7_COPPM,
+  GYML8511_UV,
+  ARDUINORAIN_RAINING
+}sensor_id_te;
 
 typedef struct
 {
   float value;
-  measurement_type_te measurement_type_switch;
+  sensor_measurement_type_te measurement_type_switch;
   boolean success;
   boolean indication;
 }sensor_reading_t;
+
+typedef float (*sensor_sensor_value_function_t)();
+typedef bool (*sensor_sensor_indication_function_t)();
+
+typedef struct
+{
+  float min_value;
+  float max_value;
+  sensor_id_te sensor_id;
+  sensor_sensor_value_function_t sensor_value_function;
+  sensor_sensor_indication_function_t sensor_indication_function;
+}sensor_sensors_config_t;
 
 extern DHT dht;
 extern Adafruit_BMP280 bmp;
 extern BH1750 lightMeter;;
 
 void sensors_init();
-sensor_reading_t sensors_getTemperature();
-sensor_reading_t sensors_getHumidity();
-sensor_reading_t sensors_getPressure();
-sensor_reading_t sensors_getTemperatureBMP();
-sensor_reading_t sensors_getAltitude();
-sensor_reading_t sensors_getLuminance();
-sensor_reading_t sensors_getVariousGasesPPM();
-sensor_reading_t sensors_getCOPPM();
-sensor_reading_t sensors_getUvIntensity();
-sensor_reading_t sensors_getRainingStatus();
+sensor_reading_t sensors_getReading(sensor_id_te id, sensor_measurement_type_te measurement_type);
 
 #endif
