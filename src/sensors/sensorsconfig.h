@@ -1,3 +1,6 @@
+#ifndef SENSORSCONFIG_H
+#define SENSORSCONFIG_H
+
 #define SENSORS_INDICATION_NO_MIN        (0)
 #define SENSORS_INDICATION_NO_MAX        (0)
 
@@ -27,3 +30,5 @@
 
 #define SENSORS_GYML8511_UV_MIN          (0)
 #define SENSORS_GYML8511_UV_MAX          (15)
+
+#endif
