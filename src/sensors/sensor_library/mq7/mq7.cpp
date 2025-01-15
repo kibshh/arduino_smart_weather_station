@@ -8,19 +8,21 @@ static float convertToResistance(int raw_adc)
   return Rs;
 }
 
-static float calculatePpm(float resistance_under_zero)
+float mq7_readPPM()
 {
-  int raw_analog_read = analogRead(MQ7_PIN_ANALOG);
+  float coPPM = NAN;
+#if defined(MQ7_R_ZERO)
+  int raw_analog_read = analogRead(SENSORS_MQ7_PIN_ANALOG);
   float resistance_under_CO = convertToResistance(raw_analog_read);
-  float ratio = resistance_under_CO / resistance_under_zero;
-  float coPPM = pow(MQ7_CALCULATION_POW_BASE_CONSTANT, ((log10(ratio) - MQ7_CALCULATION_CONSTANT_1) / (MQ7_CALCULATION_CONSTANT_2)));
-
+  float ratio = resistance_under_CO / MQ7_R_ZERO;
+  coPPM = pow(MQ7_CALCULATION_POW_BASE_CONSTANT, ((log10(ratio) - MQ7_CALCULATION_CONSTANT_1) / (MQ7_CALCULATION_CONSTANT_2)));
+#endif
   return coPPM;
 }
 
 void mq7_init()
 {
-  pinMode(MQ7_PIN_ANALOG, INPUT);
+  pinMode(SENSORS_MQ7_PIN_ANALOG, INPUT);
   pinMode(MQ7_PIN_PWM_HEATER, OUTPUT);
 
   analogWrite(MQ7_PIN_PWM_HEATER, MQ7_5V_ANALOG_OUTPUT_HEATER); //Start heating
@@ -46,21 +48,6 @@ bool mq7_heatingCycle(bool is_heated_high)
   }
 }
 
-mq7_ppm_reading_t mq7_readPPM() 
-{
-  mq7_ppm_reading_t reading = {0};
-  reading.success = false;
-#if defined(MQ7_R_ZERO)
-  float coPPM = calculatePpm(MQ7_R_ZERO);
-  reading.value = coPPM;
-  if(coPPM >= MQ7_PPM_MINIMUM && coPPM <= MQ7_PPM_MAXIMUM)
-  {
-    reading.success = true;
-  }
-#endif
-  return reading;
-}
-
 #ifdef MQ7_CALIBRATION_ENABLED
   void mq7_calculateResistanceForCalibration()
   {
@@ -73,7 +60,7 @@ mq7_ppm_reading_t mq7_readPPM()
     float Rs = 0;
     for (int i = 0; i < MQ7_NUM_OF_MEASUREMENTS_CALIB; i++) 
     {
-      int raw_adc = analogRead(MQ7_PIN_ANALOG);
+      int raw_adc = analogRead(SENSORS_MQ7_PIN_ANALOG);
       Rs += ((MQ7_ANALOG_INPUT_MAX / raw_adc) - 1) * MQ7_LOAD_RESISTANCE_VAL;
       delay(MQ7_CALIBRATION_DELAY);
     }

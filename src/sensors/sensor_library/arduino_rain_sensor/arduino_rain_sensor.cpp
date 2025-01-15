@@ -1,4 +1,4 @@
-#include "rainsensor.h"
+#include "arduino_rain_sensor.h"
 
 
 void rainsensor_init()

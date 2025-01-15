@@ -3,16 +3,16 @@
 
 display_sensors_config_t display_sensors_config[] =
 {
-  {"Temp",        "C",      DHT11_TEMPERATURE,       DISPLAY_1_DECIMAL},
-  {"Humidity",    "%",      DHT11_HUMIDITY,          DISPLAY_1_DECIMAL},
-  {"Press",       "hPa",    BMP280_PRESSURE,         DISPLAY_1_DECIMAL},
-  {"BPM Temp",    "C",      BMP280_TEMPERATURE,      DISPLAY_1_DECIMAL},
-  {"Altitude",    "m",      BMP280_ALTITUDE,         DISPLAY_0_DECIMALS},
-  {"Luminance",   "lx",     BH1750_LUMINANCE,        DISPLAY_0_DECIMALS},
-  {"Gases PPM",   "",       MQ135_PPM,               DISPLAY_0_DECIMALS},
-  {"CO PPM",      "",       MQ7_COPPM,               DISPLAY_0_DECIMALS},
-  {"UV int",      "",       GYML8511_UV,             DISPLAY_1_DECIMAL},
-  {"Raining",     "",       ARDUINORAIN_RAINING,     DISPLAY_NO_DECIMALS},
+  {"Temp",        "C",      DHT11_TEMPERATURE,       SENSORS_VALUE,      DISPLAY_1_DECIMAL},
+  {"Humidity",    "%",      DHT11_HUMIDITY,          SENSORS_VALUE,      DISPLAY_1_DECIMAL},
+  {"Press",       "hPa",    BMP280_PRESSURE,         SENSORS_VALUE,      DISPLAY_1_DECIMAL},
+  {"BPM Temp",    "C",      BMP280_TEMPERATURE,      SENSORS_VALUE,      DISPLAY_1_DECIMAL},
+  {"Altitude",    "m",      BMP280_ALTITUDE,         SENSORS_VALUE,      DISPLAY_0_DECIMALS},
+  {"Luminance",   "lx",     BH1750_LUMINANCE,        SENSORS_VALUE,      DISPLAY_0_DECIMALS},
+  {"Gases PPM",   "",       MQ135_PPM,               SENSORS_VALUE,      DISPLAY_0_DECIMALS},
+  {"CO PPM",      "",       MQ7_COPPM,               SENSORS_VALUE,      DISPLAY_0_DECIMALS},
+  {"UV int",      "",       GYML8511_UV,             SENSORS_VALUE,      DISPLAY_1_DECIMAL},
+  {"Raining",     "",       ARDUINORAIN_RAINING,     SENSORS_INDICATION, DISPLAY_NO_DECIMALS},
 };
 
 const int num_of_display_functions = sizeof(display_sensors_config) / sizeof(display_sensors_config[0]);
@@ -34,7 +34,7 @@ void display_displayData(uint8_t current_sensor_index)
 
   display_sensors_config_t current_sensor = display_sensors_config[current_sensor_index];
 
-  sensor_reading_t reading = sensors_getReading(current_sensor.id);
+  sensor_reading_t reading = sensors_getReading(current_sensor.id, current_sensor.measurement_type);
 
   String display_string = "";
 

@@ -36,6 +36,7 @@ typedef struct
     String sensor_type;
     String measurement_unit;
     sensor_id_te id;
+    sensor_measurement_type_te measurement_type;
     uint8_t accuracy;
 }display_sensors_config_t;
 

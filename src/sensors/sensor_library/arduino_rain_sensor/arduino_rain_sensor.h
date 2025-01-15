@@ -1,5 +1,5 @@
-#ifndef RAINSENSOR_H
-#define RAINSENSOR_H
+#ifndef ARDUINO_RAIN_SENSOR_H
+#define ARDUINO_RAIN_SENSOR_H
 
 #include <Arduino.h>
 

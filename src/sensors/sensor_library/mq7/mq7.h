@@ -2,10 +2,10 @@
 #define MQ7_H
 
 #include <Arduino.h>
+#include "../../sensorsconfig.h"
 
 #define MQ7_CALIBRATION_ENABLED
 
-#define MQ7_PIN_ANALOG                    (A1)
 #define MQ7_PIN_PWM_HEATER                (9u) //pwm pin
 #define MQ7_LOAD_RESISTANCE_VAL           (10000) //Load resistance in ohms which is connected to from analog output of sensor to ground
 #define MQ7_ANALOG_INPUT_MAX              (1023u)
@@ -28,16 +28,9 @@
 //#define MQ7_R_ZERO 
 
 
-typedef struct
-{
-  boolean success;
-  float value;
-}mq7_ppm_reading_t;
-
-
 void mq7_init();
 bool mq7_heatingCycle(bool is_heated_high); 
-mq7_ppm_reading_t mq7_readPPM();
+float mq7_readPPM();
 #ifdef MQ7_CALIBRATION_ENABLED
   void mq7_calculateResistanceForCalibration();
 #endif
