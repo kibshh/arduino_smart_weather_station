@@ -2,6 +2,7 @@
 #define DISPLAY_H
 
 #include <Arduino.h>
+#include <avr/pgmspace.h>
 #include <LiquidCrystal_I2C.h>
 #include <WString.h>
 #include "../sensors/sensors.h"
@@ -33,8 +34,8 @@ typedef sensor_reading_t (*display_sensorFunction_t)();
 
 typedef struct
 {
-    String sensor_type;
-    String measurement_unit;
+    const char* sensor_type;
+    const char* measurement_unit;
     sensor_id_te id;
     sensor_measurement_type_te measurement_type;
     uint8_t accuracy;

@@ -2,6 +2,7 @@
 #define SENSORS_H
 
 #include <Arduino.h>
+#include <avr/pgmspace.h>
 #include "sensor_library/dht11/dht11.h"
 #include "sensor_library/bmp280/bmp280.h"
 #include "sensor_library/bh1750/bh1750.h"

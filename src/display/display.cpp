@@ -1,7 +1,7 @@
 #include "display.h"
 
 
-display_sensors_config_t display_sensors_config[] =
+const display_sensors_config_t display_sensors_config[] PROGMEM =
 {
   {"Temp",        "C",      DHT11_TEMPERATURE,       SENSORS_VALUE,      DISPLAY_1_DECIMAL},
   {"Humidity",    "%",      DHT11_HUMIDITY,          SENSORS_VALUE,      DISPLAY_1_DECIMAL},
@@ -32,7 +32,10 @@ void display_displayData(uint8_t current_sensor_index)
 {
   lcd.setCursor(0, 0);
 
-  display_sensors_config_t current_sensor = display_sensors_config[current_sensor_index];
+  display_sensors_config_t current_sensor;
+  memcpy_P(&current_sensor, &display_sensors_config[current_sensor_index], sizeof(display_sensors_config_t));
+  const char* sensor_type = (const char*)pgm_read_word(&(current_sensor.sensor_type));
+  const char* measurement_unit = (const char*)pgm_read_word(&(current_sensor.measurement_unit));
 
   sensor_reading_t reading = sensors_getReading(current_sensor.id, current_sensor.measurement_type);
 
@@ -57,11 +60,11 @@ void display_displayData(uint8_t current_sensor_index)
         val = "no";
       }
     }
-    display_string = current_sensor.sensor_type + ": " + val + current_sensor.measurement_unit;
+    display_string = String(sensor_type) + ": " + val + String(measurement_unit);
   }
   else
   {
-    display_string = "Error " + current_sensor.sensor_type;
+    display_string = "Error " + String(sensor_type);
   }
   while (display_string.length() < DISPLAY_LCD_WIDTH) 
   {

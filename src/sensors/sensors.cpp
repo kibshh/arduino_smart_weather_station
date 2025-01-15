@@ -1,6 +1,6 @@
 #include "sensors.h"
 
-sensor_sensors_config_t sensor_sensors_config[]
+const sensor_sensors_config_t sensor_sensors_config[] PROGMEM =
 {
   {SENSORS_DHT11_TEMPERATURE_MIN,     SENSORS_DHT11_TEMPERATURE_MAX,    DHT11_TEMPERATURE,      dht11_readTemperature,          SENSORS_NO_INDICATION_FUNCTION},
   {SENSORS_DHT11_HUMIDITY_MIN,        SENSORS_DHT11_HUMIDITY_MAX,       DHT11_HUMIDITY,         dht11_readHumidity,             SENSORS_NO_INDICATION_FUNCTION},
@@ -35,7 +35,8 @@ sensor_reading_t sensors_getReading(sensor_id_te id, sensor_measurement_type_te 
     size_t sensor_config_len = sizeof(sensor_sensors_config) / sizeof(sensor_sensors_config[0]);
     if(sensor_config_len > id)
     {
-      sensor_sensors_config_t current_sensor = sensor_sensors_config[id];
+      sensor_sensors_config_t current_sensor;
+      memcpy_P(&current_sensor, &sensor_sensors_config[id], sizeof(sensor_sensors_config_t));
 
       if(id == sensor_sensors_config[id].sensor_id)
       {
