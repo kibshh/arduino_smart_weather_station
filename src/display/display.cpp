@@ -3,16 +3,36 @@
 
 const display_sensors_config_t display_sensors_config[] PROGMEM =
 {
-  {"Temp",        "C",      DHT11_TEMPERATURE,       SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_1_DECIMAL},
-  {"Humidity",    "%",      DHT11_HUMIDITY,          SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_1_DECIMAL},
-  {"Press",       "hPa",    BMP280_PRESSURE,         SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_1_DECIMAL},
-  {"BPM Temp",    "C",      BMP280_TEMPERATURE,      SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_1_DECIMAL},
-  {"Altitude",    "m",      BMP280_ALTITUDE,         SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_0_DECIMALS},
-  {"Luminance",   "lx",     BH1750_LUMINANCE,        SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_0_DECIMALS},
-  {"Gases PPM",   "",       MQ135_PPM,               SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_0_DECIMALS},
-  {"CO PPM",      "",       MQ7_COPPM,               SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_0_DECIMALS},
-  {"UV int",      "",       GYML8511_UV,             SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_1_DECIMAL},
-  {"Raining",     "",       ARDUINORAIN_RAINING,     SENSORS_MEASUREMENT_TYPE_INDICATION, DISPLAY_NO_DECIMALS},
+#ifdef DHT11_TEMPERATURE
+  {"Temp",        "C",      DHT11_TEMPERATURE,       DISPLAY_READING_VALUE,      DISPLAY_1_DECIMAL},
+#endif
+#ifdef DHT11_HUMIDITY
+  {"Humidity",    "%",      DHT11_HUMIDITY,          DISPLAY_READING_VALUE,      DISPLAY_1_DECIMAL},
+#endif
+#ifdef BMP280_PRESSURE
+  {"Press",       "hPa",    BMP280_PRESSURE,         DISPLAY_READING_VALUE,      DISPLAY_1_DECIMAL},
+#endif
+#ifdef BMP280_TEMPERATURE
+  {"BPM Temp",    "C",      BMP280_TEMPERATURE,      DISPLAY_READING_VALUE,      DISPLAY_1_DECIMAL},
+#endif
+#ifdef BMP280_ALTITUDE
+  {"Altitude",    "m",      BMP280_ALTITUDE,         DISPLAY_READING_VALUE,      DISPLAY_0_DECIMALS},
+#endif
+#ifdef BH1750_LUMINANCE
+  {"Luminance",   "lx",     BH1750_LUMINANCE,        DISPLAY_READING_VALUE,      DISPLAY_0_DECIMALS},
+#endif
+#ifdef MQ135_PPM
+  {"Gases PPM",   "",       MQ135_PPM,               DISPLAY_READING_VALUE,      DISPLAY_0_DECIMALS},
+#endif
+#ifdef MQ7_COPPM
+  {"CO PPM",      "",       MQ7_COPPM,               DISPLAY_READING_VALUE,      DISPLAY_0_DECIMALS},
+#endif
+#ifdef GYML8511_UV
+  {"UV int",      "",       GYML8511_UV,             DISPLAY_READING_VALUE,      DISPLAY_1_DECIMAL},
+#endif
+#ifdef ARDUINORAIN_RAINING
+  {"Raining",     "",       ARDUINORAIN_RAINING,     DISPLAY_INDICATION,         DISPLAY_NO_DECIMALS},
+#endif
 };
 
 const int num_of_display_functions = sizeof(display_sensors_config) / sizeof(display_sensors_config[0]);
@@ -34,21 +54,21 @@ error_manager_error_code_te display_displayData(data_router_output_input_type in
   switch(input_type)
   {
     case SENSOR_MEASUREMENT:
-      if(DATA_ROUTER_DISPLAY_SENSORS_PAYLOAD_LEN_MIN <= payload_len)
+      if(DATA_ROUTER_INPUT_SENSORS_RETURN_PAYLOAD_MIN_LEN <= payload_len)
       {
         error_code = display_displaySensorMeasurement(payload, payload_len);
       }
       break;
 
     case TIME_MEASUREMENT:
-      if(DATA_ROUTER_DISPLAY_TIME_PAYLOAD_LEN_MIN <= payload_len)
+      if(DATA_ROUTER_INPUT_RTC_RETURN_PAYLOAD_LEN_MIN <= payload_len)
       {
         error_code = display_displayTime(payload, payload_len);
       }
       break;
 
     case I2C_SCAN_OUTPUT:
-      if(DATA_ROUTER_DISPLAY_I2C_SCAN_PAYLOAD_LEN_MIN <= payload_len)
+      if(DATA_ROUTER_INPUT_I2C_SCAN_RETURN_PAYLOAD_LEN_MIN <= payload_len)
       {
         error_code = display_displayI2CScan(payload, payload_len);
       }

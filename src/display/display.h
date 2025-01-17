@@ -5,10 +5,9 @@
 #include <avr/pgmspace.h>
 #include <LiquidCrystal_I2C.h>
 #include <WString.h>
-#include "../sensors/sensors.h"
-#include "../functionality/rtc.h"
 #include "../error_manager/error_manager.h"
 #include "../data_router/data_router_common.h"
+#include "../sensors/sensorsconfig.h"
 
 
 #define DISPLAY_LCD_HEIGHT    (2u)

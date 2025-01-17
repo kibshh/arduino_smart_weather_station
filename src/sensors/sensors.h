@@ -12,7 +12,6 @@
 #include "sensor_library/arduino_rain_sensor/arduino_rain_sensor.h"
 #include "sensorsconfig.h"
 #include "../error_manager/error_manager.h"
-#include "../data_router/data_router_common.h"
 
 #define SENSORS_NO_SENSORS_CONFIGURED         (0u)
 #define SENSORS_NO_INDICATION_FUNCTION        (nullptr)
@@ -21,16 +20,6 @@
 #define SENSORS_MEASUREMENT_TYPE_VALUE        (0u)
 #define SENSORS_MEASUREMENT_TYPE_INDICATION   (1u)
 
-#define DHT11_TEMPERATURE                     (0u)    
-#define DHT11_HUMIDITY                        (1u)
-#define BMP280_PRESSURE                       (2u)
-#define BMP280_TEMPERATURE                    (3u)
-#define BMP280_ALTITUDE                       (4u)
-#define BH1750_LUMINANCE                      (5u)
-#define MQ135_PPM                             (6u)
-#define MQ7_COPPM                             (7u)
-#define GYML8511_UV                           (8u)
-#define ARDUINORAIN_RAINING                   (9u)
 
 typedef struct
 {

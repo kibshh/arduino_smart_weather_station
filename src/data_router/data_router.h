@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 #include "../display/display.h"
+#include "../sensors/sensors.h"
+#include "../functionality/rtc.h"
 #include "../error_manager/error_manager.h"
 #include "data_router_common.h"
 
