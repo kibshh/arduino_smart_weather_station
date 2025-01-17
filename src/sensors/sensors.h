@@ -11,37 +11,34 @@
 #include "sensor_library/mq7/mq7.h"
 #include "sensor_library/arduino_rain_sensor/arduino_rain_sensor.h"
 #include "sensorsconfig.h"
+#include "../error_manager/error_manager.h"
+#include "../data_router/data_router_common.h"
 
-#define SENSORS_NO_SENSORS_CONFIGURED    (0u)
-#define SENSORS_NO_INDICATION_FUNCTION   (nullptr)
-#define SENSORS_NO_VALUE_FUNCTION        (nullptr)
+#define SENSORS_NO_SENSORS_CONFIGURED         (0u)
+#define SENSORS_NO_INDICATION_FUNCTION        (nullptr)
+#define SENSORS_NO_VALUE_FUNCTION             (nullptr)
 
-typedef enum
-{
-  SENSORS_VALUE,
-  SENSORS_INDICATION
-}sensor_measurement_type_te;
+#define SENSORS_MEASUREMENT_TYPE_VALUE        (0u)
+#define SENSORS_MEASUREMENT_TYPE_INDICATION   (1u)
 
-typedef enum
-{
-  DHT11_TEMPERATURE = 0,
-  DHT11_HUMIDITY,
-  BMP280_PRESSURE,
-  BMP280_TEMPERATURE,
-  BMP280_ALTITUDE,
-  BH1750_LUMINANCE,
-  MQ135_PPM,
-  MQ7_COPPM,
-  GYML8511_UV,
-  ARDUINORAIN_RAINING
-}sensor_id_te;
+#define DHT11_TEMPERATURE                     (0u)    
+#define DHT11_HUMIDITY                        (1u)
+#define BMP280_PRESSURE                       (2u)
+#define BMP280_TEMPERATURE                    (3u)
+#define BMP280_ALTITUDE                       (4u)
+#define BH1750_LUMINANCE                      (5u)
+#define MQ135_PPM                             (6u)
+#define MQ7_COPPM                             (7u)
+#define GYML8511_UV                           (8u)
+#define ARDUINORAIN_RAINING                   (9u)
 
 typedef struct
 {
   float value;
-  sensor_measurement_type_te measurement_type_switch;
-  boolean success;
-  boolean indication;
+  uint8_t sensor_id;
+  uint8_t measurement_type_switch;
+  error_manager_error_code_te error_code;
+  bool indication;
 }sensor_reading_t;
 
 typedef float (*sensor_sensor_value_function_t)();
@@ -51,13 +48,13 @@ typedef struct
 {
   float min_value;
   float max_value;
-  sensor_id_te sensor_id;
+  uint8_t sensor_id;
   sensor_sensor_value_function_t sensor_value_function;
   sensor_sensor_indication_function_t sensor_indication_function;
 }sensor_sensors_config_t;
 
 
 void sensors_init();
-sensor_reading_t sensors_getReading(sensor_id_te id, sensor_measurement_type_te measurement_type);
+sensor_reading_t sensors_getReading(uint8_t id, uint8_t measurement_type);
 
 #endif

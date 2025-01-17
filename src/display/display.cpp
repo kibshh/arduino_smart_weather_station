@@ -3,55 +3,105 @@
 
 const display_sensors_config_t display_sensors_config[] PROGMEM =
 {
-  {"Temp",        "C",      DHT11_TEMPERATURE,       SENSORS_VALUE,      DISPLAY_1_DECIMAL},
-  {"Humidity",    "%",      DHT11_HUMIDITY,          SENSORS_VALUE,      DISPLAY_1_DECIMAL},
-  {"Press",       "hPa",    BMP280_PRESSURE,         SENSORS_VALUE,      DISPLAY_1_DECIMAL},
-  {"BPM Temp",    "C",      BMP280_TEMPERATURE,      SENSORS_VALUE,      DISPLAY_1_DECIMAL},
-  {"Altitude",    "m",      BMP280_ALTITUDE,         SENSORS_VALUE,      DISPLAY_0_DECIMALS},
-  {"Luminance",   "lx",     BH1750_LUMINANCE,        SENSORS_VALUE,      DISPLAY_0_DECIMALS},
-  {"Gases PPM",   "",       MQ135_PPM,               SENSORS_VALUE,      DISPLAY_0_DECIMALS},
-  {"CO PPM",      "",       MQ7_COPPM,               SENSORS_VALUE,      DISPLAY_0_DECIMALS},
-  {"UV int",      "",       GYML8511_UV,             SENSORS_VALUE,      DISPLAY_1_DECIMAL},
-  {"Raining",     "",       ARDUINORAIN_RAINING,     SENSORS_INDICATION, DISPLAY_NO_DECIMALS},
+  {"Temp",        "C",      DHT11_TEMPERATURE,       SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_1_DECIMAL},
+  {"Humidity",    "%",      DHT11_HUMIDITY,          SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_1_DECIMAL},
+  {"Press",       "hPa",    BMP280_PRESSURE,         SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_1_DECIMAL},
+  {"BPM Temp",    "C",      BMP280_TEMPERATURE,      SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_1_DECIMAL},
+  {"Altitude",    "m",      BMP280_ALTITUDE,         SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_0_DECIMALS},
+  {"Luminance",   "lx",     BH1750_LUMINANCE,        SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_0_DECIMALS},
+  {"Gases PPM",   "",       MQ135_PPM,               SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_0_DECIMALS},
+  {"CO PPM",      "",       MQ7_COPPM,               SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_0_DECIMALS},
+  {"UV int",      "",       GYML8511_UV,             SENSORS_MEASUREMENT_TYPE_VALUE,      DISPLAY_1_DECIMAL},
+  {"Raining",     "",       ARDUINORAIN_RAINING,     SENSORS_MEASUREMENT_TYPE_INDICATION, DISPLAY_NO_DECIMALS},
 };
 
 const int num_of_display_functions = sizeof(display_sensors_config) / sizeof(display_sensors_config[0]);
-
 
 LiquidCrystal_I2C lcd(DISPLAY_LCD_I2C_ADDDR, DISPLAY_LCD_WIDTH, DISPLAY_LCD_HEIGHT);
 
 void display_init()
 {
   lcd.begin(DISPLAY_LCD_WIDTH, DISPLAY_LCD_HEIGHT); // Initialize a 16x2 LCD
-  lcd.setCursor(0, 0);
+  lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_START_ROW);
   lcd.backlight();
   lcd.noCursor();
 }
 
-void display_displayData(uint8_t current_sensor_index)
+error_manager_error_code_te display_displayData(data_router_output_input_type input_type, uint8_t *payload, size_t payload_len)
 {
-  lcd.setCursor(0, 0);
+  error_manager_error_code_te error_code = ERROR_CODE_INVALID_OUTPUT_PAYLOAD_LEN;
 
-  display_sensors_config_t current_sensor;
-  memcpy_P(&current_sensor, &display_sensors_config[current_sensor_index], sizeof(display_sensors_config_t));
-  const char* sensor_type = (const char*)pgm_read_word(&(current_sensor.sensor_type));
-  const char* measurement_unit = (const char*)pgm_read_word(&(current_sensor.measurement_unit));
-
-  sensor_reading_t reading = sensors_getReading(current_sensor.id, current_sensor.measurement_type);
-
-  String display_string = "";
-
-  if(true == reading.success)
+  switch(input_type)
   {
+    case SENSOR_MEASUREMENT:
+      if(DATA_ROUTER_DISPLAY_SENSORS_PAYLOAD_LEN_MIN <= payload_len)
+      {
+        error_code = display_displaySensorMeasurement(payload, payload_len);
+      }
+      break;
+
+    case TIME_MEASUREMENT:
+      if(DATA_ROUTER_DISPLAY_TIME_PAYLOAD_LEN_MIN <= payload_len)
+      {
+        error_code = display_displayTime(payload, payload_len);
+      }
+      break;
+
+    case I2C_SCAN_OUTPUT:
+      if(DATA_ROUTER_DISPLAY_I2C_SCAN_PAYLOAD_LEN_MIN <= payload_len)
+      {
+        error_code = display_displayI2CScan(payload, payload_len);
+      }
+      break;
+
+    default:
+      error_code = ERROR_CODE_INVALID_OUTPUT_PARAMETERS;
+      break;
+  }
+
+  return error_code;
+}
+
+error_manager_error_code_te display_displaySensorMeasurement(uint8_t *payload, size_t payload_len)
+{
+  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
+
+  lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_SENSORS_ROW);
+
+  uint8_t sensor_id = payload[DATA_ROUTER_INPUT_SENSORS_RETURN_ID_POS];
+  bool is_sensor_configured = false;
+  uint8_t sensor_index = 0;
+  for (uint8_t index = 0; index < num_of_display_functions; index++)
+  {
+    if(display_sensors_config[index].id == sensor_id)
+    {
+      is_sensor_configured = true;
+      sensor_index = index;
+      break;
+    }
+  }
+
+  if(true == is_sensor_configured)
+  {
+    uint8_t measurement_type = payload[DATA_ROUTER_INPUT_SENSORS_RETURN_MEASUREMENT_TYPE_POS];
+
+    display_sensors_config_t current_sensor;
+    memcpy_P(&current_sensor, &display_sensors_config[sensor_index], sizeof(display_sensors_config_t));
+    const char* sensor_type = (const char*)pgm_read_word(&(current_sensor.sensor_type));
+    const char* measurement_unit = (const char*)pgm_read_word(&(current_sensor.measurement_unit));
+    String display_string = "";
     String val = "";
 
-    if(DISPLAY_READING_VALUE == reading.measurement_type_switch)
+    if(DISPLAY_READING_VALUE == measurement_type)
     {
-      val = String(reading.value, current_sensor.accuracy);
+      float value;
+      memcpy(&value, &(payload[DATA_ROUTER_INPUT_SENSORS_RETURN_VALUE_POS]), DATA_ROUTER_INPUT_SENSORS_RETURN_VALUE_LEN);
+      val = String(value, current_sensor.accuracy);
     }
-    else
+    else if(DISPLAY_INDICATION == measurement_type)
     {
-      if(true == reading.indication)
+      bool indication = (bool)payload[DATA_ROUTER_INPUT_SENSORS_RETURN_INDICATION_POS];
+      if(true == indication)
       {
         val = "yes";
       }
@@ -60,38 +110,71 @@ void display_displayData(uint8_t current_sensor_index)
         val = "no";
       }
     }
+    else
+    {
+      error_code = ERROR_CODE_DISPLAY_INVALID_MEASUREMENT_TYPE;
+    }
+
     display_string = String(sensor_type) + ": " + val + String(measurement_unit);
+    while (display_string.length() < DISPLAY_LCD_WIDTH) 
+    {
+      display_string += ' '; //Add spaces to fill to the end
+    }
+    lcd.print(display_string);
   }
   else
   {
-    display_string = "Error " + String(sensor_type);
+    error_code = ERROR_CODE_DISPLAY_SENSOR_NOT_CONFIGURED;
   }
-  while (display_string.length() < DISPLAY_LCD_WIDTH) 
-  {
-    display_string += ' '; //Add spaces to fill to the end
-  }
-  lcd.print(display_string);
+
+  return error_code;
 }
 
-void display_updateTime()
+error_manager_error_code_te display_displayTime(uint8_t *payload, size_t payload_len)
 {
-  lcd.setCursor(0, 1);
+  lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_TIME_ROW);
 
-  rtc_time_reading_t time_reading = rtc_getTime();
-  rtc_date_reading_t date_reading = rtc_getDate();
+  uint16_t year;
+  memcpy(&year, &(payload[DATA_ROUTER_INPUT_RTC_RETURN_YEAR_POS]), DATA_ROUTER_INPUT_RTC_RETURN_YEAR_LEN);
+  uint8_t month = payload[DATA_ROUTER_INPUT_RTC_RETURN_MONTH_POS];
+  uint8_t day = payload[DATA_ROUTER_INPUT_RTC_RETURN_DAY_POS];
+  uint8_t hour = payload[DATA_ROUTER_INPUT_RTC_RETURN_HOUR_POS];
+  uint8_t mins = payload[DATA_ROUTER_INPUT_RTC_RETURN_MINS_POS];
+  uint8_t secs = payload[DATA_ROUTER_INPUT_RTC_RETURN_SECS_POS];
 
-  if(true == time_reading.success && true == date_reading.success)
+  String time_string = (hour < DISPLAY_TWO_CIPHER_NUMBER ? "0" : "") + String(hour) + ":" +
+                        (mins < DISPLAY_TWO_CIPHER_NUMBER ? "0" : "") + String(mins) + " " +
+                        (day < DISPLAY_TWO_CIPHER_NUMBER ? "0" : "") + String(day) + "/" +
+                        (month < DISPLAY_TWO_CIPHER_NUMBER ? "0" : "") + String(month) + "/" +
+                        String(year);
+  lcd.print(time_string);
+
+  return ERROR_CODE_NO_ERROR;
+}
+
+error_manager_error_code_te display_displayI2CScan(uint8_t *payload, size_t payload_len)
+{
+  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
+
+  lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_I2C_SCAN_ROW);
+
+  uint8_t number_of_addresses = payload[DATA_ROUTER_INPUT_I2C_SCAN_RETURN_NUM_OF_ADDR_POS];
+  uint8_t selected_i2c_address = payload[DATA_ROUTER_INPUT_I2C_SCAN_RETURN_CURRENT_ADDR_POS];
+
+  if(selected_i2c_address < number_of_addresses)
   {
-    String time_string = (time_reading.currentTime.hour < 10 ? "0" : "") + String(time_reading.currentTime.hour) + ":" +
-                         (time_reading.currentTime.mins < 10 ? "0" : "") + String(time_reading.currentTime.mins) + " " +
-                         (date_reading.currentDate.day < 10 ? "0" : "") + String(date_reading.currentDate.day) + "/" +
-                         (date_reading.currentDate.month < 10 ? "0" : "") + String(date_reading.currentDate.month) + "/" +
-                         String(date_reading.currentDate.year);
-
-    lcd.print(time_string);
+    uint8_t i2c_address = payload[DATA_ROUTER_INPUT_I2C_SCAN_RETURN_STARTING_ADDR_POS + selected_i2c_address];
+    String display_string = "I2C Addr: 0x" + String(i2c_address < DISPLAY_TWO_CIPHER_NUMBER ? "0" : "") + String(i2c_address, HEX);
+    while (display_string.length() < DISPLAY_LCD_WIDTH) 
+    {
+      display_string += ' '; //Add spaces to fill to the end
+    }
+    lcd.print(display_string);
   }
   else
   {
-    lcd.print("Error time");
-  }  
+    error_code = ERROR_CODE_DISPLAY_CURRENT_I2C_ADDR_OUT_OF_RANGE;
+  }
+
+  return error_code;
 }

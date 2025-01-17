@@ -7,11 +7,19 @@
 #include <WString.h>
 #include "../sensors/sensors.h"
 #include "../functionality/rtc.h"
+#include "../error_manager/error_manager.h"
+#include "../data_router/data_router_common.h"
 
 
 #define DISPLAY_LCD_HEIGHT    (2u)
 #define DISPLAY_LCD_WIDTH     (16u)
 #define DISPLAY_LCD_I2C_ADDDR (0x27)
+
+#define DISPLAY_START_COLUMN  (0u)
+#define DISPLAY_START_ROW     (0u)
+#define DISPLAY_SENSORS_ROW   (0u)
+#define DISPLAY_TIME_ROW      (1u)
+#define DISPLAY_I2C_SCAN_ROW  (0u)
 
 #define DISPLAY_READING_VALUE (0u)
 #define DISPLAY_INDICATION    (1u)
@@ -27,27 +35,26 @@
 
 #define DISPLAY_DATETIME_FORMATER_LEN (3u)
 
+#define DISPLAY_TWO_CIPHER_NUMBER     (10u)
+
 #define DISPLAY_DISPLAY_INTERVAL_MS        (2000)  //2 seconds
 #define DISPLAY_TIME_DISPLAY_INTERVAL_MS   (30000) //30 seconds
-
-typedef sensor_reading_t (*display_sensorFunction_t)();
 
 typedef struct
 {
     const char* sensor_type;
     const char* measurement_unit;
-    sensor_id_te id;
-    sensor_measurement_type_te measurement_type;
+    uint8_t id;
+    uint8_t measurement_type;
     uint8_t accuracy;
 }display_sensors_config_t;
 
-extern LiquidCrystal_I2C lcd;
 extern const int num_of_display_functions;
 
 void display_init();
-void display_displayData(uint8_t current_sensor_index);
-void display_displayDate();
-void display_displayTime();
-void display_updateTime();
+error_manager_error_code_te display_displayData(data_router_output_input_type input_type, uint8_t *payload, size_t payload_len);
+error_manager_error_code_te display_displaySensorMeasurement(uint8_t *payload, size_t payload_len);
+error_manager_error_code_te display_displayTime(uint8_t *payload, size_t payload_len);
+error_manager_error_code_te display_displayI2CScan(uint8_t *payload, size_t payload_len);
 
 #endif

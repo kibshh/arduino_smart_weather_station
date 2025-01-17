@@ -5,6 +5,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <RTClib.h>
+#include "../error_manager/error_manager.h"
 
 
 #define RTC_COMPILE_DATE    __DATE__
@@ -26,35 +27,19 @@
 
 typedef struct
 {
+  error_manager_error_code_te error_code;
   uint16_t year; 
   uint8_t month;
   uint8_t day;
-}rtc_date_t;
-
-typedef struct
-{
-  bool success;
-  rtc_date_t currentDate;
-}rtc_date_reading_t;
-
-typedef struct
-{
   uint8_t hour;
   uint8_t mins;
   uint8_t secs;
-}rtc_time_t;
-
-typedef struct
-{
-  bool success;
-  rtc_time_t currentTime;
-}rtc_time_reading_t;
+}rtc_reading_t;
 
 extern RTC_DS3231 rtc;
 
 
 void rtc_init();
-rtc_time_reading_t rtc_getTime();
-rtc_date_reading_t rtc_getDate();
+rtc_reading_t rtc_getTime();
 
 #endif

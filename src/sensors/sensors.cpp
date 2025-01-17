@@ -25,46 +25,81 @@ void sensors_init()
   gy_ml8511_init();
 }
 
-sensor_reading_t sensors_getReading(sensor_id_te id, sensor_measurement_type_te measurement_type)
+sensor_reading_t sensors_getReading(uint8_t id, uint8_t measurement_type)
 {
   sensor_reading_t reading;
-  reading.success = false;
+  reading.error_code = ERROR_CODE_SENSORS_NO_SENSORS_CONFIGURED;
 
   if(SENSORS_NO_SENSORS_CONFIGURED != sizeof(sensor_sensors_config))
   {
     size_t sensor_config_len = sizeof(sensor_sensors_config) / sizeof(sensor_sensors_config[0]);
-    if(sensor_config_len > id)
+    bool is_sensor_configured = false;
+    uint8_t sensor_index = 0;
+
+    for (uint8_t index = 0; index < sensor_config_len; index++)
+    {
+      if(sensor_sensors_config[index].sensor_id == id)
+      {
+        is_sensor_configured = true;
+        sensor_index = index;
+        break;
+      }
+    }
+    
+    if(true == is_sensor_configured)
     {
       sensor_sensors_config_t current_sensor;
-      memcpy_P(&current_sensor, &sensor_sensors_config[id], sizeof(sensor_sensors_config_t));
+      memcpy_P(&current_sensor, &sensor_sensors_config[sensor_index], sizeof(sensor_sensors_config_t));
+      reading.sensor_id = id;
 
-      if(id == sensor_sensors_config[id].sensor_id)
+      if(SENSORS_MEASUREMENT_TYPE_VALUE == measurement_type)
       {
-        if(SENSORS_VALUE == measurement_type)
+        if(SENSORS_NO_VALUE_FUNCTION != current_sensor.sensor_value_function)
         {
-          if(SENSORS_NO_VALUE_FUNCTION != current_sensor.sensor_value_function)
+          reading.measurement_type_switch = SENSORS_MEASUREMENT_TYPE_VALUE;
+          reading.value = current_sensor.sensor_value_function();
+          if(!isnan(reading.value))
           {
-            reading.measurement_type_switch = SENSORS_VALUE;
-            reading.value = current_sensor.sensor_value_function();
-            if(!isnan(reading.value))
+            if(reading.value > current_sensor.min_value && reading.value < current_sensor.max_value)
             {
-              if(reading.value > current_sensor.min_value && reading.value < current_sensor.max_value)
-              {
-                reading.success = true;
-              }
+              reading.error_code = ERROR_CODE_NO_ERROR;
             }
+            else
+            {
+              reading.error_code = ERROR_CODE_SENSORS_ABNORMAL_VALUE;
+            }
+          }
+          else
+          {
+            reading.error_code = ERROR_CODE_SENSORS_INVALID_VALUE_FROM_SENSOR;
           }
         }
         else
         {
-          if(SENSORS_NO_INDICATION_FUNCTION != current_sensor.sensor_indication_function)
-          {
-            reading.measurement_type_switch = SENSORS_INDICATION;
-            reading.indication = current_sensor.sensor_indication_function();
-            reading.success = true;
-          }
+          reading.error_code = ERROR_CODE_SENSORS_MEASUREMENT_TYPE_MISSING_FUNCTION;
         }
       }
+      else if(SENSORS_MEASUREMENT_TYPE_INDICATION == measurement_type)
+      {
+        if(SENSORS_NO_INDICATION_FUNCTION != current_sensor.sensor_indication_function)
+        {
+          reading.measurement_type_switch = SENSORS_MEASUREMENT_TYPE_INDICATION;
+          reading.indication = current_sensor.sensor_indication_function();
+          reading.error_code = ERROR_CODE_NO_ERROR;
+        }
+        else
+        {
+          reading.error_code = ERROR_CODE_SENSORS_MEASUREMENT_TYPE_MISSING_FUNCTION;
+        }
+      }
+      else
+      {
+        reading.error_code = ERROR_CODE_SENSORS_INVALID_MEASUREMENT_TYPE;
+      }
+    }
+    else
+    {
+      reading.error_code = ERROR_CODE_SENSORS_SENSOR_NOT_FOUND;
     }
   }
   return reading;
