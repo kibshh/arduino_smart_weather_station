@@ -26,9 +26,14 @@ typedef struct
   float value;
   uint8_t sensor_id;
   uint8_t measurement_type_switch;
-  error_manager_error_code_te error_code;
   bool indication;
 }sensor_reading_t;
+
+typedef struct
+{
+  sensor_reading_t sensor_reading;
+  error_manager_error_code_te error_code;
+} sensor_return_t;
 
 typedef float (*sensor_sensor_value_function_t)();
 typedef bool (*sensor_sensor_indication_function_t)();
@@ -44,6 +49,6 @@ typedef struct
 
 
 void sensors_init();
-sensor_reading_t sensors_getReading(uint8_t id, uint8_t measurement_type);
+sensor_return_t sensors_getReading(uint8_t id, uint8_t measurement_type);
 
 #endif

@@ -27,7 +27,6 @@
 
 typedef struct
 {
-  error_manager_error_code_te error_code;
   uint16_t year; 
   uint8_t month;
   uint8_t day;
@@ -36,10 +35,13 @@ typedef struct
   uint8_t secs;
 }rtc_reading_t;
 
-extern RTC_DS3231 rtc;
-
+typedef struct
+{
+  rtc_reading_t rtc_reading;
+  error_manager_error_code_te error_code;
+} rtc_return_t;
 
 void rtc_init();
-rtc_reading_t rtc_getTime();
+rtc_return_t rtc_getTime();
 
 #endif

@@ -47,53 +47,45 @@ void display_init()
   lcd.noCursor();
 }
 
-error_manager_error_code_te display_displayData(data_router_output_input_type input_type, uint8_t *payload, size_t payload_len)
+error_manager_error_code_te display_displayData(data_router_input_data_ts data)
 {
-  error_manager_error_code_te error_code = ERROR_CODE_INVALID_OUTPUT_PAYLOAD_LEN;
+  error_manager_error_code_te error_code = ERROR_CODE_INVALID_INPUT_TYPE;
 
   switch(input_type)
   {
     case SENSOR_MEASUREMENT:
-      if(DATA_ROUTER_INPUT_SENSORS_RETURN_PAYLOAD_MIN_LEN <= payload_len)
-      {
-        error_code = display_displaySensorMeasurement(payload, payload_len);
-      }
+      error_code = display_displaySensorMeasurement(data.input_return.sensor_reading);
       break;
 
     case TIME_MEASUREMENT:
-      if(DATA_ROUTER_INPUT_RTC_RETURN_PAYLOAD_LEN_MIN <= payload_len)
-      {
-        error_code = display_displayTime(payload, payload_len);
-      }
+      error_code = display_displayTime(data.input_return.rtc_reading);
       break;
 
-    case I2C_SCAN_OUTPUT:
+    /* case I2C_SCAN_OUTPUT:
       if(DATA_ROUTER_INPUT_I2C_SCAN_RETURN_PAYLOAD_LEN_MIN <= payload_len)
       {
         error_code = display_displayI2CScan(payload, payload_len);
       }
-      break;
+      break; */
 
     default:
-      error_code = ERROR_CODE_INVALID_OUTPUT_PARAMETERS;
       break;
   }
 
   return error_code;
 }
 
-error_manager_error_code_te display_displaySensorMeasurement(uint8_t *payload, size_t payload_len)
+error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_t sensor_data)
 {
   error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
   lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_SENSORS_ROW);
 
-  uint8_t sensor_id = payload[DATA_ROUTER_INPUT_SENSORS_RETURN_ID_POS];
   bool is_sensor_configured = false;
   uint8_t sensor_index = 0;
   for (uint8_t index = 0; index < num_of_display_functions; index++)
   {
-    if(display_sensors_config[index].id == sensor_id)
+    if(display_sensors_config[index].id == sensor_data.sensor_id)
     {
       is_sensor_configured = true;
       sensor_index = index;
@@ -103,8 +95,6 @@ error_manager_error_code_te display_displaySensorMeasurement(uint8_t *payload, s
 
   if(true == is_sensor_configured)
   {
-    uint8_t measurement_type = payload[DATA_ROUTER_INPUT_SENSORS_RETURN_MEASUREMENT_TYPE_POS];
-
     display_sensors_config_t current_sensor;
     memcpy_P(&current_sensor, &display_sensors_config[sensor_index], sizeof(display_sensors_config_t));
     const char* sensor_type = (const char*)pgm_read_word(&(current_sensor.sensor_type));
@@ -112,16 +102,14 @@ error_manager_error_code_te display_displaySensorMeasurement(uint8_t *payload, s
     String display_string = "";
     String val = "";
 
-    if(DISPLAY_READING_VALUE == measurement_type)
+    if(DISPLAY_READING_VALUE == sensor_data.measurement_type_switch)
     {
-      float value;
-      memcpy(&value, &(payload[DATA_ROUTER_INPUT_SENSORS_RETURN_VALUE_POS]), DATA_ROUTER_INPUT_SENSORS_RETURN_VALUE_LEN);
+      float value = sensor_data.value;
       val = String(value, current_sensor.accuracy);
     }
-    else if(DISPLAY_INDICATION == measurement_type)
+    else if(DISPLAY_INDICATION == sensor_data.measurement_type_switch)
     {
-      bool indication = (bool)payload[DATA_ROUTER_INPUT_SENSORS_RETURN_INDICATION_POS];
-      if(true == indication)
+      if(true == sensor_data.indication)
       {
         val = "yes";
       }
@@ -146,21 +134,19 @@ error_manager_error_code_te display_displaySensorMeasurement(uint8_t *payload, s
   {
     error_code = ERROR_CODE_DISPLAY_SENSOR_NOT_CONFIGURED;
   }
-
   return error_code;
 }
 
-error_manager_error_code_te display_displayTime(uint8_t *payload, size_t payload_len)
+error_manager_error_code_te display_displayTime(rtc_reading_t time_data)
 {
   lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_TIME_ROW);
 
-  uint16_t year;
-  memcpy(&year, &(payload[DATA_ROUTER_INPUT_RTC_RETURN_YEAR_POS]), DATA_ROUTER_INPUT_RTC_RETURN_YEAR_LEN);
-  uint8_t month = payload[DATA_ROUTER_INPUT_RTC_RETURN_MONTH_POS];
-  uint8_t day = payload[DATA_ROUTER_INPUT_RTC_RETURN_DAY_POS];
-  uint8_t hour = payload[DATA_ROUTER_INPUT_RTC_RETURN_HOUR_POS];
-  uint8_t mins = payload[DATA_ROUTER_INPUT_RTC_RETURN_MINS_POS];
-  uint8_t secs = payload[DATA_ROUTER_INPUT_RTC_RETURN_SECS_POS];
+  uint16_t year = time_data.year;
+  uint8_t month = time_data.month;
+  uint8_t day = time_data.day;
+  uint8_t hour = time_data.hour;
+  uint8_t mins = time_data.mins;
+  uint8_t secs = time_data.secs;
 
   String time_string = (hour < DISPLAY_TWO_CIPHER_NUMBER ? "0" : "") + String(hour) + ":" +
                         (mins < DISPLAY_TWO_CIPHER_NUMBER ? "0" : "") + String(mins) + " " +
@@ -172,6 +158,7 @@ error_manager_error_code_te display_displayTime(uint8_t *payload, size_t payload
   return ERROR_CODE_NO_ERROR;
 }
 
+/*
 error_manager_error_code_te display_displayI2CScan(uint8_t *payload, size_t payload_len)
 {
   error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
@@ -198,3 +185,4 @@ error_manager_error_code_te display_displayI2CScan(uint8_t *payload, size_t payl
 
   return error_code;
 }
+*/

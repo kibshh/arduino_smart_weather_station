@@ -17,11 +17,11 @@ void rtc_init()
   }
 }
 
-rtc_reading_t rtc_getTime()
+rtc_return_t rtc_getTime()
 {
   DateTime now = rtc.now();
 
-  rtc_reading_t new_reading = {.error_code=ERROR_CODE_INTERNAL_ERROR};
+  rtc_return_t new_reading = {.error_code=ERROR_CODE_INTERNAL_ERROR};
 
   if(now.hour() >= RTC_MIN_HOUR && now.hour() <= RTC_MAX_HOUR && 
      now.minute() >= RTC_MIN_MINUTE && now.minute() <= RTC_MAX_MINUTE && 
@@ -30,12 +30,12 @@ rtc_reading_t rtc_getTime()
      now.month() >= RTC_MIN_MONTH && now.month() <= RTC_MAX_MONTH &&
      now.day() >= RTC_MIN_DAY && now.day() <= RTC_MAX_DAY)
   {
-    new_reading.year = now.year();
-    new_reading.month = now.month();
-    new_reading.day = now.day();
-    new_reading.hour = now.hour();
-    new_reading.mins = now.minute();
-    new_reading.secs = now.second();
+    new_reading.rtc_reading.year = now.year();
+    new_reading.rtc_reading.month = now.month();
+    new_reading.rtc_reading.day = now.day();
+    new_reading.rtc_reading.hour = now.hour();
+    new_reading.rtc_reading.mins = now.minute();
+    new_reading.rtc_reading.secs = now.second();
 
     new_reading.error_code = ERROR_CODE_NO_ERROR;
   }

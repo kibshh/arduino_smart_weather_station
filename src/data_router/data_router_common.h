@@ -4,10 +4,6 @@
 #include <Arduino.h>
 #include "../error_manager/error_manager.h"
 
-#define DATA_ROUTER_RECEIVE_NO_PAYLOAD                           (nullptr)
-#define DATA_ROUTER_RECEIVE_NO_PAYLOAD_SIZE                      (0u)
-
-/* INPUT COMPONENT - SENSORS */
 /* SENSORS INPUT PARAMETERS */
 #define DATA_ROUTER_INPUT_SENSORS_PARAMS_SENSOR_ID_POS           (0u)
 #define DATA_ROUTER_INPUT_SENSORS_PARAMS_SENSOR_ID_LEN           (1u)
@@ -15,57 +11,6 @@
 #define DATA_ROUTER_INPUT_SENSORS_PARAMS_MEASUREMENT_TYPE_LEN    (1u)
 #define DATA_ROUTER_INPUT_SENSORS_PARAMS_LEN                     (DATA_ROUTER_INPUT_SENSORS_PARAMS_SENSOR_ID_LEN + DATA_ROUTER_INPUT_SENSORS_PARAMS_MEASUREMENT_TYPE_LEN)
 /* ********************************* */
-/* SENSORS OUTPUT DATA */
-#define DATA_ROUTER_INPUT_SENSORS_RETURN_MEASUREMENT_TYPE_POS    (0u)
-#define DATA_ROUTER_INPUT_SENSORS_RETURN_MEASUREMENT_TYPE_LEN    (1u)
-#define DATA_ROUTER_INPUT_SENSORS_RETURN_VALUE_POS               (1u)
-#define DATA_ROUTER_INPUT_SENSORS_RETURN_VALUE_LEN               (sizeof(float))
-#define DATA_ROUTER_INPUT_SENSORS_RETURN_INDICATION_POS          (DATA_ROUTER_INPUT_SENSORS_RETURN_VALUE_LEN + 1)
-#define DATA_ROUTER_INPUT_SENSORS_RETURN_INDICATION_LEN          (1u)
-#define DATA_ROUTER_INPUT_SENSORS_RETURN_ID_POS                  (DATA_ROUTER_INPUT_SENSORS_RETURN_INDICATION_POS + 1)
-#define DATA_ROUTER_INPUT_SENSORS_RETURN_ID_LEN                  (1u)
-#define DATA_ROUTER_INPUT_SENSORS_RETURN_LEN                     ((DATA_ROUTER_INPUT_SENSORS_RETURN_VALUE_LEN) + (DATA_ROUTER_INPUT_SENSORS_RETURN_MEASUREMENT_TYPE_LEN) + (DATA_ROUTER_INPUT_SENSORS_RETURN_MEASUREMENT_TYPE_LEN) + (DATA_ROUTER_INPUT_SENSORS_RETURN_ID_LEN))
-#define DATA_ROUTER_INPUT_SENSORS_RETURN_PAYLOAD_MIN_LEN         (DATA_ROUTER_INPUT_SENSORS_RETURN_LEN)
-/* ********************************* */
-/* END OF INPUT COMPONENT - SENSORS */
-
-/* INPUT COMPONENT - REAL TIME CLOCK (RTC) */
-/* RTC OUTPUT DATA  */
-#define DATA_ROUTER_INPUT_RTC_RETURN_YEAR_POS                    (0u)
-#define DATA_ROUTER_INPUT_RTC_RETURN_YEAR_LEN                    (2u)
-#define DATA_ROUTER_INPUT_RTC_RETURN_MONTH_POS                   (2u)
-#define DATA_ROUTER_INPUT_RTC_RETURN_MONTH_LEN                   (1u)
-#define DATA_ROUTER_INPUT_RTC_RETURN_DAY_POS                     (3u)
-#define DATA_ROUTER_INPUT_RTC_RETURN_DAY_LEN                     (1u)
-#define DATA_ROUTER_INPUT_RTC_RETURN_HOUR_POS                    (4u)
-#define DATA_ROUTER_INPUT_RTC_RETURN_HOUR_LEN                    (1u)
-#define DATA_ROUTER_INPUT_RTC_RETURN_MINS_POS                    (5u)
-#define DATA_ROUTER_INPUT_RTC_RETURN_MINS_LEN                    (1u)
-#define DATA_ROUTER_INPUT_RTC_RETURN_SECS_POS                    (6u)
-#define DATA_ROUTER_INPUT_RTC_RETURN_SECS_LEN                    (1u)
-#define DATA_ROUTER_INPUT_RTC_RETURN_LEN                         (DATA_ROUTER_INPUT_RTC_RETURN_YEAR_LEN + DATA_ROUTER_INPUT_RTC_RETURN_MONTH_LEN + DATA_ROUTER_INPUT_RTC_RETURN_DAY_LEN + DATA_ROUTER_INPUT_RTC_RETURN_HOUR_LEN + DATA_ROUTER_INPUT_RTC_RETURN_MINS_LEN + DATA_ROUTER_INPUT_RTC_RETURN_SECS_LEN)
-#define DATA_ROUTER_INPUT_RTC_RETURN_PAYLOAD_LEN_MIN             (DATA_ROUTER_INPUT_RTC_RETURN_LEN)
-/* ********************************* */
-/* END OF INPUT COMPONENT - RTC */
-
-/* INPUT COMPONENT - I2C SCANNER */
-/* I2C SCANNER OUTPUT DATA  */
-#define DATA_ROUTER_INPUT_I2C_SCAN_RETURN_NUM_OF_ADDR_POS        (0u)
-#define DATA_ROUTER_INPUT_I2C_SCAN_RETURN_NUM_OF_ADDR_LEN        (1u)
-#define DATA_ROUTER_INPUT_I2C_SCAN_RETURN_CURRENT_ADDR_POS       (1u)
-#define DATA_ROUTER_INPUT_I2C_SCAN_RETURN_CURRENT_ADDR_LEN       (1u)
-#define DATA_ROUTER_INPUT_I2C_SCAN_RETURN_STARTING_ADDR_POS      (2u)
-#define DATA_ROUTER_INPUT_I2C_SCAN_RETURN_STARTING_ADDR_LEN      (1u)
-#define DATA_ROUTER_INPUT_I2C_SCAN_RETURN_PAYLOAD_LEN_MIN        (2u)
-/* ********************************* */
-/* END OF INPUT COMPONENT - I2C SCANNER */
-
-typedef struct
-{
-    error_manager_error_code_te error_code;
-    uint8_t *payload;
-    size_t payload_len;
-} data_router_receive_ts;
 
 typedef enum
 {
@@ -80,11 +25,15 @@ typedef enum
     OUTPUT_SERIAL_CONSOLE
 } data_router_output_component;
 
-typedef enum
+typedef struct
 {
-    SENSOR_MEASUREMENT,
-    TIME_MEASUREMENT,
-    I2C_SCAN_OUTPUT
-} data_router_output_input_type;
+    union 
+    {
+        sensor_reading_t sensor_reading;
+        rtc_reading_t rtc_reading;
+    } input_return;
+    data_router_input_component input_type;
+    error_manager_error_code_te error_code;
+} data_router_input_data_ts;
 
 #endif

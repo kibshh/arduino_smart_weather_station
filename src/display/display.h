@@ -51,9 +51,9 @@ typedef struct
 extern const int num_of_display_functions;
 
 void display_init();
-error_manager_error_code_te display_displayData(data_router_output_input_type input_type, uint8_t *payload, size_t payload_len);
-error_manager_error_code_te display_displaySensorMeasurement(uint8_t *payload, size_t payload_len);
-error_manager_error_code_te display_displayTime(uint8_t *payload, size_t payload_len);
+error_manager_error_code_te display_displayData(data_router_input_data_ts data);
+error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_t sensor_data);
+error_manager_error_code_te display_displayTime(rtc_reading_t time_data);
 error_manager_error_code_te display_displayI2CScan(uint8_t *payload, size_t payload_len);
 
 #endif
