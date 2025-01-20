@@ -1,29 +1,36 @@
 #ifndef ERROR_MANAGER_H
 #define ERROR_MANAGER_H
 
-typedef enum
-{
-  ERROR_CODE_NO_ERROR,
-  ERROR_CODE_INTERNAL_ERROR,
-  ERROR_CODE_INVALID_INPUT,
-  ERROR_CODE_INVALID_OUTPUT,
-  ERROR_CODE_INVALID_RETURN_BUFFER,
-  ERROR_CODE_INVALID_INPUT_PARAMETERS,
-  ERROR_CODE_INVALID_OUTPUT_PARAMETERS,
-  ERROR_CODE_DISPLAY_SENSOR_NOT_CONFIGURED,
-  ERROR_CODE_DISPLAY_INVALID_MEASUREMENT_TYPE,
-  ERROR_CODE_INVALID_INPUT_TYPE,
-  ERROR_CODE_DISPLAY_CURRENT_I2C_ADDR_OUT_OF_RANGE,
-  ERROR_CODE_INVALID_OUTPUT_PAYLOAD_LEN,
-  ERROR_CODE_SENSORS_NO_SENSORS_CONFIGURED,
-  ERROR_CODE_SENSORS_SENSOR_NOT_FOUND,
-  ERROR_CODE_SENSORS_INVALID_MEASUREMENT_TYPE,
-  ERROR_CODE_SENSORS_MEASUREMENT_TYPE_MISSING_FUNCTION,
-  ERROR_CODE_SENSORS_INVALID_VALUE_FROM_SENSOR,
-  ERROR_CODE_SENSORS_ABNORMAL_VALUE,
-  ERROR_CODE_OUTPUT_ROUTER_DATA_CONTAINS_ERRORS
-} error_manager_error_code_te;
+#include <Arduino.h>
+#include "error_codes.h"
+#include "../data_router/data_router_types.h"
 
-void error_manager_handleError(error_manager_error_code_te error);
+typedef struct
+{
+  data_router_output_component_te output_component;
+  data_router_input_component_te input_type;
+  uint8_t input_id;
+} error_manager_output_error_ts;
+
+typedef struct
+{
+  data_router_input_component_te input_component;
+  uint8_t input_id;
+} error_manager_input_error_ts;
+
+typedef union
+{
+  error_manager_output_error_ts output_error;
+  error_manager_input_error_ts input_error;
+} error_type_tu;
+
+typedef struct
+{
+  error_manager_error_code_te error_code;
+  data_router_io_type io_flag;
+  error_type_tu component;
+} error_manager_error_ts;
+
+void error_manager_handleError(error_manager_error_ts error_msg);
 
 #endif
