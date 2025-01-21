@@ -15,6 +15,7 @@ void task_cyclicTask()
     i2cScan_scanForAdress();
   }
 #else
+/*
   if (current_millis - previous_millis >= (unsigned long)DISPLAY_TIME_DISPLAY_INTERVAL_MS)
   {
     previous_millis = current_millis;
@@ -34,6 +35,7 @@ void task_cyclicTask()
       Serial.println("Internal RTC error, failed to write to buffer");
     }
   }
+  */
   // if (current_millis - previous_millis >= (unsigned long)DISPLAY_DISPLAY_INTERVAL_MS)
   // {
 

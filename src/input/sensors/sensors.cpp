@@ -35,17 +35,33 @@ const sensor_sensors_config_t sensor_sensors_config[] PROGMEM =
 };
 
 
-void sensors_init()
+error_manager_error_code_te sensors_init()
 {
+  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
+
+#if defined(DHT11_TEMPERATURE) || defined(DHT11_HUMIDITY)
   dht11_init();
+#endif
+#if defined(BMP280_PRESSURE) || defined(BMP280_TEMPERATURE) || defined(BMP280_ALTITUDE)
   (void)bmp280_init();
+#endif
+#if defined(BH1750_LUMINANCE)
   (void)bh1750_init();
+#endif
+#if defined(MQ135_PPM)
   mq135_init();
+#endif
+#if defined(MQ7_COPPM)
   mq7_init();
+#endif
+#if defined(GYML8511_UV)
   gy_ml8511_init();
+#endif
+
+  return error_code;
 }
 
-sensor_return_t sensors_getReading(uint8_t id, uint8_t measurement_type)
+sensor_return_t sensors_getReading(uint8_t id)
 {
   sensor_return_t return_data;
   return_data.error_code = ERROR_CODE_SENSORS_NO_SENSORS_CONFIGURED;
@@ -58,7 +74,7 @@ sensor_return_t sensors_getReading(uint8_t id, uint8_t measurement_type)
 
     for (uint8_t index = 0; index < sensor_config_len; index++)
     {
-      if(sensor_sensors_config[index].sensor_id == id)
+      if(pgm_read_byte(&sensor_sensors_config[index].sensor_id) == id)
       {
         is_sensor_configured = true;
         sensor_index = index;
@@ -72,49 +88,35 @@ sensor_return_t sensors_getReading(uint8_t id, uint8_t measurement_type)
       memcpy_P(&current_sensor, &sensor_sensors_config[sensor_index], sizeof(sensor_sensors_config_t));
       return_data.sensor_reading.sensor_id = id;
 
-      if(SENSORS_MEASUREMENT_TYPE_VALUE == measurement_type)
+      if(SENSORS_NO_VALUE_FUNCTION != current_sensor.sensor_value_function)
       {
-        if(SENSORS_NO_VALUE_FUNCTION != current_sensor.sensor_value_function)
+        return_data.sensor_reading.measurement_type_switch = SENSORS_MEASUREMENT_TYPE_VALUE;
+        return_data.sensor_reading.value = current_sensor.sensor_value_function();
+        if(!isnan(return_data.sensor_reading.value))
         {
-          return_data.sensor_reading.measurement_type_switch = SENSORS_MEASUREMENT_TYPE_VALUE;
-          return_data.sensor_reading.value = current_sensor.sensor_value_function();
-          if(!isnan(return_data.sensor_reading.value))
+          if(return_data.sensor_reading.value > current_sensor.min_value && return_data.sensor_reading.value < current_sensor.max_value)
           {
-            if(return_data.sensor_reading.value > current_sensor.min_value && return_data.sensor_reading.value < current_sensor.max_value)
-            {
-              return_data.error_code = ERROR_CODE_NO_ERROR;
-            }
-            else
-            {
-              return_data.error_code = ERROR_CODE_SENSORS_ABNORMAL_VALUE;
-            }
+            return_data.error_code = ERROR_CODE_NO_ERROR;
           }
           else
           {
-            return_data.error_code = ERROR_CODE_SENSORS_INVALID_VALUE_FROM_SENSOR;
+            return_data.error_code = ERROR_CODE_SENSORS_ABNORMAL_VALUE;
           }
         }
         else
         {
-          return_data.error_code = ERROR_CODE_SENSORS_MEASUREMENT_TYPE_MISSING_FUNCTION;
+          return_data.error_code = ERROR_CODE_SENSORS_INVALID_VALUE_FROM_SENSOR;
         }
       }
-      else if(SENSORS_MEASUREMENT_TYPE_INDICATION == measurement_type)
+      else if(SENSORS_NO_INDICATION_FUNCTION != current_sensor.sensor_indication_function)
       {
-        if(SENSORS_NO_INDICATION_FUNCTION != current_sensor.sensor_indication_function)
-        {
-          return_data.sensor_reading.measurement_type_switch = SENSORS_MEASUREMENT_TYPE_INDICATION;
-          return_data.sensor_reading.indication = current_sensor.sensor_indication_function();
-          reading.error_code = ERROR_CODE_NO_ERROR;
-        }
-        else
-        {
-          return_data.error_code = ERROR_CODE_SENSORS_MEASUREMENT_TYPE_MISSING_FUNCTION;
-        }
+        return_data.sensor_reading.measurement_type_switch = SENSORS_MEASUREMENT_TYPE_INDICATION;
+        return_data.sensor_reading.indication = current_sensor.sensor_indication_function();
+        return_data.error_code = ERROR_CODE_NO_ERROR;
       }
       else
       {
-        return_data.error_code = ERROR_CODE_SENSORS_INVALID_MEASUREMENT_TYPE;
+        return_data.error_code = ERROR_CODE_SENSORS_MEASUREMENT_TYPE_MISSING_FUNCTION;
       }
     }
     else

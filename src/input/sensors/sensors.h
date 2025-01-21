@@ -11,7 +11,7 @@
 #include "sensor_library/mq7/mq7.h"
 #include "sensor_library/arduino_rain_sensor/arduino_rain_sensor.h"
 #include "sensorsconfig.h"
-#include "../error_manager/error_manager.h"
+#include "../input_types.h"
 
 #define SENSORS_NO_SENSORS_CONFIGURED         (0u)
 #define SENSORS_NO_INDICATION_FUNCTION        (nullptr)
@@ -19,21 +19,6 @@
 
 #define SENSORS_MEASUREMENT_TYPE_VALUE        (0u)
 #define SENSORS_MEASUREMENT_TYPE_INDICATION   (1u)
-
-
-typedef struct
-{
-  float value;
-  uint8_t sensor_id;
-  uint8_t measurement_type_switch;
-  bool indication;
-}sensor_reading_t;
-
-typedef struct
-{
-  sensor_reading_t sensor_reading;
-  error_manager_error_code_te error_code;
-} sensor_return_t;
 
 typedef float (*sensor_sensor_value_function_t)();
 typedef bool (*sensor_sensor_indication_function_t)();
@@ -48,7 +33,7 @@ typedef struct
 }sensor_sensors_config_t;
 
 
-void sensors_init();
-sensor_return_t sensors_getReading(uint8_t id, uint8_t measurement_type);
+error_manager_error_code_te sensors_init();
+sensor_return_t sensors_getReading(uint8_t id);
 
 #endif

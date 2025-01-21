@@ -35,8 +35,6 @@ const display_sensors_config_t display_sensors_config[] PROGMEM =
 #endif
 };
 
-const int num_of_display_functions = sizeof(display_sensors_config) / sizeof(display_sensors_config[0]);
-
 LiquidCrystal_I2C lcd(DISPLAY_LCD_I2C_ADDDR, DISPLAY_LCD_WIDTH, DISPLAY_LCD_HEIGHT);
 
 void display_init()
@@ -47,21 +45,21 @@ void display_init()
   lcd.noCursor();
 }
 
-error_manager_error_code_te display_displayData(data_router_input_data_ts data)
+error_manager_error_code_te display_displayData(data_router_data_ts data)
 {
   error_manager_error_code_te error_code = ERROR_CODE_INVALID_INPUT_TYPE;
 
-  switch(input_type)
+  switch(data.input_type)
   {
-    case SENSOR_MEASUREMENT:
+    case INPUT_SENSORS:
       error_code = display_displaySensorMeasurement(data.input_return.sensor_reading);
       break;
 
-    case TIME_MEASUREMENT:
+    case INPUT_RTC:
       error_code = display_displayTime(data.input_return.rtc_reading);
       break;
 
-    /* case I2C_SCAN_OUTPUT:
+    /* case INPUT_I2C_SCAN:
       if(DATA_ROUTER_INPUT_I2C_SCAN_RETURN_PAYLOAD_LEN_MIN <= payload_len)
       {
         error_code = display_displayI2CScan(payload, payload_len);
@@ -83,56 +81,64 @@ error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_t se
 
   bool is_sensor_configured = false;
   uint8_t sensor_index = 0;
-  for (uint8_t index = 0; index < num_of_display_functions; index++)
+  if(DIPSLAY_NO_SENSORS_CONFIGURED != sizeof(display_sensors_config))
   {
-    if(display_sensors_config[index].id == sensor_data.sensor_id)
+    size_t num_of_display_functions = sizeof(display_sensors_config) / sizeof(display_sensors_config[0]);
+    for (uint8_t index = 0; index < num_of_display_functions; index++)
     {
-      is_sensor_configured = true;
-      sensor_index = index;
-      break;
-    }
-  }
-
-  if(true == is_sensor_configured)
-  {
-    display_sensors_config_t current_sensor;
-    memcpy_P(&current_sensor, &display_sensors_config[sensor_index], sizeof(display_sensors_config_t));
-    const char* sensor_type = (const char*)pgm_read_word(&(current_sensor.sensor_type));
-    const char* measurement_unit = (const char*)pgm_read_word(&(current_sensor.measurement_unit));
-    String display_string = "";
-    String val = "";
-
-    if(DISPLAY_READING_VALUE == sensor_data.measurement_type_switch)
-    {
-      float value = sensor_data.value;
-      val = String(value, current_sensor.accuracy);
-    }
-    else if(DISPLAY_INDICATION == sensor_data.measurement_type_switch)
-    {
-      if(true == sensor_data.indication)
+      if(pgm_read_byte(&display_sensors_config[index].id) == sensor_data.sensor_id)
       {
-        val = "yes";
+        is_sensor_configured = true;
+        sensor_index = index;
+        break;
+      }
+    }
+
+    if(true == is_sensor_configured)
+    {
+      display_sensors_config_t current_sensor;
+      memcpy_P(&current_sensor, &display_sensors_config[sensor_index], sizeof(display_sensors_config_t));
+      const char* sensor_type = (const char*)pgm_read_word(&(current_sensor.sensor_type));
+      const char* measurement_unit = (const char*)pgm_read_word(&(current_sensor.measurement_unit));
+      String display_string = "";
+      String val = "";
+
+      if(DISPLAY_READING_VALUE == sensor_data.measurement_type_switch)
+      {
+        float value = sensor_data.value;
+        val = String(value, current_sensor.accuracy);
+      }
+      else if(DISPLAY_INDICATION == sensor_data.measurement_type_switch)
+      {
+        if(true == sensor_data.indication)
+        {
+          val = "yes";
+        }
+        else
+        {
+          val = "no";
+        }
       }
       else
       {
-        val = "no";
+        error_code = ERROR_CODE_DISPLAY_INVALID_MEASUREMENT_TYPE;
       }
+
+      display_string = String(sensor_type) + ": " + val + String(measurement_unit);
+      while (display_string.length() < DISPLAY_LCD_WIDTH) 
+      {
+        display_string += ' '; //Add spaces to fill to the end
+      }
+      lcd.print(display_string);
     }
     else
     {
-      error_code = ERROR_CODE_DISPLAY_INVALID_MEASUREMENT_TYPE;
+      error_code = ERROR_CODE_DISPLAY_SENSOR_NOT_CONFIGURED;
     }
-
-    display_string = String(sensor_type) + ": " + val + String(measurement_unit);
-    while (display_string.length() < DISPLAY_LCD_WIDTH) 
-    {
-      display_string += ' '; //Add spaces to fill to the end
-    }
-    lcd.print(display_string);
   }
   else
   {
-    error_code = ERROR_CODE_DISPLAY_SENSOR_NOT_CONFIGURED;
+    error_code = ERROR_CODE_DISPLAY_NO_SENSORS_CONFIGURED;
   }
   return error_code;
 }

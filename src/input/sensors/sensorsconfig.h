@@ -1,6 +1,8 @@
 #ifndef SENSORSCONFIG_H
 #define SENSORSCONFIG_H
 
+#include <Arduino.h>
+
 /* SENSOR ID'S - Comment out if sensor is not used */
 #define DHT11_TEMPERATURE                     (0u)    
 #define DHT11_HUMIDITY                        (1u)

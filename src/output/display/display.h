@@ -5,10 +5,12 @@
 #include <avr/pgmspace.h>
 #include <LiquidCrystal_I2C.h>
 #include <WString.h>
-#include "../error_manager/error_manager.h"
-#include "../data_router/data_router_common.h"
-#include "../sensors/sensorsconfig.h"
+#include "../../error_manager/error_codes.h"
+#include "../../input/sensors/sensorsconfig.h"
+#include "../../data_router/data_router_types.h"
+#include "../../input/input_types.h"
 
+#define DIPSLAY_NO_SENSORS_CONFIGURED (0u)
 
 #define DISPLAY_LCD_HEIGHT    (2u)
 #define DISPLAY_LCD_WIDTH     (16u)
@@ -51,7 +53,7 @@ typedef struct
 extern const int num_of_display_functions;
 
 void display_init();
-error_manager_error_code_te display_displayData(data_router_input_data_ts data);
+error_manager_error_code_te display_displayData(data_router_data_ts data);
 error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_t sensor_data);
 error_manager_error_code_te display_displayTime(rtc_reading_t time_data);
 error_manager_error_code_te display_displayI2CScan(uint8_t *payload, size_t payload_len);

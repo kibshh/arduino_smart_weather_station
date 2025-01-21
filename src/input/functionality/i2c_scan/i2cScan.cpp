@@ -1,5 +1,7 @@
 #include "i2cScan.h"
 
+// Needs to be reimplemented
+/*
 void i2cScan_scanForAdress()
 {
   byte num_of_devices = I2CSCAN_NO_DEVICES_FOUND;
@@ -29,3 +31,4 @@ void i2cScan_scanForAdress()
     Serial.println("Done\n");
   }
 }
+*/

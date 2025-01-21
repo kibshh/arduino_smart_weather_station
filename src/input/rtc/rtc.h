@@ -2,16 +2,19 @@
 #ifndef RTC_H
 #define RTC_H
 
+#include <avr/pgmspace.h>
 #include <Arduino.h>
 #include <Wire.h>
 #include <RTClib.h>
-#include "../error_manager/error_manager.h"
+#include "../input_types.h"
 
 
 #define RTC_COMPILE_DATE    __DATE__
 #define RTC_COMPILE_TIME    __TIME__
 
 #define RTC_I2C_ADDR        (0x68)
+
+#define RTC_DEFAULT_RTC     (0u)
 
 #define RTC_MIN_YEAR        (2024u)
 #define RTC_MIN_MONTH       (1u)
@@ -25,23 +28,7 @@
 #define RTC_MIN_SECOND      (0u)
 #define RTC_MAX_SECOND      (59u)
 
-typedef struct
-{
-  uint16_t year; 
-  uint8_t month;
-  uint8_t day;
-  uint8_t hour;
-  uint8_t mins;
-  uint8_t secs;
-}rtc_reading_t;
-
-typedef struct
-{
-  rtc_reading_t rtc_reading;
-  error_manager_error_code_te error_code;
-} rtc_return_t;
-
-void rtc_init();
-rtc_return_t rtc_getTime();
+error_manager_error_code_te rtc_init();
+rtc_return_t rtc_getTime(uint8_t id);
 
 #endif

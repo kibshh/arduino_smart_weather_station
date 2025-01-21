@@ -1,8 +1,3 @@
-#include "src/project_settings.h"
-#include "src/sensors/sensors.h"
-#include "src/functionality/rtc.h"
-#include "src/functionality/i2cScan.h"
-#include "src/display/display.h"
 #include "src/task/task.h"
 
 void setup() 
@@ -25,7 +20,7 @@ void setup()
 #endif
 
 #ifdef RTC_USED
-  rtc_init();
+  (void)rtc_init();
 #endif
 
 #ifdef DEBUG_USED

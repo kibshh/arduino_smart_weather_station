@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
-#include "../error_manager/error_manager.h"
+#include "../../input_types.h"
 
 
 #define I2CSCAN_I2C_ADDRESS_MIN     (1u)

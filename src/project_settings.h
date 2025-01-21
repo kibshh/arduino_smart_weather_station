@@ -1,6 +1,8 @@
 #ifndef PROJECT_SETTINGS_H
 #define PROJECT_SETTINGS_H
 
+#include <Arduino.h>
+
 /**
  * Uncomment to enable I2C scan mode.
  * When defined, application scans all available I2C addresses and prints them to the console.
