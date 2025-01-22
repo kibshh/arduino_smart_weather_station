@@ -126,3 +126,19 @@ sensor_return_ts sensors_getReading(uint8_t id)
   }
   return return_data;
 }
+
+size_t sensors_getSensorsLen()
+{
+  size_t sensors_len = SENSORS_NO_SENSORS_CONFIGURED;
+  if (SENSORS_NO_SENSORS_CONFIGURED != sizeof(sensor_sensors_config))
+  {
+    sensors_len = sizeof(sensor_sensors_config) / sizeof(sensor_sensors_config[0]);
+  }
+  return sensors_len;
+}
+
+unit8_t sensors_sensorIndexToId(uint8_t index) 
+{
+  uint8_t sensor_id = sensor_sensors_config[index].sensor_id;
+  return sensor_id;
+}
