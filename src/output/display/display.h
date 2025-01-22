@@ -20,7 +20,8 @@
 #define DISPLAY_START_ROW     (0u)
 #define DISPLAY_SENSORS_ROW   (0u)
 #define DISPLAY_TIME_ROW      (1u)
-#define DISPLAY_I2C_SCAN_ROW  (0u)
+#define DISPLAY_I2C_SCAN_STRING_ROW  (0u)
+#define DISPLAY_I2C_SCAN_ADDR_ROW    (1u)
 
 #define DISPLAY_READING_VALUE (0u)
 #define DISPLAY_INDICATION    (1u)
@@ -54,8 +55,8 @@ extern const int num_of_display_functions;
 
 void display_init();
 error_manager_error_code_te display_displayData(data_router_data_ts data);
-error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_t sensor_data);
-error_manager_error_code_te display_displayTime(rtc_reading_t time_data);
-error_manager_error_code_te display_displayI2CScan(uint8_t *payload, size_t payload_len);
+error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts sensor_data);
+error_manager_error_code_te display_displayTime(rtc_reading_ts time_data);
+error_manager_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_data);
 
 #endif

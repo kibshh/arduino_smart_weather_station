@@ -34,6 +34,6 @@ typedef struct
 
 
 error_manager_error_code_te sensors_init();
-sensor_return_t sensors_getReading(uint8_t id);
+sensor_return_ts sensors_getReading(uint8_t id);
 
 #endif

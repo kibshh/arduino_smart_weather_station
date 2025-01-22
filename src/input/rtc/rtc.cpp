@@ -19,9 +19,9 @@ error_manager_error_code_te rtc_init()
   }
 }
 
-rtc_return_t rtc_getTime(uint8_t id)
+rtc_return_ts rtc_getTime(uint8_t id)
 {
-  rtc_return_t new_reading;
+  rtc_return_ts new_reading;
   new_reading.error_code = ERROR_CODE_RTC_RTC_NOT_FOUND;
 
   if(id == RTC_DEFAULT_RTC)

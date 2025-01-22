@@ -50,14 +50,17 @@ typedef enum
  * allowing the function to flexibly handle multiple input sources.
  * 
  * Fields:
- *  - sensor_reading: Contains data specific to sensor readings, such as value, 
- *                    measurement type, and sensor ID.
- *  - rtc_reading:    Contains data specific to RTC readings, such as date and time.
+ *  - sensor_reading:     Contains data specific to sensor readings, such as value, 
+ *                        measurement type, and sensor ID.
+ *  - rtc_reading:        Contains data specific to RTC readings, such as date and time.
+ *  - i2cScan_reading:    Contains data specific to I2C scan readings, 
+ *                        such as addresses bit fields or I2C device status.
  */
 typedef union 
 {
-    sensor_reading_t sensor_reading;  /**< Data structure for sensor readings. */
-    rtc_reading_t rtc_reading;        /**< Data structure for RTC readings. */
+    sensor_reading_ts sensor_reading;      /**< Data structure for sensor readings. */
+    rtc_reading_ts rtc_reading;            /**< Data structure for RTC readings. */
+    i2cScan_reading_ts i2cScan_reading;    /**< Data structure for I2C scan readings. */
 } input_return_tu;
 
 /**
