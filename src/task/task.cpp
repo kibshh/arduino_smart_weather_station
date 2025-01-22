@@ -2,9 +2,11 @@
 
 void task_cyclicTask()
 {
-
-  // static uint8_t current_display_function = 0;
   static unsigned long previous_millis = 0;
+
+  static size_t sensors_len = sensors_getSensorsLen();
+
+  static uint8_t sensor_index = TASK_STARTING_SENSOR_INDEX;
 
   unsigned long current_millis = millis();
 
@@ -15,32 +17,31 @@ void task_cyclicTask()
     i2cScan_scanForAdress();
   }
 #else
-/*
   if (current_millis - previous_millis >= (unsigned long)DISPLAY_TIME_DISPLAY_INTERVAL_MS)
   {
     previous_millis = current_millis;
 
-    uint8_t return_buffer[DATA_ROUTER_INPUT_RTC_RETURN_LEN] = {0};
-    size_t return_buffer_size = sizeof(return_buffer);
+    data_router_input_data_ts return_data = data_router_fetchDataFromInput(INPUT_RTC, RTC_DEFAULT_RTC);
 
-    error_manager_error_code_te error_code = data_router_fetchDataFromInput(
-        INPUT_RTC, NULL, 0, return_buffer, &return_buffer_size);
-    // RTC read success code
-    if (error_code == ERROR_CODE_NO_ERROR)
-    {
-      data_router_routeDataToOutput(OUTPUT_DISPLAY, TIME_MEASUREMENT, return_buffer, return_buffer_size);
-    }
-    else
-    {
-      Serial.println("Internal RTC error, failed to write to buffer");
-    }
+    error_manager_error_ts error = data_router_routeDataToOutput(OUTPUT_DISPLAY, return_data);
+
+    // handle with error handler
   }
-  */
-  // if (current_millis - previous_millis >= (unsigned long)DISPLAY_DISPLAY_INTERVAL_MS)
-  // {
+  if (current_millis - previous_millis >= (unsigned long)DISPLAY_DISPLAY_INTERVAL_MS)
+  {
+    previous_millis = current_millis;
 
-  //   current_display_function++;
-  //   current_display_function %= num_of_display_functions;
-  // }
+    if (sensor_index >= sensors_len) {
+      sensor_index = TASK_STARTING_SENSOR_INDEX;
+    }
+
+    data_router_input_data_ts return_data = data_router_fetchDataFromInput(INPUT_SENSORS, sensors_sensorIndexToId(sensor_index));
+
+    sensor_index++;
+
+    error_manager_error_ts error = data_router_routeDataToOutput(OUTPUT_DISPLAY, return_data);
+
+    // handle with error handler
+  }
 #endif
 }
