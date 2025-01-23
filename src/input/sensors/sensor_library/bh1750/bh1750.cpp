@@ -1,8 +1,8 @@
 #include "bh1750.h"
 
-BH1750 lightMeter;
+static BH1750 lightMeter;
 
-boolean bh1750_init()
+bool bh1750_init()
 {
   if(!lightMeter.begin())
   {

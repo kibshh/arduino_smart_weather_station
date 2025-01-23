@@ -1,6 +1,6 @@
 #include "bmp280.h"
 
-Adafruit_BMP280 bmp;
+static Adafruit_BMP280 bmp;
 
 boolean bmp280_init()
 {

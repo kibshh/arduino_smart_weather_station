@@ -137,7 +137,7 @@ size_t sensors_getSensorsLen()
   return sensors_len;
 }
 
-unit8_t sensors_sensorIndexToId(uint8_t index) 
+uint8_t sensors_sensorIndexToId(uint8_t index) 
 {
   uint8_t sensor_id = sensor_sensors_config[index].sensor_id;
   return sensor_id;
