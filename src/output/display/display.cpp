@@ -59,12 +59,9 @@ error_manager_error_code_te display_displayData(data_router_data_ts data)
       error_code = display_displayTime(data.input_return.rtc_reading);
       break;
 
-    /* case INPUT_I2C_SCAN:
-      if(DATA_ROUTER_INPUT_I2C_SCAN_RETURN_PAYLOAD_LEN_MIN <= payload_len)
-      {
-        error_code = display_displayI2CScan(payload, payload_len);
-      }
-      break; */
+    case INPUT_I2C_SCAN:
+      error_code = display_displayI2cScan(data.input_return.i2cScan_reading);
+      break;
 
     default:
       break;
@@ -73,7 +70,7 @@ error_manager_error_code_te display_displayData(data_router_data_ts data)
   return error_code;
 }
 
-error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_t sensor_data)
+error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts sensor_data)
 {
   error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
@@ -143,7 +140,7 @@ error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_t se
   return error_code;
 }
 
-error_manager_error_code_te display_displayTime(rtc_reading_t time_data)
+error_manager_error_code_te display_displayTime(rtc_reading_ts time_data)
 {
   lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_TIME_ROW);
 
@@ -164,31 +161,67 @@ error_manager_error_code_te display_displayTime(rtc_reading_t time_data)
   return ERROR_CODE_NO_ERROR;
 }
 
-/*
-error_manager_error_code_te display_displayI2CScan(uint8_t *payload, size_t payload_len)
+error_manager_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_data)
 {
   error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
-  lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_I2C_SCAN_ROW);
-
-  uint8_t number_of_addresses = payload[DATA_ROUTER_INPUT_I2C_SCAN_RETURN_NUM_OF_ADDR_POS];
-  uint8_t selected_i2c_address = payload[DATA_ROUTER_INPUT_I2C_SCAN_RETURN_CURRENT_ADDR_POS];
-
-  if(selected_i2c_address < number_of_addresses)
+  if(I2CSCAN_MODE_SCAN_FOR_ALL_DEVICES == i2c_scan_data.device_address)
   {
-    uint8_t i2c_address = payload[DATA_ROUTER_INPUT_I2C_SCAN_RETURN_STARTING_ADDR_POS + selected_i2c_address];
-    String display_string = "I2C Addr: 0x" + String(i2c_address < DISPLAY_TWO_CIPHER_NUMBER ? "0" : "") + String(i2c_address, HEX);
+    // Print user friendly string
+    lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_I2C_SCAN_STRING_ROW);
+    String display_string = "Scanning I2C....";
+    lcd.print(display_string);
+
+    // Print I2C address
+    lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_I2C_SCAN_ADDR_ROW);
+    display_string = "";
+    display_string = "I2C Addr: 0x" + 
+                     String(i2c_scan_data.current_i2c_addr < DISPLAY_TWO_CIPHER_NUMBER ? "0" : "") + 
+                     String(i2c_scan_data.current_i2c_addr, HEX);
+    lcd.print(display_string);
+  }
+  else
+  {
+    // Print headline string
+    lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_I2C_SCAN_STRING_ROW);
+    String display_string = "I2C 0x" + String(i2c_scan_data.device_address < DISPLAY_TWO_CIPHER_NUMBER ? "0" : "") + String(i2c_scan_data.device_address, HEX) + " status:";
+    lcd.print(display_string);
+
+    // Print device status
+    lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_I2C_SCAN_ADDR_ROW);
+    display_string = "";
+    switch(i2c_scan_data.single_device_status)
+    {
+      case I2CSCAN_TRANSMISSION_RESULT_SUCCESS:
+        display_string = "Successful";
+        break;
+      
+      case I2CSCAN_TRANSMISSION_RESULT_TOOLONG:
+        display_string = "Result too long";
+        break;
+
+      case I2CSCAN_TRANSMISSION_RESULT_NACKADR:
+        display_string = "Result NACK";
+        break;
+      
+      case I2CSCAN_TRANSMISSION_RESULT_NACKDAT:
+        display_string = "Result NACKDAT";
+        break;
+
+      case I2CSCAN_TRANSMISSION_RESULT_UNKNOWN:
+        display_string = "Unknown error";
+        break;
+      
+      default:
+        error_code = ERROR_CODE_DISPLAY_UNKNOWN_I2C_DEVICE_STATUS;
+        break;
+    }
     while (display_string.length() < DISPLAY_LCD_WIDTH) 
     {
       display_string += ' '; //Add spaces to fill to the end
     }
     lcd.print(display_string);
   }
-  else
-  {
-    error_code = ERROR_CODE_DISPLAY_CURRENT_I2C_ADDR_OUT_OF_RANGE;
-  }
 
   return error_code;
 }
-*/

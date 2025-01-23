@@ -29,6 +29,6 @@
 #define RTC_MAX_SECOND      (59u)
 
 error_manager_error_code_te rtc_init();
-rtc_return_t rtc_getTime(uint8_t id);
+rtc_return_ts rtc_getTime(uint8_t id);
 
 #endif

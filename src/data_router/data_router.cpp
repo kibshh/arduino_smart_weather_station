@@ -50,24 +50,28 @@ data_router_input_data_ts data_router_fetchDataFromInput(data_router_input_compo
     {
         case INPUT_SENSORS:
             // Fetch sensor reading and update return data
-            sensor_return_t sensor_return = sensors_getReading(component_id);
+            sensor_return_ts sensor_return = sensors_getReading(component_id);
             return_data.error_msg.error_code = sensor_return.error_code;
             return_data.data.input_return.sensor_reading = sensor_return.sensor_reading;
             break;
 
         case INPUT_RTC:
             // Fetch RTC data and update return data
-            rtc_return_t rtc_return = rtc_getTime(component_id);
+            rtc_return_ts rtc_return = rtc_getTime(component_id);
             return_data.error_msg.error_code = rtc_return.error_code;
             return_data.data.input_return.rtc_reading = rtc_return.rtc_reading;
             break;
 
         case INPUT_I2C_SCAN:
-             // I2C scan functionality not implemented yet
+            // Fetch I2C scan data and update return data
+            uint8_t i2c_addr = component_id;
+            i2cScan_return_ts i2cScan_return = i2cScan_getReading(i2c_addr);
+            return_data.error_msg.error_code = i2cScan_return.error_code;
+            return_data.data.input_return.i2cScan_reading = i2cScan_return.i2cScan_reading;
             break;
 
         default:
-            //  Default error code is set to ERROR_CODE_INVALID_INPUT so no need to set it again here.
+            // Default error code is set to ERROR_CODE_INVALID_INPUT so no need to set it again here.
             break;
     }
     return return_data;

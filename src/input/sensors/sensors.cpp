@@ -61,9 +61,9 @@ error_manager_error_code_te sensors_init()
   return error_code;
 }
 
-sensor_return_t sensors_getReading(uint8_t id)
+sensor_return_ts sensors_getReading(uint8_t id)
 {
-  sensor_return_t return_data;
+  sensor_return_ts return_data;
   return_data.error_code = ERROR_CODE_SENSORS_NO_SENSORS_CONFIGURED;
 
   if(SENSORS_NO_SENSORS_CONFIGURED != sizeof(sensor_sensors_config))
