@@ -28,5 +28,5 @@ float bmp280_readPressure()
 
 float bmp280_readAltitude()
 {
-    return bmp.readAltitude(BMP280_SEA_LEVEL_PRESSURE);
+    return bmp.readAltitude(SENSORS_BMP280_LOCAL_SEA_LEVEL_PRESSURE);
 }
