@@ -4,7 +4,7 @@
 // Global variable for heater status
 static bool mq7_is_heater_hot = MQ7_HEATER_IS_OFF;
 
-#ifdef MQ7_CALIBRATION_ENABLED
+#ifdef SENSORS_MQ7_CALIBRATION_ENABLED
 // Initialized to default values and zeros
 static mq7_calibration_helper_struct_ts mq7_calibration_helper_struct = {0, 0, MQ7_CALIBRATION_NOT_IN_PROGRESS, 0, 0, 0};
 #endif
@@ -37,10 +37,10 @@ void mq7_init()
 
 float mq7_readPPM()
 {
-  float coPPM = NAN; // Return value in case of not defined macros(handled by sensors module)
+  float coPPM = MQ7_INVALID_VALUE; // Return value in case of not defined macros(handled by sensors module)
 #if defined(SENSORS_MQ7_R_ZERO) && defined(SENSORS_MQ7_CALCULATION_CONSTANT_1) && defined(SENSORS_MQ7_CALCULATION_CONSTANT_2) // All parameters must be defined
   int raw_analog_read = analogRead(SENSORS_MQ7_PIN_ANALOG);
-  if(raw_analog_read >= MQ7_ANALOG_INPUT_MIN || raw_analog_read <= MQ7_ANALOG_INPUT_MAX) // Check for valid analog read
+  if(raw_analog_read >= MQ7_ANALOG_INPUT_MIN && raw_analog_read <= MQ7_ANALOG_INPUT_MAX) // Check for valid analog read
   {
     float resistance_under_CO = convertToResistance(raw_analog_read); // Convert analog read to resistance in ohms
     float ratio = resistance_under_CO / SENSORS_MQ7_R_ZERO; // Calculate ratio based on calibrated resistance in clear air
@@ -125,7 +125,7 @@ mq7_calibration_return_struct_ts mq7_calculateResistanceForCalibration(unsigned 
 /* STATIC FUNCTIONS IMPLEMENTATIONS */
 static float convertToResistance(int raw_adc) 
 {
-  if(0 == raw_adc)
+  if(MQ7_ANALOG_INPUT_MIN == raw_adc)
   {
     raw_adc += 1; // To avoid division by 0
   }

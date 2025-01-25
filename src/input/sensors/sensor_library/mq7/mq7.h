@@ -40,7 +40,15 @@
 /** Base constant for the calculation of CO PPM, used in logarithmic equation. */
 #define MQ7_CALCULATION_POW_BASE_CONSTANT (10)
 
-#ifdef MQ7_CALIBRATION_ENABLED
+/**
+ * @brief Defines the invalid value for the MQ7 sensor readings.
+ * 
+ * This macro represents a "Not a Number" (NAN) value, which is used to indicate 
+ * invalid readings for the MQ7 sensor.
+ */
+#define MQ7_INVALID_VALUE                 (NAN)
+
+#ifdef SENSORS_MQ7_CALIBRATION_ENABLED
 /**
  * @brief Structure to hold calibration process data for the MQ7 sensor.
  *
@@ -70,9 +78,13 @@ typedef struct
 } mq7_calibration_return_struct_ts;
 
 /**
- * Initializes the calibration process for the MQ-7 sensor.
+ * @brief Initializes the calibration process for the MQ-7 sensor.
+ * 
  * This function sets up the calibration parameters and prepares the system 
- * to start measuring the sensor's resistance over a specified number of measurements.
+ * to start measuring the sensor's resistance over a specified number of measurements. 
+ * The calibration process calculates the sensor's baseline resistance (\( R0 \)), 
+ * which represents the sensor resistance in clean air. This \( R0 \) value is essential 
+ * for determining gas concentrations during normal operation.
  * 
  * @param current_millis The current time in milliseconds (e.g., from millis()), 
  *                       used to track the delay between consecutive measurements.

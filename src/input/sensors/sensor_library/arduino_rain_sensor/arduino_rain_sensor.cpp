@@ -26,7 +26,7 @@ bool arduino_rain_sensor_readRaining()
 #ifdef ARDUINO_RAIN_SENSOR_ANALOG_MEASUREMENT
 bool arduino_rain_sensor_isRainingAnalog()
 {
-  int analog_reading = analogRead(RAINSENSOR_PIN_ANALOG);
+  int analog_reading = analogRead(SENSORS_ARDUINO_RAIN_PIN_ANALOG);
   // Return true if the reading is below or equal to the defined threshold
   if(ARDUINO_RAIN_SENSOR_ANALOG_THRESHOLD >= analog_reading)
   {

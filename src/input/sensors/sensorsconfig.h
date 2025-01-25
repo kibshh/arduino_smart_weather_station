@@ -48,9 +48,9 @@
 #define SENSORS_MQ135_PIN_ANALOG                      (A0)
 #define SENSORS_MQ135_PPM_MIN                         (0)
 #define SENSORS_MQ135_PPM_MAX                         (10000)
-#define SENSORS_MQ135_PARAMETER_A                     () 
-#define SENSORS_MQ135_PARAMETER_B                     ()
-#define SENSORS_MQ135_R_ZERO                          ()
+#define SENSORS_MQ135_PARAMETER_A                     (116.60) 
+#define SENSORS_MQ135_PARAMETER_B                     (2.77)
+#define SENSORS_MQ135_R_ZERO                          (10000)
 
 /* MQ7 */
 #define SENSORS_MQ7_CALIBRATION_ENABLED

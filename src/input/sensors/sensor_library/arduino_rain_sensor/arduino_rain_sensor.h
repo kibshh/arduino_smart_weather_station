@@ -22,7 +22,7 @@ void arduino_rain_sensor_init();
  * Delegates the reading to either the analog or digital sensor reading function.
  * @return true if rain is detected, false otherwise.
  */
-bool rainsensor_readRaining();
+bool arduino_rain_sensor_readRaining();
 
 
 #ifdef ARDUINO_RAIN_SENSOR_ANALOG_MEASUREMENT
