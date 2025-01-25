@@ -61,6 +61,7 @@
 #define SENSORS_MQ7_R_ZERO                            (10000)  // Set to the vaule you got after calibration, in ohms
 #define SENSORS_MQ7_CALCULATION_CONSTANT_1            (0.5)    //By datasheet, change after calibration
 #define SENSORS_MQ7_CALCULATION_CONSTANT_2            (-0.27)  //By datasheet, change after calibration
+#define SENSORS_MQ7_CLEAR_AIR_FACTOR                  (9.83)   // By datasheet
 #define SENSORS_MQ7_HEATER_LOW_TIMEOUT_MS             (90000u)           
 #define SENSORS_MQ7_HEATER_HIGH_TIMEOUT_MS            (60000u)  
 
