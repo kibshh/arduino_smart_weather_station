@@ -127,6 +127,16 @@ sensor_return_ts sensors_getReading(uint8_t id)
   return return_data;
 }
 
+void sensors_loop(unsigned long current_millis)
+{
+#ifdef MQ7_COPPM
+  mq7_heatingCycle(current_millis);
+#ifdef SENSORS_MQ7_CALIBRATION_ENABLED
+  mq7_calibratingLoopFunction(current_millis);
+#endif
+#endif
+}
+
 size_t sensors_getSensorsLen()
 {
   size_t sensors_len = SENSORS_NO_SENSORS_CONFIGURED;
