@@ -44,10 +44,16 @@ error_manager_error_code_te sensors_init()
   dht11_init();
 #endif
 #if defined(BMP280_PRESSURE) || defined(BMP280_TEMPERATURE) || defined(BMP280_ALTITUDE)
-  (void)bmp280_init();
+  if(!bmp280_init())
+  {
+    error_code = ERROR_CODE_SENSORS_INIT_BMP280;
+  }
 #endif
 #if defined(BH1750_LUMINANCE)
-  (void)bh1750_init();
+  if(!bh1750_init())
+  {
+    error_code = ERROR_CODE_SENSORS_INIT_BH1750;
+  }
 #endif
 #if defined(MQ135_PPM)
   mq135_init();
@@ -57,6 +63,9 @@ error_manager_error_code_te sensors_init()
 #endif
 #if defined(GYML8511_UV)
   gy_ml8511_init();
+#endif
+#if defined(ARDUINORAIN_RAINING)
+  arduino_rain_sensor_init();
 #endif
 
   return error_code;

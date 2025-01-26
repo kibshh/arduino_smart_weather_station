@@ -37,12 +37,13 @@ const display_sensors_config_t display_sensors_config[] PROGMEM =
 
 LiquidCrystal_I2C lcd(DISPLAY_LCD_I2C_ADDDR, DISPLAY_LCD_WIDTH, DISPLAY_LCD_HEIGHT);
 
-void display_init()
+error_manager_error_code_te display_init()
 {
   lcd.begin(DISPLAY_LCD_WIDTH, DISPLAY_LCD_HEIGHT); // Initialize a 16x2 LCD
   lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_START_ROW);
   lcd.backlight();
   lcd.noCursor();
+  return ERROR_CODE_NO_ERROR;
 }
 
 error_manager_error_code_te display_displayData(data_router_data_ts data)

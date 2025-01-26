@@ -28,6 +28,16 @@
 #define RTC_MIN_SECOND      (0u)
 #define RTC_MAX_SECOND      (59u)
 
+/**
+ * @brief Initializes the Real-Time Clock (RTC) module.
+ *
+ * This function initializes the RTC module, checks its power status, 
+ * and sets the RTC time if the module has lost power or is being used for the first time.
+ *
+ * @return error_manager_error_code_te
+ * - ERROR_CODE_NO_ERROR: RTC initialized successfully.
+ * - ERROR_CODE_RTC_INIT_FAILED: RTC initialization failed.
+ */
 error_manager_error_code_te rtc_init();
 rtc_return_ts rtc_getTime(uint8_t id);
 

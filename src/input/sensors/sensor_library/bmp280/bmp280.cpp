@@ -2,7 +2,7 @@
 
 static Adafruit_BMP280 bmp;
 
-boolean bmp280_init()
+bool bmp280_init()
 {
   if(!bmp.begin(SENSORS_BMP280_I2C_ADDR))
   {

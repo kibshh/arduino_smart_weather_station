@@ -53,7 +53,16 @@ typedef struct
 
 extern const int num_of_display_functions;
 
-void display_init();
+/**
+ * @brief Initializes the LCD display module.
+ *
+ * This function sets up the LCD display with the specified dimensions,
+ * configures its cursor and backlight settings, and ensures it is ready for use.
+ *
+ * @return error_manager_error_code_te
+ * - ERROR_CODE_NO_ERROR: Display initialized successfully.
+ */
+error_manager_error_code_te display_init();
 error_manager_error_code_te display_displayData(data_router_data_ts data);
 error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts sensor_data);
 error_manager_error_code_te display_displayTime(rtc_reading_ts time_data);
