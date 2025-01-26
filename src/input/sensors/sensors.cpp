@@ -73,7 +73,7 @@ sensor_return_ts sensors_getReading(uint8_t id)
     bool is_sensor_configured = false; // Flag to check if the sensor is found
     uint8_t sensor_index = SENSORS_MINIMUM_INDEX;
 
-    for (uint8_t index = SENSORS_MINIMUM_INDEX; index < sensor_config_len; index++) // Iterate through sensor configurations to find the matching sensor ID
+    for (uint8_t index = SENSORS_MINIMUM_INDEX; index < sensors_config_len; index++) // Iterate through sensor configurations to find the matching sensor ID
     {
       if(pgm_read_byte(&sensor_sensors_config[index].sensor_id) == id)
       {
