@@ -1,6 +1,6 @@
 #include "dht11.h"
 
-DHT dht(SENSORS_DHT11_PIN, DHT11);
+static DHT dht(SENSORS_DHT11_PIN, DHT11);
 
 void dht11_init()
 {

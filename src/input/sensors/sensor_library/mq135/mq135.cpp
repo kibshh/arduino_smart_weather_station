@@ -8,27 +8,40 @@ void mq135_init()
 
 float mq135_readPPM()
 {
-  float ppm = NAN;
-#if defined(MQ135_PARAMETER_A) && defined(MQ135_PARAMETER_B) && defined(MQ135_R_ZERO)
-  float resistance_under_gas = (float)analogRead(SENSORS_MQ135_PIN_ANALOG);
-  float ratio = resistance_under_gas / MQ135_R_ZERO;
-  float ppm = MQ135_PARAMETER_A * pow(ratio, -MQ135_PARAMETER_B);
+  float ppm = MQ135_INVALID_VALUE;
+#if defined(SENSORS_MQ135_PARAMETER_A) && defined(SENSORS_MQ135_PARAMETER_B) && defined(SENSORS_MQ135_R_ZERO)
+  int sensor_analog_reading = analogRead(SENSORS_MQ135_PIN_ANALOG); // Read the analog value from the MQ135 sensor pin
+  
+  if(MQ135_ANALOG_INPUT_MIN <= sensor_analog_reading && 
+     MQ135_ANALOG_INPUT_MAX >= sensor_analog_reading && // Check for valid analog read
+     SENSORS_MQ135_R_ZERO >= MQ135_R_ZERO_MINIMUM)      // Check for valid R0 resistance and avoid division by 0
+  {
+    if(MQ135_ANALOG_INPUT_MIN == sensor_analog_reading)
+    {
+      sensor_analog_reading = MQ135_ANALOG_INPUT_MIN_VALID; // To avoid division by 0
+    }
+    float ratio = (float)sensor_analog_reading / SENSORS_MQ135_R_ZERO;
+    ppm = SENSORS_MQ135_PARAMETER_A * pow(ratio, -SENSORS_MQ135_PARAMETER_B); // Calculate PPM with formula
+  }
 #endif
-  return ppm;
+  return ppm; // Return calculated PPM or invalid value
 }
 
-#ifdef MQ135_CALIBRATION_ENABLED
-  void mq135_calculateResistanceForCalibration()
+#ifdef SENSORS_MQ135_CALIBRATION_ENABLED
+float mq135_calculateResistanceForCalibration()
+{
+  float calculated_resistance = MQ135_INVALID_VALUE; // If analog read is not valid
+
+  int sensor_analog_reading = analogRead(SENSORS_MQ135_PIN_ANALOG);
+  if(MQ135_ANALOG_INPUT_MIN <= sensor_analog_reading && MQ135_ANALOG_INPUT_MAX >= sensor_analog_reading) // Check for valid analog read
   {
-    Serial.println("Calibrating MQ135 sensor, please ensure clean air...");
-
-    float sensor_analog_reading = (float)analogRead(SENSORS_MQ135_PIN_ANALOG);
-    float maximum_analog_reading = MQ135_ANALOG_INPUT_MAX;
-
-    float calculated_resistance = ((maximum_analog_reading / sensor_analog_reading) - 1) * MQ135_LOAD_RESISTANCE_VAL;
-
-    Serial.print("Calculated Resistance in OHMS: ");
-    Serial.println(calculated_resistance);
+    if(MQ135_ANALOG_INPUT_MIN == sensor_analog_reading)
+    {
+      sensor_analog_reading = MQ135_ANALOG_INPUT_MIN_VALID; // To avoid division by 0
+    }
+    calculated_resistance = (((float)MQ135_ANALOG_INPUT_MAX / sensor_analog_reading) - 1) * MQ135_LOAD_RESISTANCE_VAL; // Calculate resistance
   }
+  return calculated_resistance;
+}
 #endif
 
