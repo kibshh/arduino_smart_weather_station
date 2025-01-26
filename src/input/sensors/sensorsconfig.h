@@ -4,16 +4,17 @@
 #include <Arduino.h>
 
 /* SENSOR ID'S - Comment out if sensor is not used */
-#define DHT11_TEMPERATURE                     (0u)    
-#define DHT11_HUMIDITY                        (1u)
-#define BMP280_PRESSURE                       (2u)
-#define BMP280_TEMPERATURE                    (3u)
-#define BMP280_ALTITUDE                       (4u)
-#define BH1750_LUMINANCE                      (5u)
-#define MQ135_PPM                             (6u)
-#define MQ7_COPPM                             (7u)
-#define GYML8511_UV                           (8u)
-#define ARDUINORAIN_RAINING                   (9u)
+#define INVALID_SENSOR_ID                     (0u)
+#define DHT11_TEMPERATURE                     (1u)    
+#define DHT11_HUMIDITY                        (2u)
+#define BMP280_PRESSURE                       (3u)
+#define BMP280_TEMPERATURE                    (4u)
+#define BMP280_ALTITUDE                       (5u)
+#define BH1750_LUMINANCE                      (6u)
+#define MQ135_PPM                             (7u)
+#define MQ7_COPPM                             (8u)
+#define GYML8511_UV                           (9u)
+#define ARDUINORAIN_RAINING                   (10u)
 /* ********************************* */
 
 
