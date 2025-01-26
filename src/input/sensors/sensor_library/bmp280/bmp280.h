@@ -46,7 +46,7 @@
  *
  * @return true if the sensor is successfully initialized, false otherwise.
  */
-boolean bmp280_init();
+bool bmp280_init();
 
 /**
  * @brief Reads the current temperature from the BMP280 sensor.

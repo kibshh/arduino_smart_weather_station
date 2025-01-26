@@ -58,7 +58,19 @@ typedef struct
   sensor_sensor_indication_function_t sensor_indication_function; // Function pointer for obtaining a boolean status/indication from the sensor. Optional.
 } sensor_sensors_config_t;
 
-
+/**
+ * @brief Initializes all configured sensors based on their compile-time definitions.
+ *
+ * This function checks which sensors are defined at compile time and initializes them.
+ * If an initialization function fails, an appropriate error code is returned.
+ *
+ * @return error_manager_error_code_te
+ * - ERROR_CODE_NO_ERROR: All sensors initialized successfully.
+ *
+ * @note
+ * - Each sensor has its own initialization function.
+ * - Sensors are included based on preprocessor definitions.
+ */
 error_manager_error_code_te sensors_init();
 
 /***
