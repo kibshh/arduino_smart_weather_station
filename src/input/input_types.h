@@ -79,7 +79,6 @@ typedef struct
   sensor_reading_ts sensor_reading;
   error_manager_error_code_te error_code;
 } sensor_return_ts;
-/* ***************************************** */
 
 /* RTC COMPONENT */
 /**

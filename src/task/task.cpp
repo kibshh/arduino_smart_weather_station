@@ -25,7 +25,7 @@ void task_cyclicTask()
 {
   static unsigned long previous_millis = 0;
 
-  static size_t sensors_len = sensors_getSensorsLen();
+  static size_t sensors_len = sensors_interface_getSensorsLen();
 
   static uint8_t sensor_index = TASK_STARTING_SENSOR_INDEX;
 
@@ -56,7 +56,7 @@ void task_cyclicTask()
       sensor_index = TASK_STARTING_SENSOR_INDEX;
     }
 
-    data_router_input_data_ts return_data = data_router_fetchDataFromInput(INPUT_SENSORS, sensors_sensorIndexToId(sensor_index));
+    data_router_input_data_ts return_data = data_router_fetchDataFromInput(INPUT_SENSORS, sensors_interface_sensorIndexToId(sensor_index));
 
     sensor_index++;
 

@@ -1,40 +1,100 @@
 #include "sensors.h"
 
-/* Sensor configuration array */
-const sensor_sensors_config_t sensor_sensors_config[] PROGMEM =
+/* SENSOR FUNCTIONAL CONFIGURATION CATALOG */
+/* MUST BE IN THE SAME ORDER AS THE METADATA CONFIG ARRAY IN sensors_metadata.cpp */
+const sensors_functional_catalog_ts sensors_functional_catalog[] PROGMEM =
 {
 #ifdef DHT11_TEMPERATURE
-  {SENSORS_DHT11_TEMPERATURE_MIN,     SENSORS_DHT11_TEMPERATURE_MAX,    DHT11_TEMPERATURE,      dht11_readTemperature,          SENSORS_NO_INDICATION_FUNCTION},
+  { 
+    SENSORS_DHT11_TEMPERATURE_MIN,     
+    SENSORS_DHT11_TEMPERATURE_MAX,    
+    dht11_readTemperature,          
+    SENSORS_NO_INDICATION_FUNCTION,  
+    DHT11_TEMPERATURE   
+  },
 #endif
 #ifdef DHT11_HUMIDITY
-  {SENSORS_DHT11_HUMIDITY_MIN,        SENSORS_DHT11_HUMIDITY_MAX,       DHT11_HUMIDITY,         dht11_readHumidity,             SENSORS_NO_INDICATION_FUNCTION},
+  {
+    SENSORS_DHT11_HUMIDITY_MIN,        
+    SENSORS_DHT11_HUMIDITY_MAX,       
+    dht11_readHumidity,             
+    SENSORS_NO_INDICATION_FUNCTION,  
+    DHT11_HUMIDITY
+  },
 #endif  
 #ifdef BMP280_PRESSURE
-  {SENSORS_BMP280_PRESSURE_MIN,       SENSORS_BMP280_PRESSURE_MAX,      BMP280_PRESSURE,        bmp280_readPressure,            SENSORS_NO_INDICATION_FUNCTION},
+  {
+    SENSORS_BMP280_PRESSURE_MIN,       
+    SENSORS_BMP280_PRESSURE_MAX,      
+    bmp280_readPressure,            
+    SENSORS_NO_INDICATION_FUNCTION,  
+    BMP280_PRESSURE
+  },
 #endif  
 #ifdef BMP280_TEMPERATURE
-  {SENSORS_BMP280_TEMPERATURE_MIN,    SENSORS_BMP280_TEMPERATURE_MAX,   BMP280_TEMPERATURE,     bmp280_readTemperature,         SENSORS_NO_INDICATION_FUNCTION},
+  {
+    SENSORS_BMP280_TEMPERATURE_MIN,    
+    SENSORS_BMP280_TEMPERATURE_MAX,   
+    bmp280_readTemperature,         
+    SENSORS_NO_INDICATION_FUNCTION,  
+    BMP280_TEMPERATURE
+  },
 #endif  
 #ifdef BMP280_ALTITUDE
-  {SENSORS_BMP280_ALTITUDE_MIN,       SENSORS_BMP280_ALTITUDE_MAX,      BMP280_ALTITUDE,        bmp280_readAltitude,            SENSORS_NO_INDICATION_FUNCTION},
+  { 
+    SENSORS_BMP280_ALTITUDE_MIN,       
+    SENSORS_BMP280_ALTITUDE_MAX,      
+    bmp280_readAltitude,            
+    SENSORS_NO_INDICATION_FUNCTION,  
+    BMP280_ALTITUDE
+  },
 #endif  
 #ifdef BH1750_LUMINANCE
-  {SENSORS_BH1750_LUMINANCE_MIN,      SENSORS_BH1750_LUMINANCE_MAX,     BH1750_LUMINANCE,       bh1750_readLightLevel,          SENSORS_NO_INDICATION_FUNCTION},
+  {
+    SENSORS_BH1750_LUMINANCE_MIN,      
+    SENSORS_BH1750_LUMINANCE_MAX,     
+    bh1750_readLightLevel,          
+    SENSORS_NO_INDICATION_FUNCTION,  
+    BH1750_LUMINANCE
+  },
 #endif  
 #ifdef MQ135_PPM
-  {SENSORS_MQ135_PPM_MIN,             SENSORS_MQ135_PPM_MAX,            MQ135_PPM,              mq135_readPPM,                  SENSORS_NO_INDICATION_FUNCTION},
+  { 
+    SENSORS_MQ135_PPM_MIN,             
+    SENSORS_MQ135_PPM_MAX,            
+    mq135_readPPM,                  
+    SENSORS_NO_INDICATION_FUNCTION,  
+    MQ135_PPM
+  },
 #endif  
 #ifdef MQ7_COPPM
-  {SENSORS_MQ7_PPM_MIN,               SENSORS_MQ7_PPM_MAX,              MQ7_COPPM,              mq7_readPPM,                    SENSORS_NO_INDICATION_FUNCTION},
+  { 
+    SENSORS_MQ7_PPM_MIN,               
+    SENSORS_MQ7_PPM_MAX,              
+    mq7_readPPM,                    
+    SENSORS_NO_INDICATION_FUNCTION,  
+    MQ7_COPPM
+  },
 #endif  
 #ifdef GYML8511_UV
-  {SENSORS_GYML8511_UV_MIN,           SENSORS_GYML8511_UV_MAX,          GYML8511_UV,            gy_ml8511_readUvIntensity,      SENSORS_NO_INDICATION_FUNCTION},
+  { 
+    SENSORS_GYML8511_UV_MIN,           
+    SENSORS_GYML8511_UV_MAX,          
+    gy_ml8511_readUvIntensity,      
+    SENSORS_NO_INDICATION_FUNCTION,  
+    GYML8511_UV
+  },
 #endif  
 #ifdef ARDUINORAIN_RAINING
-  {SENSORS_INDICATION_NO_MIN,         SENSORS_INDICATION_NO_MAX,        ARDUINORAIN_RAINING,    SENSORS_NO_VALUE_FUNCTION,      arduino_rain_sensor_readRaining},
+  { 
+    SENSORS_INDICATION_NO_MIN,         
+    SENSORS_INDICATION_NO_MAX,        
+    SENSORS_NO_VALUE_FUNCTION,      
+    arduino_rain_sensor_readRaining, 
+    ARDUINORAIN_RAINING
+  },
 #endif
 };
-
 
 error_manager_error_code_te sensors_init()
 {
@@ -76,15 +136,15 @@ sensor_return_ts sensors_getReading(uint8_t id)
   sensor_return_ts return_data;
   return_data.error_code = ERROR_CODE_SENSORS_NO_SENSORS_CONFIGURED; // Set default error code to indicate no sensors are configured
 
-  size_t sensors_config_len = sensors_getSensorsLen(); // Get the length of the sensor configuration array
-  if(SENSORS_NO_SENSORS_CONFIGURED != sensors_config_len) // Check if any sensors are configured
+  size_t catalog_len = sensors_interface_getSensorsLen(); // Get the length of the sensor configuration array
+  if(SENSORS_INTERFACE_NO_SENSORS_CONFIGURED != catalog_len) // Check if any sensors are configured
   {
     bool is_sensor_configured = false; // Flag to check if the sensor is found
-    uint8_t sensor_index = SENSORS_MINIMUM_INDEX;
+    uint8_t sensor_index = SENSORS_FIRST_SENSOR_INDEX;
 
-    for (uint8_t index = SENSORS_MINIMUM_INDEX; index < sensors_config_len; index++) // Iterate through sensor configurations to find the matching sensor ID
+    for (uint8_t index = SENSORS_FIRST_SENSOR_INDEX; index < catalog_len; index++) // Iterate through sensor configurations to find the matching sensor ID
     {
-      if(pgm_read_byte(&sensor_sensors_config[index].sensor_id) == id)
+      if(pgm_read_byte(&sensors_functional_catalog[index].sensor_id) == id)
       {
         // Sensor ID is found, store it and exit the loop
         is_sensor_configured = true;
@@ -92,10 +152,10 @@ sensor_return_ts sensors_getReading(uint8_t id)
         break;
       }
     }
-    if(true == is_sensor_configured) // If the sensor is configured, proceed to read its values
+    if(SENSORS_SENSOR_CONFIGURED == is_sensor_configured) // If the sensor is configured, proceed to read its values
     {
-      sensor_sensors_config_t current_sensor;
-      memcpy_P(&current_sensor, &sensor_sensors_config[sensor_index], sizeof(sensor_sensors_config_t)); // Copy the sensor configuration from program memory to a local structure
+      sensors_functional_catalog_ts current_sensor;
+      memcpy_P(&current_sensor, &sensors_functional_catalog[sensor_index], sizeof(sensors_functional_catalog_ts)); // Copy the sensor configuration from program memory to a local structure
       return_data.sensor_reading.sensor_id = id;
 
       if(SENSORS_NO_VALUE_FUNCTION != current_sensor.sensor_value_function) // Check if the sensor has a value function defined
@@ -146,25 +206,4 @@ void sensors_loop(unsigned long current_millis)
   mq7_calibratingLoopFunction(current_millis);
 #endif
 #endif
-}
-
-size_t sensors_getSensorsLen()
-{
-  size_t sensors_len = SENSORS_NO_SENSORS_CONFIGURED; // Default value in case of no sensors configured
-  if (SENSORS_NO_SENSORS_CONFIGURED != sizeof(sensor_sensors_config))
-  {
-    sensors_len = sizeof(sensor_sensors_config) / sizeof(sensor_sensors_config[SENSORS_FIRST_SENSOR_INDEX]);
-  }
-  return sensors_len;
-}
-
-uint8_t sensors_sensorIndexToId(uint8_t index) 
-{
-  uint8_t sensor_id = INVALID_SENSOR_ID; // Default sensor ID in case index is out of bounds or there are no sensors configured
-  size_t num_of_sensors = sensors_getSensorsLen();
-  if(index < num_of_sensors && SENSORS_MINIMUM_INDEX <= index)
-  {
-    sensor_id = pgm_read_byte(&sensor_sensors_config[index].sensor_id); // Convert to sensor ID
-  }
-  return sensor_id;
 }
