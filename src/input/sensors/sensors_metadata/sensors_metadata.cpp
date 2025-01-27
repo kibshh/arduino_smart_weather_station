@@ -77,7 +77,7 @@ const sensors_metadata_catalog_ts sensors_metadata_catalog[] PROGMEM =
 #ifdef MQ7_COPPM
   {
     "CO PPM",          
-    "",,    
+    "",    
     MQ7_COPPM,           
     SENSORS_MEASUREMENT_TYPE_VALUE,
     SENSORS_DISPLAY_0_DECIMALS,
@@ -109,7 +109,7 @@ const sensors_metadata_catalog_ts sensors_metadata_catalog[] PROGMEM =
 bool sensors_metadata_getSensorFromCatalog(uint8_t id, sensors_metadata_catalog_ts * current_sensor)
 {
     bool success_status = SENSORS_METADATA_RETRIEVE_FAILED;
-    size_t num_of_sensors = sensor_metadata_getSensorsLen();
+    size_t num_of_sensors = sensors_metadata_getSensorsLen();
     uint8_t current_id = INVALID_SENSOR_ID;
 
     // Loop through all sensors in the catalog

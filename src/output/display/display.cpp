@@ -1,41 +1,7 @@
 #include "display.h"
 
 
-const display_sensors_config_ts display_sensors_config[] PROGMEM =
-{
-#ifdef DHT11_TEMPERATURE
-  {"Temp",        "C",      DHT11_TEMPERATURE,       DISPLAY_READING_VALUE,      DISPLAY_1_DECIMAL},
-#endif
-#ifdef DHT11_HUMIDITY
-  {"Humidity",    "%",      DHT11_HUMIDITY,          DISPLAY_READING_VALUE,      DISPLAY_1_DECIMAL},
-#endif
-#ifdef BMP280_PRESSURE
-  {"Press",       "hPa",    BMP280_PRESSURE,         DISPLAY_READING_VALUE,      DISPLAY_1_DECIMAL},
-#endif
-#ifdef BMP280_TEMPERATURE
-  {"BPM Temp",    "C",      BMP280_TEMPERATURE,      DISPLAY_READING_VALUE,      DISPLAY_1_DECIMAL},
-#endif
-#ifdef BMP280_ALTITUDE
-  {"Altitude",    "m",      BMP280_ALTITUDE,         DISPLAY_READING_VALUE,      DISPLAY_0_DECIMALS},
-#endif
-#ifdef BH1750_LUMINANCE
-  {"Luminance",   "lx",     BH1750_LUMINANCE,        DISPLAY_READING_VALUE,      DISPLAY_0_DECIMALS},
-#endif
-#ifdef MQ135_PPM
-  {"Gases PPM",   "",       MQ135_PPM,               DISPLAY_READING_VALUE,      DISPLAY_0_DECIMALS},
-#endif
-#ifdef MQ7_COPPM
-  {"CO PPM",      "",       MQ7_COPPM,               DISPLAY_READING_VALUE,      DISPLAY_0_DECIMALS},
-#endif
-#ifdef GYML8511_UV
-  {"UV int",      "",       GYML8511_UV,             DISPLAY_READING_VALUE,      DISPLAY_1_DECIMAL},
-#endif
-#ifdef ARDUINORAIN_RAINING
-  {"Raining",     "",       ARDUINORAIN_RAINING,     DISPLAY_INDICATION,         DISPLAY_NO_DECIMALS},
-#endif
-};
-
-LiquidCrystal_I2C lcd(DISPLAY_LCD_I2C_ADDDR, DISPLAY_LCD_WIDTH, DISPLAY_LCD_HEIGHT);
+static LiquidCrystal_I2C lcd(DISPLAY_LCD_I2C_ADDDR, DISPLAY_LCD_WIDTH, DISPLAY_LCD_HEIGHT);
 
 error_manager_error_code_te display_init()
 {
@@ -77,66 +43,50 @@ error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts s
 
   lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_SENSORS_ROW);
 
-  bool is_sensor_configured = false;
-  uint8_t sensor_index = 0;
-  if(DIPSLAY_NO_SENSORS_CONFIGURED != sizeof(display_sensors_config))
+  sensors_interface_metadata_ts sensor_metadata = sensors_interface_getSensorMetadata(sensor_data.sensor_id);
+
+  if(SENSORS_INTERFACE_STATUS_SUCCESS == sensor_metadata.success_status)
   {
-    size_t num_of_display_functions = sizeof(display_sensors_config) / sizeof(display_sensors_config[0]);
-    for (uint8_t index = 0; index < num_of_display_functions; index++)
+    const char* sensor_type = sensor_metadata.metadata.sensor_type;
+    const char* measurement_unit = sensor_metadata.metadata.measurement_unit;
+    uint8_t measurement_type = sensor_metadata.metadata.measurement_type;
+    uint8_t num_of_decimals = sensor_metadata.metadata.num_of_decimals;
+    uint8_t display_num_of_letters = sensor_metadata.metadata.display_num_of_letters;
+
+    String display_string = "";
+    String val = "";
+
+    if(SENSORS_MEASUREMENT_TYPE_VALUE == sensor_data.measurement_type_switch && SENSORS_MEASUREMENT_TYPE_VALUE == measurement_type)
     {
-      if(pgm_read_byte(&display_sensors_config[index].id) == sensor_data.sensor_id)
-      {
-        is_sensor_configured = true;
-        sensor_index = index;
-        break;
-      }
+      float value = sensor_data.value;
+      val = String(value, num_of_decimals);
     }
-
-    if(true == is_sensor_configured)
+    else if(SENSORS_MEASUREMENT_TYPE_INDICATION == sensor_data.measurement_type_switch && SENSORS_MEASUREMENT_TYPE_INDICATION == measurement_type)
     {
-      display_sensors_config_ts current_sensor;
-      memcpy_P(&current_sensor, &display_sensors_config[sensor_index], sizeof(display_sensors_config_ts));
-      const char* sensor_type = (const char*)pgm_read_word(&(current_sensor.sensor_type));
-      const char* measurement_unit = (const char*)pgm_read_word(&(current_sensor.measurement_unit));
-      String display_string = "";
-      String val = "";
-
-      if(DISPLAY_READING_VALUE == sensor_data.measurement_type_switch)
+      if(true == sensor_data.indication)
       {
-        float value = sensor_data.value;
-        val = String(value, current_sensor.accuracy);
-      }
-      else if(DISPLAY_INDICATION == sensor_data.measurement_type_switch)
-      {
-        if(true == sensor_data.indication)
-        {
-          val = "yes";
-        }
-        else
-        {
-          val = "no";
-        }
+        val = "yes";
       }
       else
       {
-        error_code = ERROR_CODE_DISPLAY_INVALID_MEASUREMENT_TYPE;
+        val = "no";
       }
-
-      display_string = String(sensor_type) + ": " + val + String(measurement_unit);
-      while (display_string.length() < DISPLAY_LCD_WIDTH) 
-      {
-        display_string += ' '; //Add spaces to fill to the end
-      }
-      lcd.print(display_string);
     }
     else
     {
-      error_code = ERROR_CODE_DISPLAY_SENSOR_NOT_CONFIGURED;
+      error_code = ERROR_CODE_DISPLAY_INVALID_MEASUREMENT_TYPE;
     }
+
+    display_string = String(sensor_type).substring(DISPLAY_FIRST_LETTER_IN_STR, display_num_of_letters) + ": " + val + String(measurement_unit);
+    while (display_string.length() < DISPLAY_LCD_WIDTH) 
+    {
+      display_string += ' '; //Add spaces to fill to the end
+    }
+    lcd.print(display_string);
   }
   else
   {
-    error_code = ERROR_CODE_DISPLAY_NO_SENSORS_CONFIGURED;
+    error_code = ERROR_CODE_DISPLAY_SENSOR_NOT_CONFIGURED;
   }
   return error_code;
 }

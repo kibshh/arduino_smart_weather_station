@@ -2,15 +2,12 @@
 #define DISPLAY_H
 
 #include <Arduino.h>
-#include <avr/pgmspace.h>
 #include <LiquidCrystal_I2C.h>
 #include <WString.h>
 #include "../../error_manager/error_codes.h"
 #include "../../input/sensors/sensors_interface/sensors_interface.h"
 #include "../../data_router/data_router_types.h"
 #include "../../input/input_types.h"
-
-#define DIPSLAY_NO_SENSORS_CONFIGURED (0u)
 
 #define DISPLAY_LCD_HEIGHT    (2u)
 #define DISPLAY_LCD_WIDTH     (16u)
@@ -23,18 +20,11 @@
 #define DISPLAY_I2C_SCAN_STRING_ROW  (0u)
 #define DISPLAY_I2C_SCAN_ADDR_ROW    (1u)
 
-#define DISPLAY_NO_DECIMALS   (-1)
-#define DISPLAY_0_DECIMALS    (0u)
-#define DISPLAY_1_DECIMAL     (1u)
-#define DISPLAY_2_DECIMALS    (2u)
-#define DISPLAY_3_DECIMALS    (3u)
-#define DISPLAY_4_DECIMALS    (4u)
-#define DISPLAY_5_DECIMALS    (5u)
-#define DISPLAY_6_DECIMALS    (6u)
-
 #define DISPLAY_DATETIME_FORMATER_LEN (3u)
 
 #define DISPLAY_TWO_CIPHER_NUMBER     (10u)
+
+#define DISPLAY_FIRST_LETTER_IN_STR   (0u)
 
 #define DISPLAY_DISPLAY_INTERVAL_MS        (2000)  //2 seconds
 #define DISPLAY_TIME_DISPLAY_INTERVAL_MS   (30000) //30 seconds
