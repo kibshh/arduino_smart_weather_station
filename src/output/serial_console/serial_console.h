@@ -2,9 +2,18 @@
 #define SERIAL_CONSOLE_H
 
 #include <Arduino.h>
+#include <avr/pgmspace.h>
 #include "../../error_manager/error_codes.h"
 #include "serial_console_config.h"
 
+typedef struct
+{
+    const char* sensor_type;
+    const char* measurement_unit;
+    uint8_t id;
+    uint8_t measurement_type;
+    uint8_t accuracy;
+}serial_console_config_ts;
 
 /**
  * @brief Initializes the serial console communication.

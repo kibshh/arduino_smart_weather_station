@@ -5,6 +5,7 @@
 #include <avr/pgmspace.h>
 #include "sensorsconfig.h"
 #include "../input_types.h"
+#include "sensor_interface.h"
 #if defined(DHT11_TEMPERATURE) || defined(DHT11_HUMIDITY)
 #include "sensor_library/dht11/dht11.h"
 #endif
@@ -35,28 +36,19 @@
 #define SENSORS_NO_INDICATION_FUNCTION        (nullptr) // Placeholder for sensors without an indication function
 #define SENSORS_NO_VALUE_FUNCTION             (nullptr) // Placeholder for sensors without a value function
 
-#define SENSORS_MEASUREMENT_TYPE_VALUE        (0u)      // Measurement type for sensors providing float values
-#define SENSORS_MEASUREMENT_TYPE_INDICATION   (1u)      // Measurement type for sensors providing indications
-
+#define SENSORS_INDICATION_NO_MIN        (0)
+#define SENSORS_INDICATION_NO_MAX        (0)
 
 typedef float (*sensor_sensor_value_function_t)();     // Function pointer type for sensors returning a float value
 typedef bool (*sensor_sensor_indication_function_t)(); // Function pointer type for sensors returning a bool indication
 
-/**
- * @brief Structure representing the configuration for a single sensor.
- * 
- * This structure is used to define the properties and functions associated with a sensor. 
- * Each sensor is identified by a unique ID and has optional functions to provide its value 
- * or indication. Additionally, valid ranges for the sensor's readings can be specified (in case of value sensor).
- */
 typedef struct
 {
   float min_value; // The minimum valid value for the sensor's reading. Values below this are considered invalid.
   float max_value; // The maximum valid value for the sensor's reading. Values above this are considered invalid.
-  uint8_t sensor_id; // Unique identifier for the sensor. Used to map the sensor in configurations or operations.
   sensor_sensor_value_function_t sensor_value_function; // Function pointer for obtaining a numerical reading from the sensor. Optional.
   sensor_sensor_indication_function_t sensor_indication_function; // Function pointer for obtaining a boolean status/indication from the sensor. Optional.
-} sensor_sensors_config_t;
+} sensors_functional_catalog_ts;
 
 /**
  * @brief Initializes all configured sensors based on their compile-time definitions.
@@ -95,30 +87,6 @@ error_manager_error_code_te sensors_init();
  *       (either value-based or indication-based).
  ***/
 sensor_return_ts sensors_getReading(uint8_t id);
-
-/**
- * @brief Retrieves the number of configured sensors.
- *
- * This function calculates and returns the total number of configured 
- * sensors by evaluating the size of the configuration array. Returns 
- * a default value if no sensors are configured.
- *
- * @return size_t The number of configured sensors or a default value 
- * if none are configured.
- */
-size_t sensors_getSensorsLen();
-
-/**
- * @brief Converts a sensor index to its corresponding sensor ID.
- *
- * This function takes an index within the sensor configuration array and 
- * retrieves the corresponding sensor ID. Returns an invalid ID if the 
- * index is out of bounds or no sensors are configured.
- *
- * @param index The index of the sensor in the configuration array.
- * @return uint8_t The sensor ID corresponding to the index, or an invalid ID if the index is invalid.
- */
-uint8_t sensors_sensorIndexToId(uint8_t index);
 
 /**
  * @brief Handles periodic tasks for sensors in the main loop.

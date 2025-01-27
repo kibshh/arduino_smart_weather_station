@@ -1,40 +1,149 @@
 #include "sensors.h"
 
-/* Sensor configuration array */
-const sensor_sensors_config_t sensor_sensors_config[] PROGMEM =
+/* SENSOR CONFIGURATION CATALOG */
+const sensors_catalog_ts sensors_catalog[] PROGMEM =
 {
 #ifdef DHT11_TEMPERATURE
-  {SENSORS_DHT11_TEMPERATURE_MIN,     SENSORS_DHT11_TEMPERATURE_MAX,    DHT11_TEMPERATURE,      dht11_readTemperature,          SENSORS_NO_INDICATION_FUNCTION},
+  {
+    "Temperature",     
+    "C",   
+    SENSORS_DHT11_TEMPERATURE_MIN,     
+    SENSORS_DHT11_TEMPERATURE_MAX,    
+    dht11_readTemperature,          
+    SENSORS_NO_INDICATION_FUNCTION,  
+    DHT11_TEMPERATURE,   
+    SENSORS_MEASUREMENT_TYPE_VALUE,
+    SENSORS_DISPLAY_1_DECIMAL,
+    SENSORS_DISPLAY_4_LETTERS
+  },
 #endif
 #ifdef DHT11_HUMIDITY
-  {SENSORS_DHT11_HUMIDITY_MIN,        SENSORS_DHT11_HUMIDITY_MAX,       DHT11_HUMIDITY,         dht11_readHumidity,             SENSORS_NO_INDICATION_FUNCTION},
+  {
+    "Humidity",        
+    "%",   
+    SENSORS_DHT11_HUMIDITY_MIN,        
+    SENSORS_DHT11_HUMIDITY_MAX,       
+    dht11_readHumidity,             
+    SENSORS_NO_INDICATION_FUNCTION,  
+    DHT11_HUMIDITY,      
+    SENSORS_MEASUREMENT_TYPE_VALUE,
+    SENSORS_DISPLAY_1_DECIMAL,
+    SENSORS_DISPLAY_8_LETTERS
+  },
 #endif  
 #ifdef BMP280_PRESSURE
-  {SENSORS_BMP280_PRESSURE_MIN,       SENSORS_BMP280_PRESSURE_MAX,      BMP280_PRESSURE,        bmp280_readPressure,            SENSORS_NO_INDICATION_FUNCTION},
+  {
+    "Pressure",        
+    "hPa", 
+    SENSORS_BMP280_PRESSURE_MIN,       
+    SENSORS_BMP280_PRESSURE_MAX,      
+    bmp280_readPressure,            
+    SENSORS_NO_INDICATION_FUNCTION,  
+    BMP280_PRESSURE,     
+    SENSORS_MEASUREMENT_TYPE_VALUE,
+    SENSORS_DISPLAY_1_DECIMAL,
+    SENSORS_DISPLAY_5_LETTERS
+  },
 #endif  
 #ifdef BMP280_TEMPERATURE
-  {SENSORS_BMP280_TEMPERATURE_MIN,    SENSORS_BMP280_TEMPERATURE_MAX,   BMP280_TEMPERATURE,     bmp280_readTemperature,         SENSORS_NO_INDICATION_FUNCTION},
+  {
+    "Temperature",     
+    "C",   
+    SENSORS_BMP280_TEMPERATURE_MIN,    
+    SENSORS_BMP280_TEMPERATURE_MAX,   
+    bmp280_readTemperature,         
+    SENSORS_NO_INDICATION_FUNCTION,  
+    BMP280_TEMPERATURE,  
+    SENSORS_MEASUREMENT_TYPE_VALUE,
+    SENSORS_DISPLAY_1_DECIMAL,
+    SENSORS_DISPLAY_4_LETTERS
+  },
 #endif  
 #ifdef BMP280_ALTITUDE
-  {SENSORS_BMP280_ALTITUDE_MIN,       SENSORS_BMP280_ALTITUDE_MAX,      BMP280_ALTITUDE,        bmp280_readAltitude,            SENSORS_NO_INDICATION_FUNCTION},
+  {
+    "Altitude",        
+    "m",   
+    SENSORS_BMP280_ALTITUDE_MIN,       
+    SENSORS_BMP280_ALTITUDE_MAX,      
+    bmp280_readAltitude,            
+    SENSORS_NO_INDICATION_FUNCTION,  
+    BMP280_ALTITUDE,     
+    SENSORS_MEASUREMENT_TYPE_VALUE,
+    SENSORS_DISPLAY_0_DECIMALS,
+    SENSORS_DISPLAY_8_LETTERS
+  },
 #endif  
 #ifdef BH1750_LUMINANCE
-  {SENSORS_BH1750_LUMINANCE_MIN,      SENSORS_BH1750_LUMINANCE_MAX,     BH1750_LUMINANCE,       bh1750_readLightLevel,          SENSORS_NO_INDICATION_FUNCTION},
+  {
+    "Luminance",       
+    "lx",  
+    SENSORS_BH1750_LUMINANCE_MIN,      
+    SENSORS_BH1750_LUMINANCE_MAX,     
+    bh1750_readLightLevel,          
+    SENSORS_NO_INDICATION_FUNCTION,  
+    BH1750_LUMINANCE,    
+    SENSORS_MEASUREMENT_TYPE_VALUE,
+    SENSORS_DISPLAY_0_DECIMALS,
+    SENSORS_DISPLAY_9_LETTERS
+  },
 #endif  
 #ifdef MQ135_PPM
-  {SENSORS_MQ135_PPM_MIN,             SENSORS_MQ135_PPM_MAX,            MQ135_PPM,              mq135_readPPM,                  SENSORS_NO_INDICATION_FUNCTION},
+  {
+    "Gases PPM",       
+    "",    
+    SENSORS_MQ135_PPM_MIN,             
+    SENSORS_MQ135_PPM_MAX,            
+    mq135_readPPM,                  
+    SENSORS_NO_INDICATION_FUNCTION,  
+    MQ135_PPM,           
+    SENSORS_MEASUREMENT_TYPE_VALUE,
+    SENSORS_DISPLAY_0_DECIMALS,
+    SENSORS_DISPLAY_9_LETTERS
+  },
 #endif  
 #ifdef MQ7_COPPM
-  {SENSORS_MQ7_PPM_MIN,               SENSORS_MQ7_PPM_MAX,              MQ7_COPPM,              mq7_readPPM,                    SENSORS_NO_INDICATION_FUNCTION},
+  {
+    "CO PPM",          
+    "",,   
+    SENSORS_MQ7_PPM_MIN,               
+    SENSORS_MQ7_PPM_MAX,              
+    mq7_readPPM,                    
+    SENSORS_NO_INDICATION_FUNCTION,  
+    MQ7_COPPM,           
+    SENSORS_MEASUREMENT_TYPE_VALUE,
+    SENSORS_DISPLAY_0_DECIMALS,
+    SENSORS_DISPLAY_6_LETTERS
+  },
 #endif  
 #ifdef GYML8511_UV
-  {SENSORS_GYML8511_UV_MIN,           SENSORS_GYML8511_UV_MAX,          GYML8511_UV,            gy_ml8511_readUvIntensity,      SENSORS_NO_INDICATION_FUNCTION},
+  {
+    "UV intensity",    
+    "",    
+    SENSORS_GYML8511_UV_MIN,           
+    SENSORS_GYML8511_UV_MAX,          
+    gy_ml8511_readUvIntensity,      
+    SENSORS_NO_INDICATION_FUNCTION,  
+    GYML8511_UV,         
+    SENSORS_MEASUREMENT_TYPE_VALUE,
+    SENSORS_DISPLAY_1_DECIMAL,
+    SENSORS_DISPLAY_2_LETTERS
+  },
 #endif  
 #ifdef ARDUINORAIN_RAINING
-  {SENSORS_INDICATION_NO_MIN,         SENSORS_INDICATION_NO_MAX,        ARDUINORAIN_RAINING,    SENSORS_NO_VALUE_FUNCTION,      arduino_rain_sensor_readRaining},
+  {
+    "Raining status",  
+    "",    
+    SENSORS_INDICATION_NO_MIN,         
+    SENSORS_INDICATION_NO_MAX,        
+    SENSORS_NO_VALUE_FUNCTION,      
+    arduino_rain_sensor_readRaining, 
+    ARDUINORAIN_RAINING, 
+    SENSORS_MEASUREMENT_TYPE_INDICATION,
+    SENSORS_DISPLAY_0_DECIMALS,
+    SENSORS_DISPLAY_7_LETTERS
+  },
 #endif
 };
-
 
 error_manager_error_code_te sensors_init()
 {
@@ -167,4 +276,24 @@ uint8_t sensors_sensorIndexToId(uint8_t index)
     sensor_id = pgm_read_byte(&sensor_sensors_config[index].sensor_id); // Convert to sensor ID
   }
   return sensor_id;
+}
+
+sensor_interface_ts sensor_interface_getSensorFromCatalog(uint8_t id)
+{
+  sensor_interface_ts return_interface;
+  return_interface.success_status = false;
+
+  sensors_catalog_ts current_sensor_from_catalog;
+  if(true == sensors_getSensorFromCatalog(id, &current_sensor_from_catalog))
+  {
+    // Fill the return_interface structure with data from current_sensor_from_catalog
+    return_interface.sensor_type = current_sensor_from_catalog.sensor_type;
+    return_interface.measurement_unit = current_sensor_from_catalog.measurement_unit;
+    return_interface.sensor_id = current_sensor_from_catalog.sensor_id;
+    return_interface.measurement_type = current_sensor_from_catalog.measurement_type;
+    return_interface.accuracy = current_sensor_from_catalog.accuracy;
+    return_interface.display_num_of_letters = current_sensor_from_catalog.display_num_of_letters;
+    return_interface.success_status = true; // Indicate success
+  }
+  return return_interface;
 }

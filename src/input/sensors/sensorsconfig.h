@@ -17,10 +17,6 @@
 #define ARDUINORAIN_RAINING                   (10u)
 /* ********************************* */
 
-
-#define SENSORS_INDICATION_NO_MIN        (0)
-#define SENSORS_INDICATION_NO_MAX        (0)
-
 /* DHT11 */
 #define SENSORS_DHT11_PIN                             (2u)
 #define SENSORS_DHT11_TEMPERATURE_MIN                 (-20)

@@ -1,7 +1,7 @@
 #include "display.h"
 
 
-const display_sensors_config_t display_sensors_config[] PROGMEM =
+const display_sensors_config_ts display_sensors_config[] PROGMEM =
 {
 #ifdef DHT11_TEMPERATURE
   {"Temp",        "C",      DHT11_TEMPERATURE,       DISPLAY_READING_VALUE,      DISPLAY_1_DECIMAL},
@@ -94,8 +94,8 @@ error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts s
 
     if(true == is_sensor_configured)
     {
-      display_sensors_config_t current_sensor;
-      memcpy_P(&current_sensor, &display_sensors_config[sensor_index], sizeof(display_sensors_config_t));
+      display_sensors_config_ts current_sensor;
+      memcpy_P(&current_sensor, &display_sensors_config[sensor_index], sizeof(display_sensors_config_ts));
       const char* sensor_type = (const char*)pgm_read_word(&(current_sensor.sensor_type));
       const char* measurement_unit = (const char*)pgm_read_word(&(current_sensor.measurement_unit));
       String display_string = "";

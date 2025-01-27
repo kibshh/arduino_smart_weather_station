@@ -23,9 +23,6 @@
 #define DISPLAY_I2C_SCAN_STRING_ROW  (0u)
 #define DISPLAY_I2C_SCAN_ADDR_ROW    (1u)
 
-#define DISPLAY_READING_VALUE (0u)
-#define DISPLAY_INDICATION    (1u)
-
 #define DISPLAY_NO_DECIMALS   (-1)
 #define DISPLAY_0_DECIMALS    (0u)
 #define DISPLAY_1_DECIMAL     (1u)
@@ -49,7 +46,7 @@ typedef struct
     uint8_t id;
     uint8_t measurement_type;
     uint8_t accuracy;
-}display_sensors_config_t;
+}display_sensors_config_ts;
 
 extern const int num_of_display_functions;
 
