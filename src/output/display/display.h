@@ -6,7 +6,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <WString.h>
 #include "../../error_manager/error_codes.h"
-#include "../../input/sensors/sensorsconfig.h"
+#include "../../input/sensors/sensors_interface/sensors_interface.h"
 #include "../../data_router/data_router_types.h"
 #include "../../input/input_types.h"
 
@@ -38,17 +38,6 @@
 
 #define DISPLAY_DISPLAY_INTERVAL_MS        (2000)  //2 seconds
 #define DISPLAY_TIME_DISPLAY_INTERVAL_MS   (30000) //30 seconds
-
-typedef struct
-{
-    const char* sensor_type;
-    const char* measurement_unit;
-    uint8_t id;
-    uint8_t measurement_type;
-    uint8_t accuracy;
-}display_sensors_config_ts;
-
-extern const int num_of_display_functions;
 
 /**
  * @brief Initializes the LCD display module.

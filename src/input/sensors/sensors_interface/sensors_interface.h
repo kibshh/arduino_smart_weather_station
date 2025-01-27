@@ -2,7 +2,19 @@
 #define SENSORS_INTERFACE_H
 
 #include <Arduino.h>
-#include "../sensor_metadata/sensor_metadata.h"
+#include "../sensors_metadata/sensors_metadata.h"
+
+/**
+ * @file sensors_interface.h
+ * @brief Interface component for sensor metadata encapsulation.
+ *
+ * This file provides an abstraction layer for accessing sensor metadata 
+ * and information, ensuring encapsulation of underlying implementation details. 
+ * It exposes functions for retrieving sensor metadata, mapping sensor indices 
+ * to IDs, and obtaining the number of configured sensors. Other components 
+ * interact with the sensor metadata exclusively through this interface, 
+ * promoting modularity and reducing dependencies on internal structures.
+ */
 
 // Status codes indicating the sensor interface operation success or failure
 #define SENSORS_INTERFACE_STATUS_FAILED     (false)
@@ -21,7 +33,7 @@ typedef struct
 {
     sensors_metadata_catalog_ts metadata; // Metadata details for a sensor
     bool success_status;                  // Status of the metadata retrieval operation
-} sensors_interface_metadata;
+} sensors_interface_metadata_ts;
 
 /**
  * @brief Retrieves sensor metadata for a given sensor ID from the metadata catalog.
@@ -32,10 +44,10 @@ typedef struct
  * indicates failure.
  * 
  * @param id The unique identifier of the sensor to retrieve.
- * @return sensors_interface_metadata A structure containing the sensor metadata 
+ * @return sensors_interface_metadata_ts A structure containing the sensor metadata 
  *                                    and success status.
  */
-sensors_interface_metadata sensors_interface_getSensorMetadata(uint8_t id);
+sensors_interface_metadata_ts sensors_interface_getSensorMetadata(uint8_t id);
 
 /**
  * @brief Returns the number of configured sensors.

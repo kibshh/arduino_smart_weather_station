@@ -1,6 +1,7 @@
 #include "sensors_metadata.h"
 
 /* SENSORS METADATA CATALOG */
+/* MUST BE IN THE SAME ORDER AS THE FUNCTIONAL CONFIG ARRAY IN sensors.cpp */
 const sensors_metadata_catalog_ts sensors_metadata_catalog[] PROGMEM =
 {
 #ifdef DHT11_TEMPERATURE

@@ -90,6 +90,6 @@ size_t sensors_metadata_getSensorsLen();
  * @param index The index of the sensor in the configuration array.
  * @return uint8_t The sensor ID corresponding to the index, or an invalid ID if the index is invalid.
  */
-uint8_t sensors_metadata_sensorIndexToId(uint8_t index) 
+uint8_t sensors_metadata_sensorIndexToId(uint8_t index);
 
 #endif

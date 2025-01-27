@@ -1,8 +1,8 @@
 #include "sensors_interface.h"
 
-sensors_interface_metadata sensors_interface_getSensorMetadata(uint8_t id)
+sensors_interface_metadata_ts sensors_interface_getSensorMetadata(uint8_t id)
 {
-    sensors_interface_metadata metadata_return;
+    sensors_interface_metadata_ts metadata_return;
     metadata_return.success_status = SENSORS_INTERFACE_STATUS_FAILED; // Default failure status
 
     // Attempt to retrieve the sensor metadata from the catalog
