@@ -80,4 +80,16 @@ bool sensors_metadata_getSensorFromCatalog(uint8_t id, sensors_metadata_catalog_
  */
 size_t sensors_metadata_getSensorsLen();
 
+/**
+ * @brief Converts a sensor index to its corresponding sensor ID.
+ *
+ * This function takes an index within the sensor metadata configuration array and 
+ * retrieves the corresponding sensor ID. Returns an invalid ID if the 
+ * index is out of bounds or no sensors are configured.
+ *
+ * @param index The index of the sensor in the configuration array.
+ * @return uint8_t The sensor ID corresponding to the index, or an invalid ID if the index is invalid.
+ */
+uint8_t sensors_metadata_sensorIndexToId(uint8_t index) 
+
 #endif

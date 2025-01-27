@@ -257,27 +257,6 @@ void sensors_loop(unsigned long current_millis)
 #endif
 }
 
-size_t sensors_getSensorsLen()
-{
-  size_t sensors_len = SENSORS_NO_SENSORS_CONFIGURED; // Default value in case of no sensors configured
-  if (SENSORS_NO_SENSORS_CONFIGURED != sizeof(sensor_sensors_config))
-  {
-    sensors_len = sizeof(sensor_sensors_config) / sizeof(sensor_sensors_config[SENSORS_FIRST_SENSOR_INDEX]);
-  }
-  return sensors_len;
-}
-
-uint8_t sensors_sensorIndexToId(uint8_t index) 
-{
-  uint8_t sensor_id = INVALID_SENSOR_ID; // Default sensor ID in case index is out of bounds or there are no sensors configured
-  size_t num_of_sensors = sensors_getSensorsLen();
-  if(index < num_of_sensors && SENSORS_MINIMUM_INDEX <= index)
-  {
-    sensor_id = pgm_read_byte(&sensor_sensors_config[index].sensor_id); // Convert to sensor ID
-  }
-  return sensor_id;
-}
-
 sensor_interface_ts sensor_interface_getSensorFromCatalog(uint8_t id)
 {
   sensor_interface_ts return_interface;

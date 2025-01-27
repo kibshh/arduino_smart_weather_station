@@ -136,3 +136,14 @@ size_t sensors_metadata_getSensorsLen()
   return sensors_len;
 }
 
+uint8_t sensors_metadata_sensorIndexToId(uint8_t index) 
+{
+  uint8_t sensor_id = INVALID_SENSOR_ID; // Default sensor ID in case index is out of bounds or there are no sensors configured
+  size_t num_of_sensors = sensors_metadata_getSensorsLen();
+  if(index < num_of_sensors && SENSORS_METADATA_FIRST_SENSOR_INDEX <= index)
+  {
+    sensor_id = pgm_read_byte(&sensors_metadata_catalog[index].sensor_id); // Convert to sensor ID
+  }
+  return sensor_id;
+}
+
