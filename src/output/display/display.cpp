@@ -135,7 +135,10 @@ error_manager_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_d
   {
     // Print headline string
     lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_I2C_SCAN_STRING_ROW);
-    String display_string = "I2C 0x" + String(i2c_scan_data.device_address < DISPLAY_TWO_CIPHER_NUMBER ? "0" : "") + String(i2c_scan_data.device_address, HEX) + " status:";
+    String display_string = "I2C 0x" + 
+                            String(i2c_scan_data.device_address < DISPLAY_TWO_CIPHER_NUMBER ? "0" : "") + 
+                            String(i2c_scan_data.device_address, HEX) + 
+                            " status:";
     lcd.print(display_string);
 
     // Print device status
@@ -173,6 +176,6 @@ error_manager_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_d
     }
     lcd.print(display_string);
   }
-
+  /* IMPORTANT: Check of invalid I2C address is done on I2C scanner side and it should not arrive on the Display */
   return error_code;
 }

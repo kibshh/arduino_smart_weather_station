@@ -96,7 +96,7 @@ const sensors_metadata_catalog_ts sensors_metadata_catalog[] PROGMEM =
 #endif  
 #ifdef ARDUINORAIN_RAINING
   {
-    "Raining status",  
+    "Raining",  
     "",    
     ARDUINORAIN_RAINING, 
     SENSORS_MEASUREMENT_TYPE_INDICATION,
