@@ -41,7 +41,9 @@
 #define SENSORS_BH1750_LUMINANCE_MAX                  (150000)
 
 /* MQ135 */
+#ifdef MQ135_PPM
 #define SENSORS_MQ135_CALIBRATION_ENABLED
+#endif
 #define SENSORS_MQ135_PIN_ANALOG                      (A0)
 #define SENSORS_MQ135_PPM_MIN                         (0)
 #define SENSORS_MQ135_PPM_MAX                         (10000)
@@ -50,7 +52,9 @@
 #define SENSORS_MQ135_R_ZERO                          (10000)
 
 /* MQ7 */
+#ifdef MQ7_COPPM
 #define SENSORS_MQ7_CALIBRATION_ENABLED
+#endif
 #define SENSORS_MQ7_PIN_ANALOG                        (A1)
 #define SENSORS_MQ7_PIN_PWM_HEATER                    (9u)
 #define SENSORS_MQ7_PPM_MIN                           (10)
