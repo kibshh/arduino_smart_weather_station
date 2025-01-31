@@ -228,7 +228,7 @@ error_manager_error_code_te display_displayCalibrationResults(calibration_readin
     uint8_t num_of_decimals = calib_metadata.metadata.num_of_decimals;
     uint8_t display_num_of_letters = calib_metadata.metadata.display_num_of_letters;
 
-    // Flag to control whether display should proceed
+    // Flag to control whether display should proceeded
     bool proceed_with_display = DISPLAY_PROCEED_WITH_DISPLAY;
 
     // Prepare display strings with appropriate buffer size (+1 for null terminator)

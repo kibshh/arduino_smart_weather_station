@@ -33,6 +33,9 @@ error_manager_error_code_te serial_console_displayData(data_router_data_ts data)
       error_code = serial_console_displayI2cScan(data.input_return.i2cScan_reading); // Display I2C scan results
       break;
 
+    case INPUT_CALIBRATION:
+      error_code = serial_console_displayCalibrationResults(data.input_return.calib_reading); // Display calibration results
+
     default:
       // No action, error code is already set
       break;
@@ -60,6 +63,8 @@ error_manager_error_code_te serial_console_displaySensorMeasurement(sensor_readi
     String display_string = "";
     String val = "";
 
+    bool proceed_with_display = SERIAL_CONSOLE_PROCEED_WITH_DISPLAY;
+
     // Handle value-based measurements
     if(SENSORS_MEASUREMENT_TYPE_VALUE == sensor_data.measurement_type_switch && SENSORS_MEASUREMENT_TYPE_VALUE == measurement_type)
     {
@@ -82,9 +87,10 @@ error_manager_error_code_te serial_console_displaySensorMeasurement(sensor_readi
     {
       // Set error code for invalid measurement type
       error_code = ERROR_CODE_SERIAL_CONSOLE_INVALID_MEASUREMENT_TYPE;
+      proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
     }
     // Format and display the sensor data if everything is okay
-    if(ERROR_CODE_NO_ERROR == error_code)
+    if(SERIAL_CONSOLE_PROCEED_WITH_DISPLAY == proceed_with_display)
     {
       display_string = String(sensor_type) + ": " + val + String(measurement_unit);
       Serial.println(display_string);
@@ -127,6 +133,8 @@ error_manager_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c
 
   String display_string = "";
 
+  bool proceed_with_display = SERIAL_CONSOLE_PROCEED_WITH_DISPLAY;
+
   // Handle scan for all devices mode
   if(I2CSCAN_MODE_SCAN_FOR_ALL_DEVICES == i2c_scan_data.device_address)
   {
@@ -167,12 +175,13 @@ error_manager_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c
       // Set error code for unknown I2C device status
       default:
         error_code = ERROR_CODE_SERIAL_CONSOLE_UNKNOWN_I2C_DEVICE_STATUS;
+        proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
         break;
     }
   }
   /* IMPORTANT: Check of invalid I2C address is done on I2C scanner side and it should not arrive on the Serial Console */
   // Display the formatted string if no error occurred
-  if(ERROR_CODE_NO_ERROR == error_code)
+  if(SERIAL_CONSOLE_PROCEED_WITH_DISPLAY == proceed_with_display)
   {
     Serial.println(display_string);
   }
@@ -188,6 +197,8 @@ error_manager_error_code_te serial_console_displayCalibrationResults(calibration
 
   if(CALIBRATION_INTERFACE_STATUS_SUCCESS == calib_metadata.success_status)
   {
+    bool proceed_with_display = SERIAL_CONSOLE_PROCEED_WITH_DISPLAY;
+
     const char* calibration_type = calib_metadata.metadata.calibration_type;
     const char* calibration_unit = calib_metadata.metadata.calibration_unit;
     uint8_t num_of_measurements_type = calib_metadata.metadata.num_of_measurements_type;
@@ -217,6 +228,7 @@ error_manager_error_code_te serial_console_displayCalibrationResults(calibration
 
         default:
           error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_STATUS;
+          proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
       }
     }
     else if(CALIBRATION_SINGLE_MEASUREMENT == num_of_measurements_type)
@@ -230,14 +242,16 @@ error_manager_error_code_te serial_console_displayCalibrationResults(calibration
       else
       {
         error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_STATUS;
+        proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
       }
     }
     else
     {
       error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_NUM_OF_MEASUREMENTS_TYPE_CONFIGURED;
+      proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
     }
 
-    if(ERROR_CODE_NO_ERROR == error_code)
+    if(SERIAL_CONSOLE_PROCEED_WITH_DISPLAY == proceed_with_display)
     {
       Serial.println(display_string);
     }

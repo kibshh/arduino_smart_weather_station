@@ -11,6 +11,8 @@
 #include "../../input/sensors/sensors_interface/sensors_interface.h"
 #include "../../input/functionality/calibration/calibration_interface/calibration_interface.h"
 
+#define SERIAL_CONSOLE_PROCEED_WITH_DISPLAY      (true)  // Flag to proceed with displaying data
+#define SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY (false) // Flag to prevent displaying data
 
 #define SERIAL_CONSOLE_TWO_CIPHER_NUMBER     (10u) // Defines the threshold value below which a leading zero is added for formatting.
 
