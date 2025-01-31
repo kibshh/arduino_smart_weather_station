@@ -3,6 +3,9 @@
 
 #include <Arduino.h>
 #include "../../sensorsconfig.h"
+#ifdef SENSORS_MQ7_CALIBRATION_ENABLED
+#include "../../../functionality/calibration/calibration_types.h"
+#endif
 
 /** Maximum value of the analog input reading (10-bit ADC resolution). */
 #define MQ7_ANALOG_INPUT_MAX              (1023)
@@ -37,6 +40,8 @@
 /** Base constant for the calculation of CO PPM, used in logarithmic equation. */
 #define MQ7_CALCULATION_POW_BASE_CONSTANT (10)
 
+#ifdef SENSORS_MQ7_CALIBRATION_ENABLED
+
 /**
  * @brief Defines the invalid value for the MQ7 sensor readings.
  * 
@@ -44,35 +49,6 @@
  * invalid readings for the MQ7 sensor.
  */
 #define MQ7_INVALID_VALUE                 (NAN)
-
-#ifdef SENSORS_MQ7_CALIBRATION_ENABLED
-/**
- * @brief Enumeration representing the states of the MQ7 sensor calibration process.
- * 
- * This enum is used to define and track the state of the calibration state machine. 
- * It helps to manage the flow of the calibration process and ensures a clear 
- * transition between different stages.
- * 
- * - `CALIBRATION_STATE_IDLE`: Indicates that the calibration process is not active. 
- *   The system is in its default state, waiting for the calibration to be triggered.
- * 
- * - `CALIBRATION_STATE_IN_PROGRESS`: Indicates that the calibration is currently
- *   ongoing. During this state, the system will periodically take measurements and
- *   accumulate results until the specified number of measurements is completed.
- * 
- * - `CALIBRATION_STATE_FINISHED`: Indicates that the calibration process has 
- *   successfully completed. At this stage, the calculated calibration result is 
- *   available for retrieval, and the state machine can be reset.
- * 
- * This enumeration is essential for implementing the non-blocking state machine logic 
- * in the MQ7 calibration workflow.
- */
-typedef enum
-{
-  CALIBRATION_STATE_IDLE,
-  CALIBRATION_STATE_IN_PROGRESS,
-  CALIBRATION_STATE_FINISHED
-} mq7_calibration_state_te;
 
 /**
  * @brief Structure to hold calibration process data for the MQ7 sensor.
@@ -84,10 +60,8 @@ typedef struct
 {
   float accumulated_resistance;                       /**< Sum of all resistance values measured during calibration. Used to calculate the average resistance. */
   unsigned long last_measurement_time;                /**< The timestamp (in milliseconds) when the last measurement was taken. Helps ensure proper delays between measurements. */
-  mq7_calibration_state_te calibration_state;         /**< The current state of the calibration process (idle, in progress, or finished). */
+  calibration_state_te calibration_state;             /**< The current state of the calibration process (idle, in progress, or finished). */
   uint16_t current_measurement;                       /**< Counter for the number of measurements already taken. Tracks progress during calibration. */
-  uint16_t num_of_measurements;                       /**< The total number of measurements to be performed for a complete calibration cycle. */
-  unsigned long calibration_delay;                    /**< Delay (in milliseconds) between consecutive measurements to allow sensor stabilization. */
   float calculated_resistance;                        /**< The final calculated resistance (R0) value after the calibration process completes. */
 } mq7_calibration_helper_struct_ts;
 
@@ -101,16 +75,13 @@ typedef struct
  * for determining gas concentrations during normal operation.
  * 
  * @param current_millis The current time in milliseconds (e.g., from millis()), 
- *                       used to track the delay between consecutive measurements.
- * @param num_of_measurements The total number of resistance measurements to perform 
- *                            during the calibration process.
- * @param calibration_delay The delay (in milliseconds) between each measurement to ensure 
- *                          stable readings from the sensor.
- * 
+ *                       used to track the delay between consecutive measurements. 
+ * @return `true` if calibration is successfully started ; 
+ *         otherwise, returns `false` if it is already started or finished.
  * @note This function must be followed by periodic calls to 
  *       `mq7_calibratingLoopFunction()` in the main loop to complete the calibration process.
  */
-void mq7_startCalculatingResistanceForCalibration(unsigned long current_millis, uint16_t num_of_measurements);
+bool mq7_startCalculatingResistanceForCalibration(unsigned long current_millis);
 
 /**
  * @brief Handles the MQ7 sensor calibration by accumulating resistance measurements over time.
@@ -134,12 +105,12 @@ void mq7_calibratingLoopFunction(unsigned long current_millis);
  *
  * This function provides the final calculated resistance value for the MQ7 sensor 
  * once the calibration process has finished. If the calibration process has not 
- * started or is still ongoing, it returns an invalid value (`MQ7_INVALID_VALUE`). 
+ * started or is still ongoing, it returns an invalid value (`CALIBRATION_INVALID_VALUE`). 
  * Once the result is retrieved, the calibration state is reset to `IDLE`, allowing 
  * for future calibrations to be initiated.
  *
  * @return The calculated resistance value if calibration is complete; 
- *         otherwise, returns `MQ7_INVALID_VALUE`.
+ *         otherwise, returns `CALIBRATION_INVALID_VALUE`.
  *
  * Usage Notes:
  * - Ensure that this function is called only after starting and completing the 

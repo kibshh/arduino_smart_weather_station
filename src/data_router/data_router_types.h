@@ -26,7 +26,8 @@ typedef enum
 {
     INPUT_SENSORS,      /**< Input component for sensors. */
     INPUT_RTC,          /**< Input component for the Real-Time Clock (RTC). */
-    INPUT_I2C_SCAN      /**< Input component for I2C address scanning. */
+    INPUT_I2C_SCAN,     /**< Input component for I2C address scanning. */
+    INPUT_CALIBRATION   /**< Input component for calibration. */
 } data_router_input_component_te;
 
 /**
@@ -55,12 +56,15 @@ typedef enum
  *  - rtc_reading:        Contains data specific to RTC readings, such as date and time.
  *  - i2cScan_reading:    Contains data specific to I2C scan readings, 
  *                        such as addresses bit fields or I2C device status.
+ *  - calib_reading:      Contains data specific to calibration readings, such as calibration 
+ *                        value and calibration status.
  */
 typedef union 
 {
     sensor_reading_ts sensor_reading;      /**< Data structure for sensor readings. */
     rtc_reading_ts rtc_reading;            /**< Data structure for RTC readings. */
     i2cScan_reading_ts i2cScan_reading;    /**< Data structure for I2C scan readings. */
+    calibration_reading_ts calib_reading;  /**< Data structure for calibration readings. */
 } input_return_tu;
 
 /**

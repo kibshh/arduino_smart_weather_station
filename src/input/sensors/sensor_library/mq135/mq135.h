@@ -3,6 +3,9 @@
 
 #include <Arduino.h>
 #include "../../sensorsconfig.h"
+#ifdef SENSORS_MQ135_CALIBRATION_ENABLED
+#include "../../../functionality/calibration/calibration_types.h"
+#endif
 
 
 /* Load resistance in ohms which is connected to from analog output of sensor to ground (default value for the module) */

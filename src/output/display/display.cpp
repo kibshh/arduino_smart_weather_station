@@ -30,6 +30,10 @@ error_manager_error_code_te display_displayData(data_router_data_ts data)
       error_code = display_displayI2cScan(data.input_return.i2cScan_reading);
       break;
 
+    case INPUT_CALIBRATION:
+      error_code = display_displayCalibrationResults(data.input_return.calib_reading);
+      break;
+
     default:
       break;
   }
@@ -76,18 +80,22 @@ error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts s
     {
       error_code = ERROR_CODE_DISPLAY_INVALID_MEASUREMENT_TYPE;
     }
-
-    display_string = String(sensor_type).substring(DISPLAY_FIRST_LETTER_IN_STR, display_num_of_letters) + ": " + val + String(measurement_unit);
-    while (display_string.length() < DISPLAY_LCD_WIDTH) 
+    if(ERROR_CODE_NO_ERROR == error_code)
     {
-      display_string += ' '; //Add spaces to fill to the end
+      int display_length = min(display_num_of_letters, String(sensor_type).length());
+      display_string = String(sensor_type).substring(DISPLAY_FIRST_LETTER_IN_STR, display_length) + ": " + val + String(measurement_unit);
+      while (display_string.length() < DISPLAY_LCD_WIDTH) 
+      {
+        display_string += ' '; //Add spaces to fill to the end
+      }
+      lcd.print(display_string);
     }
-    lcd.print(display_string);
   }
   else
   {
     error_code = ERROR_CODE_DISPLAY_SENSOR_NOT_CONFIGURED;
   }
+
   return error_code;
 }
 
@@ -177,5 +185,83 @@ error_manager_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_d
     lcd.print(display_string);
   }
   /* IMPORTANT: Check of invalid I2C address is done on I2C scanner side and it should not arrive on the Display */
+  return error_code;
+}
+
+error_manager_error_code_te display_displayCalibrationResults(calibration_reading_ts calibration_data)
+{
+  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
+  lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_CALIB_ROW);
+
+  calibration_interface_metadata_ts calib_metadata = calibration_interface_getCalibrationMetadata(calibration_data.calibration_id);
+
+  if(CALIBRATION_INTERFACE_STATUS_SUCCESS == calib_metadata.success_status)
+  {
+    const char* calibration_type = calib_metadata.metadata.calibration_type;
+    const char* calibration_unit = calib_metadata.metadata.calibration_unit;
+    uint8_t num_of_measurements_type = calib_metadata.metadata.num_of_measurements_type;
+    uint8_t num_of_decimals = calib_metadata.metadata.num_of_decimals;
+    uint8_t display_num_of_letters = calib_metadata.metadata.display_num_of_letters;
+
+    String display_string = "";
+    String val = "";
+    int display_length = min(display_num_of_letters, String(calibration_type).length());
+    String calib_name = String(calibration_type).substring(DISPLAY_FIRST_LETTER_IN_STR, display_length);
+
+    if(CALIBRATION_MULTIPLE_MEASUREMENTS == num_of_measurements_type)
+    {
+      switch(calibration_data.current_calibration_status)
+      {
+        case CALIBRATION_STATE_IDLE:
+          // Should not enter here because fetching of calibration data at least sets it to in progress
+          display_string = calib_name + " No calib";
+          break;
+
+        case CALIBRATION_STATE_IN_PROGRESS:
+          display_string = calib_name + " Progress";
+          break;
+
+        case CALIBRATION_STATE_FINISHED:
+          float value = calibration_data.value;
+          val = String(value, num_of_decimals);
+          display_string =calib_name + ": " + val + String(calibration_unit);
+          break;
+
+        default:
+          error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_STATUS;
+      }
+    }
+    else if(CALIBRATION_SINGLE_MEASUREMENT == num_of_measurements_type)
+    {
+      if(CALIBRATION_STATE_FINISHED == calibration_data.current_calibration_status)
+      {
+        float value = calibration_data.value;
+        val = String(value, num_of_decimals);
+        display_string =calib_name + ": " + val + String(calibration_unit);
+      }
+      else
+      {
+        error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_STATUS;
+      }
+    }
+    else
+    {
+      error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_NUM_OF_MEASUREMENTS_TYPE_CONFIGURED;
+    }
+
+    if(ERROR_CODE_NO_ERROR == error_code)
+    {
+      while (display_string.length() < DISPLAY_LCD_WIDTH) 
+      {
+        display_string += ' '; //Add spaces to fill to the end
+      }
+      lcd.print(display_string);
+    }
+  }
+  else
+  {
+    error_code = ERROR_CODE_CALIBRATION_CALIB_NOT_CONFIGURED;
+  }
+
   return error_code;
 }

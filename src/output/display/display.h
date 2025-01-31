@@ -6,6 +6,7 @@
 #include <WString.h>
 #include "../../error_manager/error_codes.h"
 #include "../../input/sensors/sensors_interface/sensors_interface.h"
+#include "../../input/functionality/calibration/calibration_interface/calibration_interface.h"
 #include "../../data_router/data_router_types.h"
 #include "../../input/input_types.h"
 
@@ -19,6 +20,7 @@
 #define DISPLAY_TIME_ROW      (1u)
 #define DISPLAY_I2C_SCAN_STRING_ROW  (0u)
 #define DISPLAY_I2C_SCAN_ADDR_ROW    (1u)
+#define DISPLAY_CALIB_ROW     (0u)
 
 #define DISPLAY_DATETIME_FORMATER_LEN (3u)
 
@@ -43,5 +45,6 @@ error_manager_error_code_te display_displayData(data_router_data_ts data);
 error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts sensor_data);
 error_manager_error_code_te display_displayTime(rtc_reading_ts time_data);
 error_manager_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_data);
+error_manager_error_code_te display_displayCalibrationResults(calibration_reading_ts calibration_data);
 
 #endif
