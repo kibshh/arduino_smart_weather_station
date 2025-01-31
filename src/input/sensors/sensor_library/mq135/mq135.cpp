@@ -30,7 +30,7 @@ float mq135_readPPM()
 #ifdef SENSORS_MQ135_CALIBRATION_ENABLED
 float mq135_calculateResistanceForCalibration()
 {
-  float calculated_resistance = MQ135_INVALID_VALUE; // If analog read is not valid
+  float calculated_resistance = CALIBRATION_INVALID_VALUE; // If analog read is not valid
 
   int sensor_analog_reading = analogRead(SENSORS_MQ135_PIN_ANALOG);
   if(MQ135_ANALOG_INPUT_MIN <= sensor_analog_reading && MQ135_ANALOG_INPUT_MAX >= sensor_analog_reading) // Check for valid analog read

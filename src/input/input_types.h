@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include "../error_manager/error_codes.h"
+#include "functionality/calibration/calibration_types.h"
 
 /**
  * Number of bits in a byte.
@@ -93,7 +94,7 @@ typedef struct
 {
   float value;
   uint8_t calibration_id;
-  uint8_t current_calibration_status;
+  calibration_state_te current_calibration_status;
 } calibration_reading_ts;
 
 /**

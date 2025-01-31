@@ -11,10 +11,46 @@
 #include "../../sensors/sensor_library/mq7/mq7.h"
 #endif
 
+#define CALIBRATION_FIRST_SENSOR_INDEX            (0u)      // The index of the first sensor in the configuration
 
-
-error_manager_error_code_te calibration_startMultipleMeasurementsCalibration(uint16_t num_of_measurements, unsigned long calibration_delay);
-sensor_return_ts calibration_getCalibrationResult(uint8_t id);
+/**
+ * @brief Retrieves a calibration reading for the specified sensor ID.
+ * 
+ * This function checks if any calibrations are configured. If so, it retrieves 
+ * the metadata for the given sensor ID and determines whether it requires a 
+ * single or multiple measurement calibration. It then calls the appropriate 
+ * calibration function.
+ * 
+ * @param id Sensor ID for which calibration data is requested.
+ * @return `calibration_return_ts` structure containing the calibration result 
+ *         or an error code if the calibration is not found or invalid.
+ */
 calibration_return_ts calibration_getReading(uint8_t id);
+
+/**
+ * @brief Performs a multiple measurement calibration for the specified sensor ID.
+ * 
+ * This function handles the calibration process for sensors requiring multiple 
+ * measurements. It checks if the calibration process has started or if results 
+ * are available. If the calibration is still in progress, it updates the status accordingly.
+ * 
+ * @param id Sensor ID for which calibration is performed.
+ * @return `calibration_return_ts` structure containing the calibration result 
+ *         or an error code if the sensor is incompatible.
+ */
+calibration_return_ts calibration_getMultipleMeasurementsCalibration(uint8_t id);
+
+/**
+ * @brief Performs a single measurement calibration for the specified sensor ID.
+ * 
+ * This function handles the calibration process for sensors that require only 
+ * a single measurement. It retrieves the calibration value and updates the result 
+ * structure accordingly.
+ * 
+ * @param id Sensor ID for which calibration is performed.
+ * @return `calibration_return_ts` structure containing the calibration result 
+ *         or an error code if the sensor is incompatible.
+ */
+calibration_return_ts calibration_getSingleMeasurementCalibration(uint8_t id);
 
 #endif

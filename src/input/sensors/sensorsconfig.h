@@ -65,6 +65,10 @@
 #define SENSORS_MQ7_CLEAR_AIR_FACTOR                  (9.83)   // By datasheet
 #define SENSORS_MQ7_HEATER_LOW_TIMEOUT_MS             (90000u)           
 #define SENSORS_MQ7_HEATER_HIGH_TIMEOUT_MS            (60000u)  
+#ifdef SENSORS_MQ7_CALIBRATION_ENABLED
+#define SENSORS_MQ7_CALIBRATION_NUM_OF_MEASUREMENTS   (20u)    // The total number of measurements to be performed for a complete calibration cycle
+#define SENSORS_MQ7_CALIBRATION_DELAY                 (100u)   // Delay (in milliseconds) between consecutive measurements to allow sensor stabilization
+#endif
 
 /* GY-ML8511 */
 #define SENSORS_GY_ML8511_PIN_ANALOG                  (A2)
