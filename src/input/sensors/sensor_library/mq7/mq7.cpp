@@ -6,7 +6,7 @@ static bool mq7_is_heater_hot = MQ7_HEATER_IS_OFF;
 
 #ifdef SENSORS_MQ7_CALIBRATION_ENABLED
 // Initialized to default values and zeros
-static mq7_calibration_helper_struct_ts mq7_calibration_helper_struct = {0, 0, CALIBRATION_STATE_IDLE, 0, 0, 0, 0};
+static mq7_calibration_helper_struct_ts mq7_calibration_helper_struct = {0, 0, CALIBRATION_STATE_IDLE, 0, 0};
 #endif
 /* *************************************** */
 
@@ -72,7 +72,7 @@ void mq7_heatingCycle(unsigned long current_millis)
 }
 
 #ifdef SENSORS_MQ7_CALIBRATION_ENABLED
-bool mq7_startCalculatingResistanceForCalibration(unsigned long current_millis, uint16_t num_of_measurements, unsigned long calibration_delay) 
+bool mq7_startCalculatingResistanceForCalibration(unsigned long current_millis) 
 {
   bool start_calibration_success = MQ7_CALIBRATION_START_FAILED;
   if(CALIBRATION_STATE_IDLE == mq7_calibration_helper_struct.calibration_state)
@@ -84,8 +84,6 @@ bool mq7_startCalculatingResistanceForCalibration(unsigned long current_millis, 
 
     // Parameters set part
     mq7_calibration_helper_struct.last_measurement_time = current_millis;
-    mq7_calibration_helper_struct.num_of_measurements = num_of_measurements;
-    mq7_calibration_helper_struct.calibration_delay = calibration_delay;
 
     // State change part
     mq7_calibration_helper_struct.calibration_state = CALIBRATION_STATE_IN_PROGRESS;
@@ -101,7 +99,7 @@ void mq7_calibratingLoopFunction(unsigned long current_millis)
   if (CALIBRATION_STATE_IN_PROGRESS == mq7_calibration_helper_struct.calibration_state) 
   {
     // Check if it's time to take a new measurement
-    if (current_millis - mq7_calibration_helper_struct.last_measurement_time >= mq7_calibration_helper_struct.calibration_delay) 
+    if (current_millis - mq7_calibration_helper_struct.last_measurement_time >= (unsigned long)SENSORS_MQ7_CALIBRATION_DELAY) 
     {
       // Take a measurement
       int raw_adc = analogRead(SENSORS_MQ7_PIN_ANALOG);
@@ -115,10 +113,10 @@ void mq7_calibratingLoopFunction(unsigned long current_millis)
     }
 
     // Check if all measurements are done
-    if (mq7_calibration_helper_struct.current_measurement >= mq7_calibration_helper_struct.num_of_measurements) 
+    if (mq7_calibration_helper_struct.current_measurement >= (uint16_t)SENSORS_MQ7_CALIBRATION_NUM_OF_MEASUREMENTS) 
     {
       // Calculate the final resistance
-      float Rs = mq7_calibration_helper_struct.accumulated_resistance / mq7_calibration_helper_struct.num_of_measurements; // Average of all readings
+      float Rs = mq7_calibration_helper_struct.accumulated_resistance / (uint16_t)SENSORS_MQ7_CALIBRATION_NUM_OF_MEASUREMENTS; // Average of all readings
       mq7_calibration_helper_struct.calculated_resistance = Rs / SENSORS_MQ7_CLEAR_AIR_FACTOR; // Calculate Ro based on clean air factor
 
       mq7_calibration_helper_struct.calibration_state = CALIBRATION_STATE_FINISHED; // Calibration complete
@@ -128,7 +126,7 @@ void mq7_calibratingLoopFunction(unsigned long current_millis)
 
 float mq7_getResultsCalculateResistanceForCalibration()
 {
-  float calculated_resistance = MQ7_INVALID_VALUE; // Return Invalid value if calibration has not started or it is still ongoing
+  float calculated_resistance = CALIBRATION_INVALID_VALUE; // Return Invalid value if calibration has not started or it is still ongoing
   if(CALIBRATION_STATE_FINISHED == mq7_calibration_helper_struct.calibration_state)
   {
     // Retrieve the calculated resistance once calibration is complete

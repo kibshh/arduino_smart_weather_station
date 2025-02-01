@@ -9,6 +9,7 @@
 #include "serial_console_config.h"
 #include "../../input/input_types.h"
 #include "../../input/sensors/sensors_interface/sensors_interface.h"
+#include "../../input/functionality/calibration/calibration_interface/calibration_interface.h"
 
 
 #define SERIAL_CONSOLE_TWO_CIPHER_NUMBER     (10u) // Defines the threshold value below which a leading zero is added for formatting.
@@ -76,5 +77,7 @@ error_manager_error_code_te serial_console_displayTime(rtc_reading_ts time_data)
  * - ERROR_CODE_SERIAL_CONSOLE_UNKNOWN_I2C_DEVICE_STATUS: Unknown device status during communication.
  */
 error_manager_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c_scan_data);
+
+error_manager_error_code_te serial_console_displayCalibrationResults(calibration_reading_ts calibration_data);
 
 #endif

@@ -179,3 +179,73 @@ error_manager_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c
 
   return error_code;
 }
+
+error_manager_error_code_te serial_console_displayCalibrationResults(calibration_reading_ts calibration_data)
+{
+  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
+
+  calibration_interface_metadata_ts calib_metadata = calibration_interface_getCalibrationMetadata(calibration_data.calibration_id);
+
+  if(CALIBRATION_INTERFACE_STATUS_SUCCESS == calib_metadata.success_status)
+  {
+    const char* calibration_type = calib_metadata.metadata.calibration_type;
+    const char* calibration_unit = calib_metadata.metadata.calibration_unit;
+    uint8_t num_of_measurements_type = calib_metadata.metadata.num_of_measurements_type;
+    uint8_t num_of_decimals = calib_metadata.metadata.num_of_decimals;
+
+    String display_string = "";
+    String val = "";
+
+    if(CALIBRATION_MULTIPLE_MEASUREMENTS == num_of_measurements_type)
+    {
+      switch(calibration_data.current_calibration_status)
+      {
+        case CALIBRATION_STATE_IDLE:
+          // Should not enter here because fetching of calibration data at least sets it to in progress
+          display_string = String(calibration_type) + ": No calibration active";
+          break;
+
+        case CALIBRATION_STATE_IN_PROGRESS:
+          display_string = String(calibration_type) + ": Calibration in progress...";
+          break;
+
+        case CALIBRATION_STATE_FINISHED:
+          float value = calibration_data.value;
+          val = String(value, num_of_decimals);
+          display_string = "Calibration for " + String(calibration_type) + ": " + val + String(calibration_unit);
+          break;
+
+        default:
+          error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_STATUS;
+      }
+    }
+    else if(CALIBRATION_SINGLE_MEASUREMENT == num_of_measurements_type)
+    {
+      if(CALIBRATION_STATE_FINISHED == calibration_data.current_calibration_status)
+      {
+        float value = calibration_data.value;
+        val = String(value, num_of_decimals);
+        display_string = "Calibration for " + String(calibration_type) + ": " + val + String(calibration_unit);
+      }
+      else
+      {
+        error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_STATUS;
+      }
+    }
+    else
+    {
+      error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_NUM_OF_MEASUREMENTS_TYPE_CONFIGURED;
+    }
+
+    if(ERROR_CODE_NO_ERROR == error_code)
+    {
+      Serial.println(display_string);
+    }
+  }
+  else
+  {
+    error_code = ERROR_CODE_CALIBRATION_CALIB_NOT_CONFIGURED;
+  }
+
+  return error_code;
+}
