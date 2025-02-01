@@ -18,9 +18,11 @@
 #define DISPLAY_DONT_PROCEED_WITH_DISPLAY (false) // Flag to prevent displaying data
 
 #define DISPLAY_FIRST_LETTER_IN_STR   (0u)  // Index of the first letter in a string
-#define DISPLAY_MIN_STRING_LEN        (0u)  // Minimum length of the string for display
-#define DISPLAY_DTOSTRF_BUFFER_SIZE   (10u) // Size of the buffer for converting float to string
+#define DISPLAY_MIN_FLOAT_STRING_LEN  (1u)  // Minimum length of the float string for display
+#define DISPLAY_DTOSTRF_BUFFER_SIZE   (20u) // Size of the buffer for converting float to string
 #define DISPLAY_NULL_TERMINATOR_SIZE  (1u)  // Size for the null terminator in strings
+
+#define DISPLAY_MAX_STRING_LEN        (DISPLAY_LCD_WIDTH + DISPLAY_NULL_TERMINATOR_SIZE)
 
 /**
  * @brief Initializes the LCD display module.

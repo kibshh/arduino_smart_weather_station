@@ -66,7 +66,7 @@ error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts s
 {
   error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR; // Default Error code
   bool proceed_with_display = DISPLAY_DONT_PROCEED_WITH_DISPLAY; // Flag to determine if the display should be updated
-  char val[DISPLAY_LCD_WIDTH + DISPLAY_NULL_TERMINATOR_SIZE]; // Holds the formatted sensor value or indication
+  char val[DISPLAY_MAX_STRING_LEN]; // Holds the formatted sensor value or indication
 
   // Retrieve metadata for the given sensor ID
   sensors_interface_metadata_ts sensor_metadata = sensors_interface_getSensorMetadata(sensor_data.sensor_id);
@@ -81,7 +81,7 @@ error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts s
     {
       // Case: Sensor provides a numerical value
       char val_buffer[DISPLAY_DTOSTRF_BUFFER_SIZE]; // Buffer for formatted float value
-      dtostrf(sensor_data.value, DISPLAY_MIN_STRING_LEN, num_of_decimals, val_buffer); // Convert float to string
+      dtostrf(sensor_data.value, DISPLAY_MIN_FLOAT_STRING_LEN, num_of_decimals, val_buffer); // Convert float to string
       strncpy(val, val_buffer, sizeof(val) - DISPLAY_NULL_TERMINATOR_SIZE); // Copy into val
       val[sizeof(val) - DISPLAY_NULL_TERMINATOR_SIZE] = '\0'; // Null terminate
       proceed_with_display = DISPLAY_PROCEED_WITH_DISPLAY;
@@ -129,7 +129,7 @@ error_manager_error_code_te display_displayTime(rtc_reading_ts time_data)
   uint8_t secs = time_data.secs;
 
   // Build the formatted time string to fit the 16-character display
-  char time_string[DISPLAY_LCD_WIDTH + DISPLAY_NULL_TERMINATOR_SIZE]; // One extra for null terminator
+  char time_string[DISPLAY_MAX_STRING_LEN]; // One extra for null terminator
   snprintf(time_string, sizeof(time_string), "%02d:%02d %02d/%02d/%04d", hour, mins, day, month, year); // To avoid dynamic allocation
 
   lcd.print(time_string);
@@ -142,7 +142,7 @@ error_manager_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_d
   error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
   // Create buffer for display strings
-  char display_string[DISPLAY_LCD_WIDTH + DISPLAY_NULL_TERMINATOR_SIZE];  // +1 for null terminator
+  char display_string[DISPLAY_MAX_STRING_LEN];  // +1 for null terminator
 
   if(I2CSCAN_MODE_SCAN_FOR_ALL_DEVICES == i2c_scan_data.device_address)
   {
@@ -161,7 +161,7 @@ error_manager_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_d
     bool proceed_with_display = DISPLAY_PROCEED_WITH_DISPLAY;
 
     // Create buffer for status
-    char status_string[DISPLAY_LCD_WIDTH + DISPLAY_NULL_TERMINATOR_SIZE];  // +1 for null terminator
+    char status_string[DISPLAY_MAX_STRING_LEN];  // +1 for null terminator
 
     switch(i2c_scan_data.single_device_status)
     {
@@ -232,7 +232,7 @@ error_manager_error_code_te display_displayCalibrationResults(calibration_readin
     bool proceed_with_display = DISPLAY_PROCEED_WITH_DISPLAY;
 
     // Prepare display strings with appropriate buffer size (+1 for null terminator)
-    char display_string[DISPLAY_LCD_WIDTH + DISPLAY_NULL_TERMINATOR_SIZE];  // +1 for null terminator
+    char display_string[DISPLAY_MAX_STRING_LEN];  // +1 for null terminator
     char val[DISPLAY_LCD_WIDTH];  // Buffer for value representation
 
     // Determine the display string length based on the maximum allowed letters
@@ -317,7 +317,7 @@ error_manager_error_code_te display_displayCalibrationResults(calibration_readin
 /* STATIC FUNCTIONS IMPLEMENTATIONS */
 static String formatDisplaySensorData(sensors_metadata_catalog_ts sensor_metadata, char* val)
 {
-  char display_string[DISPLAY_LCD_WIDTH + DISPLAY_NULL_TERMINATOR_SIZE]; // Buffer to hold formatted string
+  char display_string[DISPLAY_MAX_STRING_LEN]; // Buffer to hold formatted string
   int display_sensor_type_length = min(sensor_metadata.display_num_of_letters, strlen(sensor_metadata.sensor_type));
   
   snprintf(display_string, sizeof(display_string), "%s: %s%s", sensor_metadata.sensor_type, val, sensor_metadata.measurement_unit);

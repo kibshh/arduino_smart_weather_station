@@ -1,5 +1,10 @@
 #include "calibration_metadata.h"
 
+/* It's very important to keep the strings (calibration_type and calibration_unit) short enough to fit into the allocated buffer size.
+   Ensure that:
+   - `calibration_type` does not exceed 40 characters.
+   - `calibration_unit` does not exceed 10 characters.
+   This is to avoid potential overflow issues when reading from flash memory and formatting the final output in the buffer. */
 const calibration_metadata_ts calibration_metadata[] PROGMEM =
     {
 #ifdef SENSORS_MQ135_CALIBRATION_ENABLED
@@ -36,7 +41,7 @@ bool calibration_metadata_getData(uint8_t id, calibration_metadata_ts * current_
         current_id = pgm_read_byte(&calibration_metadata[index].sensor_id); // Read from program memory
         if(id == current_id)
         {
-             // Copy the calib configuration from program memory to the provided structure
+            // Copy the calib configuration from program memory to the provided structure
             memcpy_P(current_calibration, &calibration_metadata[index], sizeof(calibration_metadata_ts));
             success_status = CALIBRATION_METADATA_RETRIEVE_SUCCESS; // Mark as successful
             break;
