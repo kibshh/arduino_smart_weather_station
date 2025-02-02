@@ -88,6 +88,7 @@ error_manager_error_code_te display_displayTime(rtc_reading_ts time_data);
  *         - ERROR_CODE_DISPLAY_UNKNOWN_I2C_DEVICE_STATUS for unknown device statuses.
  **/
 error_manager_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_data);
+error_manager_error_code_te display_displayCalibrationResults(calibration_reading_ts calibration_data);
 
 /**
  * Displays the calibration results on the LCD display based on the given calibration data.

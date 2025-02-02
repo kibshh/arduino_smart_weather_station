@@ -113,7 +113,6 @@ error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts s
   {
     displayEmptyLine(DISPLAY_SENSORS_ROW); // Clear the display row if no valid data
   }
-
   return error_code;
 }
 
