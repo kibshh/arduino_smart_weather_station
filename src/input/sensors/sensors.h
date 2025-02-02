@@ -71,7 +71,7 @@ typedef struct
  */
 error_manager_error_code_te sensors_init();
 
-/***
+/**
  * Retrieves a sensor reading based on the provided sensor ID.
  * Handles both value-based and indication-based sensor measurements.
  * Validates sensor data against configured thresholds.
@@ -91,7 +91,7 @@ error_manager_error_code_te sensors_init();
  * @note The function verifies whether the requested sensor ID exists in the configuration.
  *       If the sensor ID is valid, it invokes the appropriate function for the sensor 
  *       (either value-based or indication-based).
- ***/
+ **/
 sensor_return_ts sensors_getReading(uint8_t id);
 
 /**

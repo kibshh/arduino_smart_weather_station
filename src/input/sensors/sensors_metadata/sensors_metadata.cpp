@@ -1,7 +1,11 @@
 #include "sensors_metadata.h"
 
 /* SENSORS METADATA CATALOG */
-/* MUST BE IN THE SAME ORDER AS THE FUNCTIONAL CONFIG ARRAY IN sensors.cpp */
+/* It's crucial to keep the strings (sensor_type and measurement_unit) short enough to fit into the allocated buffer size.
+   Ensure that:
+   - `sensor_type` does not exceed 25 characters.
+   - `measurement_unit` does not exceed 10 characters.
+   This prevents potential overflow issues when formatting the final output in the buffer and ensures proper display of sensor readings. */
 const sensors_metadata_catalog_ts sensors_metadata_catalog[] PROGMEM =
 {
 #ifdef DHT11_TEMPERATURE
