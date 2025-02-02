@@ -9,7 +9,7 @@ void task_initTask()
 #ifdef OUTPUT_SERIAL_MONITOR_USED
   error_code = serial_console_init();
 #endif
-#ifdef OUTPUT_DISPLAY_USED
+#ifdef OUTPUT_LCD_DISPLAY_USED
   error_code = display_init();
 #endif
 #ifdef INPUT_SENSORS_USED

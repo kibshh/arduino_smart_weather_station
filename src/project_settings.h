@@ -15,7 +15,7 @@
  * Make sure that the display is properly connected.
  * Make sure to enable communication protocol which the display uses (I2C for example).
  */
-#define OUTPUT_DISPLAY_USED
+#define OUTPUT_LCD_DISPLAY_USED
 
 /**
  * Uncomment if at least one sensor from available sensors libraary is present and used.
