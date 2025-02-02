@@ -15,13 +15,10 @@
 
 #define STARTING_SENSOR_INDEX         (0u)  // Initial sensor index for cyclic display
 
-
-#if defined(INPUT_SENSORS_USED) && (defined(OUTPUT_LCD_DISPLAY_USED) || defined(OUTPUT_SERIAL_MONITOR_USED))
 /***
- * Cycles through all sensors, fetches their data, and routes the data to display and serial console.
- * @param output The output parameter (not used in current implementation).
+ * Cycles through all sensors, fetches their data, and routes the data to defined output(s).
+ * @param output The output parameter.
  */
 void app_cyclicDisplayAllSensors(uint8_t output);
-#endif
 
 #endif
