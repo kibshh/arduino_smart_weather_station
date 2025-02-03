@@ -28,7 +28,8 @@ error_manager_error_ts data_router_routeDataToOutput(data_router_output_componen
                 break;
 
             case OUTPUT_SERIAL_CONSOLE:
-                // Serial console output not implemented yet
+                // Route data to serial console and update error code
+                error_msg.error_code = serial_console_displayData(data.data);
                 break;
 
             default:

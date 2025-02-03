@@ -21,4 +21,10 @@
  */
 void app_cyclicDisplayAllSensors(uint8_t output);
 
+/***
+ * Fetches RTC data, and routes the data to defined output(s).
+ * @param output The output parameter.
+ */
+void app_displayCurrentRtcTime(uint8_t output);
+
 #endif

@@ -2,8 +2,7 @@
 #define TASK_H
 
 #include <Arduino.h>
-#include "../project_settings.h"
-#include "../data_router/data_router.h"
+#include "../app_layer/app.h"
 
 void task_initTask();
 void task_cyclicTask();
