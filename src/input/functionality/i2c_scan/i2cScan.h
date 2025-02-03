@@ -5,8 +5,6 @@
 #include <Wire.h>
 #include "../../input_types.h"
 
-#define I2CSCAN_CURRENT_ADDRESS_SEARCH_BEGIN  (0u)
-
 #define I2CSCAN_ADDRESS_FOUND                 (true)
 
 #define I2CSCAN_ADDRESS_NOT_FOUND             (false)

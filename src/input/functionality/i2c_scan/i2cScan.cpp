@@ -4,7 +4,7 @@ i2cScan_return_ts i2cScan_getReading(uint8_t device_address)
 {
   i2cScan_return_ts return_data;
   return_data.i2cScan_reading.update_i2c_address = i2cScan_updateNextAddress;
-  return_data.i2cScan_reading.current_i2c_addr = I2CSCAN_CURRENT_ADDRESS_SEARCH_BEGIN;
+  return_data.i2cScan_reading.current_i2c_addr = I2CSCAN_I2C_ADDRESS_MIN;
 
   if(I2CSCAN_MODE_SCAN_FOR_ALL_DEVICES == device_address)
   {
@@ -101,7 +101,7 @@ bool i2cScan_updateNextAddress(i2cScan_reading_ts *i2cScan_data)
 
   if(I2CSCAN_ADDRESS_NOT_FOUND == next_address_is_found)
   {
-    i2cScan_data->current_i2c_addr = I2CSCAN_CURRENT_ADDRESS_SEARCH_BEGIN;
+    i2cScan_data->current_i2c_addr = I2CSCAN_I2C_ADDRESS_MIN;
   }
 
   return next_address_is_found;

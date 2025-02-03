@@ -44,7 +44,7 @@ void task_cyclicTask()
   {
     previous_millis = current_millis;
 
-    app_cyclicDisplayAllSensors(ALL_OUTPUTS);
+    app_displayAllSensors(ALL_OUTPUTS, REPEAT_CYCLIC);
   }
 #endif
 }

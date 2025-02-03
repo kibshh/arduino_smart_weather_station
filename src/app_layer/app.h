@@ -15,16 +15,24 @@
 
 #define STARTING_SENSOR_INDEX         (0u)  // Initial sensor index for cyclic display
 
+#define REPEAT_CYCLIC                        (true)
+#define REPEAT_ONCE                          (false)
+
+#define CONTINUE_DISPLAYING_YES                  (true)
+#define CONTINUE_DISPLAYING_NO                   (false)
+
 /***
  * Cycles through all sensors, fetches their data, and routes the data to defined output(s).
  * @param output The output parameter.
  */
-void app_cyclicDisplayAllSensors(uint8_t output);
+void app_displayAllSensors(uint8_t output, bool repeat);
 
 /***
  * Fetches RTC data, and routes the data to defined output(s).
  * @param output The output parameter.
  */
 void app_displayCurrentRtcTime(uint8_t output);
+
+void app_displayAllI2CAddresses(uint8_t output, bool repeat);
 
 #endif
