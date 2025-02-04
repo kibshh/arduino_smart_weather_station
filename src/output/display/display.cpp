@@ -55,6 +55,10 @@ error_manager_error_code_te display_displayData(data_router_data_ts data)
       error_code = display_displayCalibrationResults(data.input_return.calib_reading);
       break;
 
+    case INPUT_ERROR:
+      error_code = ERROR_CODE_NO_ERROR; // Need to implement
+      break;
+
     default:
       break;
   }

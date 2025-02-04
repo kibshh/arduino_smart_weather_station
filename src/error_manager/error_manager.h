@@ -3,8 +3,9 @@
 
 #include <Arduino.h>
 #include "error_codes.h"
-#include "../data_router/data_router_types.h"
+#include "../data_router/data_router.h"
 
+#define ERROR_INPUT_ID_UNUSED (0xFF)
 /**
  * Structure representing an error related to an output component.
  * 
@@ -19,7 +20,7 @@
 typedef struct
 {
     data_router_output_component_te output_component; /**< The output component where the error occurred. */
-    data_router_input_component_te input_type;        /**< The associated input component type. */
+    data_router_input_te input_type;        /**< The associated input component type. */
     uint8_t input_id;                                 /**< The ID of the input component. */
 } error_manager_output_error_ts;
 
@@ -35,7 +36,7 @@ typedef struct
  */
 typedef struct
 {
-    data_router_input_component_te input_component; /**< The input component where the error occurred. */
+    data_router_input_te input_component; /**< The input component where the error occurred. */
     uint8_t input_id;                               /**< The ID of the input component. */
 } error_manager_input_error_ts;
 
@@ -74,7 +75,15 @@ typedef struct
     error_type_tu component;               /**< Detailed information about the error source. */
 } error_manager_error_ts;
 
-/* Yet to be implemented. */
+/**
+ * Handles errors by routing them to output components
+ * 
+ * This function retrieves the specific error structure and tries to display it
+ * using output components. It tries each one of the output components sequentially if some
+ * of them produce an error. If all of the attempts are unsuccessful, it aborts the operation.
+ * 
+ * @param error_msg A structure containing the information about the error.
+ */
 void error_manager_handleError(error_manager_error_ts error_msg);
 
 #endif

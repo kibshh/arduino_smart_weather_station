@@ -65,7 +65,24 @@ error_manager_error_ts data_router_routeDataToOutput(data_router_output_componen
  *         `error_msg` - containing error code, flag for input/output and the details of the 
  *         component( ID, etc.)
  */
-data_router_input_data_ts data_router_fetchDataFromInput(data_router_input_component_te input_component, 
+data_router_input_data_ts data_router_fetchDataFromInput(data_router_input_te input_component, 
                                                          uint8_t component_id);
+
+/**
+ * Routes error to the specified output component.
+ *
+ * This function forwards error recieved from an input component to one of the
+ * defined output components. It returns an error code that can be passed
+ * to the Error Manager for handling.
+ *
+ * @param output_component The ID of the output component to which the error
+ *                         is forwarded (e.g., display, serial console).
+ * @param error_msg            A structure containing the information about the error.
+ *
+ * @return An error message of type `error_manager_error_ts` indicating the
+ *         status of the routing operation.
+ */
+error_manager_error_ts data_router_routeErrorToOutput(data_router_output_component_te output_component,
+                                                      error_manager_error_ts error_msg);
 
 #endif

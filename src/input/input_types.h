@@ -11,7 +11,7 @@
 #define BITS_IN_BYTE                     (8u)
 
 /**
- * Flag indicating that but is set.
+ * Flag indicating that bit is set.
  */
 #define BIT_SET                          (1u)
 
