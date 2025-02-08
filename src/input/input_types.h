@@ -145,6 +145,8 @@ typedef struct
 /* ***************************************** */
 
 /* I2C SCAN COMPONENT */
+/* Forward declaration of the structure */
+struct i2cScan_reading;
 /**
  * Structure representing the result of an I2C scan operation.
  * 
@@ -159,10 +161,10 @@ typedef struct
  *                          This is because 0 is not a valid I2C address.
  *                    - 1–127: Perform a single-device status check for the specified address 
  *                              and update the `single_device_status` field.
+ *  - update_to_next_i2c_address: Function pointer that updates `current_i2c_addr` 
+ *                                to the next detected I2C address in `addresses` bit-field.
+ *  - current_i2c_addr: Stores the currently selected I2C address during iteration.
  */
-// Forward declaration of the structure
-struct i2cScan_reading;
-
 typedef struct i2cScan_reading
 {
   uint8_t addresses[I2C_SCAN_ARRAY_SIZE];

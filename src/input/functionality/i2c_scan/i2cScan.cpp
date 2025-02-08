@@ -3,25 +3,26 @@
 i2cScan_return_ts i2cScan_getReading(uint8_t device_address)
 {
   i2cScan_return_ts return_data;
-  return_data.i2cScan_reading.update_i2c_address = i2cScan_updateNextAddress;
-  return_data.i2cScan_reading.current_i2c_addr = I2CSCAN_I2C_ADDRESS_MIN;
 
   if(I2CSCAN_MODE_SCAN_FOR_ALL_DEVICES == device_address)
   {
     // Find all I2C addresses on the bus
     return_data = i2cScan_scanForAddresses();
-    return_data.i2cScan_reading.device_address = device_address;
   }
   else if(device_address >= I2CSCAN_I2C_ADDRESS_MIN && device_address <= I2CSCAN_I2C_ADDRESS_MAX)
   {
     // Find status of the I2C device with specific address
     return_data = i2cScan_checkDeviceStatus(device_address);
-    return_data.i2cScan_reading.device_address = device_address;
   }
   else
   {
     return_data.error_code = ERROR_CODE_I2C_SCAN_INVALID_ADDRESS_PARAMETER;
   }
+
+  return_data.i2cScan_reading.current_i2c_addr = I2CSCAN_STARTING_ADDRESS; // Because we start the loop from current address + 1
+  return_data.i2cScan_reading.update_i2c_address = i2cScan_updateNextAddress;
+  return_data.i2cScan_reading.device_address = device_address;
+
   return return_data;
 }
 
@@ -89,7 +90,7 @@ bool i2cScan_updateNextAddress(i2cScan_reading_ts *i2cScan_data)
   bool next_address_is_found = I2CSCAN_ADDRESS_NOT_FOUND;
 
   // Iterate through all the possible I2C addresses for starting from current address
-  for (uint8_t address = current_address; address <= I2CSCAN_I2C_ADDRESS_MAX; address++) 
+  for (uint8_t address = current_address + I2CSCAN_OFFSET_FOR_NEXT_ADDR; address <= I2CSCAN_I2C_ADDRESS_MAX; address++) 
   {
     if(BIT_SET == ((i2cScan_data->addresses[address / BITS_IN_BYTE] >> (address % BITS_IN_BYTE)) & BIT_SET))
     {
@@ -101,7 +102,7 @@ bool i2cScan_updateNextAddress(i2cScan_reading_ts *i2cScan_data)
 
   if(I2CSCAN_ADDRESS_NOT_FOUND == next_address_is_found)
   {
-    i2cScan_data->current_i2c_addr = I2CSCAN_I2C_ADDRESS_MIN;
+    i2cScan_data->current_i2c_addr = I2CSCAN_STARTING_ADDRESS;
   }
 
   return next_address_is_found;

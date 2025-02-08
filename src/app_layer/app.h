@@ -27,6 +27,9 @@
 #define TIME_INDEPENDENT_OUTPUT       (true)
 #define TIME_DEPENDENT_OUTPUT         (false)
 
+#define I2C_SCANER_RUN                (true)
+#define I2C_SCANER_DONT_RUN           (false)
+
 typedef enum
 {
     FINISHED,
@@ -53,6 +56,12 @@ typedef struct
     size_t number_of_sensors;
     uint8_t sensor_index;
 } sensor_reading_context_ts;
+
+typedef struct
+{
+    data_router_input_data_ts i2c_scan_return;
+    bool run_i2c_scanner;
+} i2cScan_reading_context_ts;
 
 /***
  * Reads data from a specific sensor and routes it to the defined output(s).
@@ -115,11 +124,36 @@ sensor_reading_context_ts app_createNewSensorsReadingContext();
 task_status_te app_readAllSensorsAtOnce(output_destination_t output);
 
 /***
- * Fetches RTC data, and routes the data to defined output(s).
- * @param output The output parameter.
+ * Retrieves the current RTC time and sends it to the specified output destinations.
+ * @param output The output destinations where the RTC time should be displayed (e.g., LCD display, serial console).
+ * @return FINISHED after processing.
+ *
+ * This function fetches the current time from the RTC module and routes the data 
+ * to the selected outputs. It checks for errors in data retrieval and output routing.
  */
-void app_displayCurrentRtcTime(output_destination_t output);
+task_status_te app_displayCurrentRtcTime(output_destination_t output);
 
-void app_displayAllI2CAddresses(output_destination_t output, bool repeat);
+/**
+ * @brief Periodically scans and displays I2C addresses.
+ *
+ * This function runs the I2C scanner periodically and updates the display or console with 
+ * detected I2C addresses. If no more addresses are found, it marks the scanning process as completed.
+ *
+ * @param output The output destination (LCD display, serial console, etc.).
+ * @param context The I2C scan reading context containing the scan data.
+ * @return task_status_te - `NOT_FINISHED` if there are more addresses to process, `FINISHED` otherwise.
+ */
+task_status_te app_displayAllI2CAddressesPeriodic(output_destination_t output, i2cScan_reading_context_ts *context);
+
+/**
+ * @brief Initializes and returns a new I2C scan reading context.
+ *
+ * This function initializes the I2C scan reading context with default values.
+ * The function pointer `update_i2c_address` is explicitly set to `I2CSCAN_NO_ADDRESS_UPDATE_FUNCTION`,
+ * which serves as the key check for determining if address updates should occur.
+ *
+ * @return i2cScan_reading_context_ts - A half initialized I2C scan reading context.
+ */
+i2cScan_reading_context_ts app_createI2CScanReadingContext();
 
 #endif

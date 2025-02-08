@@ -22,6 +22,18 @@ static void checkForErrors(error_manager_error_ts error_status);
  * @return A mask containing only time-independent outputs.
  ***/
 static output_destination_t filterOutTimeDependentOutputs(output_destination_t output);
+
+/**
+ * @brief Updates the I2C scan result to the next available address.
+ * 
+ * This function scans the bit-array of detected I2C addresses and updates 
+ * `current_i2c_addr` to the next detected address. If no other addresses 
+ * are found, it resets to the minimum I2C address.
+ * 
+ * @param i2cScan_data Pointer to the I2C scan structure.
+ * @return bool Returns true if a valid address was found, false if no addresses remain.
+ */
+static bool updateI2CScanForAllAddressesUpdateNextAddress(i2cScan_reading_ts *reading);
 /* *************************************** */
 
 /* EXPORTED FUNCTIONS */
@@ -92,56 +104,70 @@ task_status_te app_readAllSensorsAtOnce(output_destination_t output)
     return FINISHED; // Return FINISHED since all sensors are processed
 }
 
-void app_displayCurrentRtcTime(output_destination_t output)
+task_status_te app_displayCurrentRtcTime(output_destination_t output)
 {
-    error_manager_error_ts error_return; // Shared return struct used to collect return error data
-
     data_router_input_data_ts rtc_result = data_router_fetchDataFromInput(INPUT_RTC, RTC_DEFAULT_RTC); // Fetch data from the RTC
-    error_return = rtc_result.error_msg;
-    checkForErrors(error_return);
+    checkForErrors(rtc_result.error_msg);
 
-    if(ALL_OUTPUTS == output || LCD_DISPLAY == output)
+    if(IS_OUTPUT_INCLUDED(output, LCD_DISPLAY))
     {
-        error_return = data_router_routeDataToOutput(OUTPUT_DISPLAY, rtc_result); // Send RTC data to display output
-        checkForErrors(error_return);
+        checkForErrors(data_router_routeDataToOutput(OUTPUT_DISPLAY, rtc_result)); // Send RTC data to display output and check for errors
     }
-    if(ALL_OUTPUTS == output || SERIAL_CONSOLE == output)
+    if(IS_OUTPUT_INCLUDED(output, SERIAL_CONSOLE))
     {
-        error_return = data_router_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, rtc_result); // Send RTC data to serial console output
-        checkForErrors(error_return);
-    }    
+        checkForErrors(data_router_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, rtc_result)); // Send RTC data to serial console output and check for errors
+    }   
+    return FINISHED;
 }
 
-void app_displayAllI2CAddresses(output_destination_t output, bool repeat)
+task_status_te app_displayAllI2CAddressesPeriodic(output_destination_t output, i2cScan_reading_context_ts *context)
 {
-    static bool continue_with_displaying = CONTINUE_DISPLAYING_YES;
-
-    if(CONTINUE_DISPLAYING_YES == continue_with_displaying)
+    // Run the I2C scanner if it's not already completed
+    if(I2C_SCANER_RUN == context->run_i2c_scanner)
     {
-        error_manager_error_ts error_return; // Shared return struct used to collect return error data
+        // Fetch the I2C scan result and check for errors
+        context->i2c_scan_return = data_router_fetchDataFromInput(INPUT_I2C_SCAN, I2CSCAN_MODE_SCAN_FOR_ALL_DEVICES);
+        checkForErrors(context->i2c_scan_return.error_msg);
+        // Mark scanner as stopped after fetching the data
+        context->run_i2c_scanner = I2C_SCANER_DONT_RUN;
+    }
 
-        data_router_input_data_ts i2c_scan_result = data_router_fetchDataFromInput(INPUT_I2C_SCAN, I2CSCAN_MODE_SCAN_FOR_ALL_DEVICES);
-        error_return = i2c_scan_result.error_msg;
-        checkForErrors(error_return);
+    // Check if an address update function is assigned
+    if(I2CSCAN_NO_ADDRESS_UPDATE_FUNCTION != context->i2c_scan_return.data.input_return.i2cScan_reading.update_i2c_address)
+    {
+        // Try updating the I2C address (returns true if a valid address is found)
+        if(I2CSCAN_ADDRESS_NOT_FOUND != updateI2CScanForAllAddressesUpdateNextAddress(&(context->i2c_scan_return.data.input_return.i2cScan_reading)))
+        {
+            if(IS_OUTPUT_INCLUDED(output, LCD_DISPLAY))
+            {
+                checkForErrors(data_router_routeDataToOutput(OUTPUT_DISPLAY, context->i2c_scan_return)); // Send I2C scan address to display output and check for errors
+            }
+            if(IS_OUTPUT_INCLUDED(output, SERIAL_CONSOLE))
+            {
+                checkForErrors(data_router_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, context->i2c_scan_return)); // Send I2C scan address to serial console output and check for errors
+            }
 
-        if(ALL_OUTPUTS == output || LCD_DISPLAY == output)
-        {
-            error_return = data_router_routeDataToOutput(OUTPUT_DISPLAY, i2c_scan_result); // Send I2C scan address to display output
-            checkForErrors(error_return);
-        }
-        if(ALL_OUTPUTS == output || SERIAL_CONSOLE == output)
-        {
-            error_return = data_router_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, i2c_scan_result); // Send I2C scan address to serial console output
-            checkForErrors(error_return);
-        }
-
-        i2cScan_reading_ts current_reading = i2c_scan_result.data.input_return.i2cScan_reading;
-        current_reading.update_i2c_address(&current_reading);
-        if(I2CSCAN_I2C_ADDRESS_MIN == current_reading.current_i2c_addr && REPEAT_ONCE == repeat)
-        {
-            continue_with_displaying = CONTINUE_DISPLAYING_NO;
+            return NOT_FINISHED;
         }
     }
+    // If we have cycled through all I2C addresses and there is no more, indicate that processing is complete
+    context->run_i2c_scanner = I2C_SCANER_RUN; // Also, in case if start fails, make it possible to retry again
+    return FINISHED; // No update function assigned, just return finished
+}
+
+i2cScan_reading_context_ts app_createI2CScanReadingContext()
+{
+    // Initialize the I2C scan reading context with zeroed-out default values
+    i2cScan_reading_context_ts new_i2c_scan_reading_context = {0};
+
+    // Set the function pointer to indicate no address update functionality is available
+    new_i2c_scan_reading_context.i2c_scan_return.data.input_return.i2cScan_reading.update_i2c_address = I2CSCAN_NO_ADDRESS_UPDATE_FUNCTION;
+
+    // Mark the scanner as active, meaning it should start scanning when triggered
+    new_i2c_scan_reading_context.run_i2c_scanner = I2C_SCANER_RUN;
+
+    // Return the half initialized scan reading context structure
+    return new_i2c_scan_reading_context;
 }
 /* *************************************** */
 
@@ -171,5 +197,10 @@ static void checkForErrors(error_manager_error_ts error_status)
 static output_destination_t filterOutTimeDependentOutputs(output_destination_t output)
 {
     return (output & ALL_TIME_INDEPENDENT_OUTPUTS);
+}
+
+static bool updateI2CScanForAllAddressesUpdateNextAddress(i2cScan_reading_ts *reading)
+{
+    return reading->update_i2c_address(reading);
 }
 /* *************************************** */
