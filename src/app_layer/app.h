@@ -6,6 +6,9 @@
 #include "../project_settings.h"
 #include "../error_manager/error_manager.h"
 
+// Macro to check if a specific output bit is set in the output variable
+// It returns true if the specified bit (bit_mask) is set in the output, otherwise false
+#define IS_OUTPUT_INCLUDED(output, bit_mask) ((output & bit_mask) != 0)
 
 #define NUM_OF_SENSORS_NOT_CALCULATED (false) // Flag indicating sensors length has not been calculated
 #define NUM_OF_SENSORS_CALCULATED     (true)  // Flag indicating sensors length has been calculated
@@ -30,14 +33,20 @@ typedef enum
     NOT_FINISHED
 } task_status_te;
 
-typedef enum
-{
-    ALL_OUTPUTS,                    // Used to indicate all outputs (works only for sequential readings)
-    LCD_DISPLAY,                    // Output option for displays(cannot show all at once)
-    SERIAL_CONSOLE,                 // Output option for serial console(can show all at once or sequentially)
-    ALL_TIME_INDEPENDENT_OUTPUTS,   // Outputs that can be sent independently of time constraints(all at once)
-    ALL_TIME_DEPENDENT_OUTPUTS      // Outputs that require time constraints (e.g., display)
-} output_destination_te;
+// Type for representing and managing output destinations (supports up to 16 different output options)
+typedef uint16_t output_destination_t;
+// Bitmask macros for output destinations:
+// - The first 8 bits (0x00FF) are for time-independent outputs (supports up to 8 outputs at once).
+// - The second 8 bits (0xFF00) are for time-dependent outputs (supports up to 8 outputs at once, e.g., display).
+// - ALL_OUTPUTS combines both time-independent and time-dependent outputs (16 bits in total).
+#define SERIAL_CONSOLE                 (output_destination_t)(1 << 0) // Output option for serial console(can show all at once or sequentially)
+// 7 bytes reserved for the future
+#define LCD_DISPLAY                    (output_destination_t)(1 << 8) // Output option for displays(cannot show all at once)
+// 7 bytes reserved for the future
+#define ALL_TIME_INDEPENDENT_OUTPUTS   (output_destination_t)(0x00FF) // Outputs that can be sent independently of time constraints(all at once)
+#define ALL_TIME_DEPENDENT_OUTPUTS     (output_destination_t)(0xFF00) // Outputs that require time constraints (e.g., display)
+#define ALL_OUTPUTS                    (output_destination_t)(0xFFFF) // Used to indicate all outputs
+#define NO_OUTPUTS                     (output_destination_t)(0x0000) // Used to indicate no outputs are set
 
 typedef struct
 {
@@ -56,7 +65,7 @@ typedef struct
  * @param output The output destination (LCD, serial console, or both).
  * @return task_status_te Returns FINISHED to notify the task component.
  */
-task_status_te app_readSpecificSensor(uint8_t sensor_id, output_destination_te output);
+task_status_te app_readSpecificSensor(uint8_t sensor_id, output_destination_t output);
 
 /**
  * @brief Reads all configured sensors in a cyclic manner and processes their data.
@@ -74,7 +83,7 @@ task_status_te app_readSpecificSensor(uint8_t sensor_id, output_destination_te o
  *         - `FINISHED` when all sensors have been read in the current cycle.
  *         - `NOT_FINISHED` if there are more sensors left to process.
  */
-task_status_te app_readAllSensorsPeriodic(output_destination_te output, sensor_reading_context_ts *context);
+task_status_te app_readAllSensorsPeriodic(output_destination_t output, sensor_reading_context_ts *context);
 
 /**
  * @brief Creates and initializes a new sensor reading context.
@@ -103,14 +112,14 @@ sensor_reading_context_ts app_createNewSensorsReadingContext();
  * 
  * @return task_status_te Always returns FINISHED, indicating that all sensors were processed.
  */
-task_status_te app_readAllSensorsAtOnce(output_destination_te output);
+task_status_te app_readAllSensorsAtOnce(output_destination_t output);
 
 /***
  * Fetches RTC data, and routes the data to defined output(s).
  * @param output The output parameter.
  */
-void app_displayCurrentRtcTime(output_destination_te output);
+void app_displayCurrentRtcTime(output_destination_t output);
 
-void app_displayAllI2CAddresses(output_destination_te output, bool repeat);
+void app_displayAllI2CAddresses(output_destination_t output, bool repeat);
 
 #endif
