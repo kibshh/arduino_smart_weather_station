@@ -7,61 +7,89 @@
  * @param number_of_sensors The total number of sensors.
  * @return The updated sensor index.
  */
-static uint8_t cyclicDisplaySensorsUpdateSensorIndex(uint8_t current_index, size_t number_of_sensors);
+static uint8_t readAllSensorsPeriodicUpdateSensorIndex(uint8_t current_index, size_t number_of_sensors);
 
 /***
  * Checks for errors and handles them if any occur.
  * @param error_status The error status structure.
  */
 static void checkForErrors(error_manager_error_ts error_status);
+
+/**
+ * Checks if the given output is time-independent.
+ * @param output The output destination to check.
+ * @return true if the output is time-independent, false otherwise.
+ */
+static bool isOutputTimeIndependent(output_destination_te output);
 /* *************************************** */
 
 /* EXPORTED FUNCTIONS */
-void app_displayAllSensors(uint8_t output, bool repeat)
+task_status_te app_readSpecificSensor(uint8_t sensor_id, output_destination_te output)
 {
-    // Static variables to maintain state across function calls
-    static size_t number_of_sensors = sensors_interface_getSensorsLen(); // Calculate the number of sensors only once
-    static uint8_t sensor_index = STARTING_SENSOR_INDEX;
-    static bool continue_with_displaying = CONTINUE_DISPLAYING_YES;
-
-    if(CONTINUE_DISPLAYING_YES == continue_with_displaying)
+    data_router_input_data_ts sensor_reading_result = data_router_fetchDataFromInput(INPUT_SENSORS, sensor_id); // Fetch data from the sensor
+    checkForErrors(sensor_reading_result.error_msg);
+    if(ALL_OUTPUTS == output || LCD_DISPLAY == output || ALL_TIME_DEPENDENT_OUTPUTS == output)
     {
-        // If sensors are available, process them one by one in a cyclic manner
+        checkForErrors(data_router_routeDataToOutput(OUTPUT_DISPLAY, sensor_reading_result)); // Send sensor data to display output
+    }
+    if(ALL_OUTPUTS == output || SERIAL_CONSOLE == output || ALL_TIME_INDEPENDENT_OUTPUTS == output)
+    {
+        checkForErrors(data_router_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, sensor_reading_result)); // Send sensor data to serial console output
+    }
+    return FINISHED; // Return value is used to notify task component
+}
+
+task_status_te app_readAllSensorsPeriodic(output_destination_te output, sensor_reading_context_ts *context)
+{
+    // If sensors are available, process them one by one in a cyclic manner
+    if(SENSORS_INTERFACE_NO_SENSORS_CONFIGURED != context->number_of_sensors)
+    {
+        // Get sensor ID from the current index
+        uint8_t current_sensor_id = sensors_interface_sensorIndexToId(context->sensor_index);
+        // Process only valid sensor IDs
+        if(INVALID_SENSOR_ID != current_sensor_id)
+        {
+            (void)app_readSpecificSensor(current_sensor_id, output);
+        }
+        // Update sensor index for the next iteration
+        context->sensor_index = readAllSensorsPeriodicUpdateSensorIndex(context->sensor_index, context->number_of_sensors);
+    }
+
+    // If we have cycled through all sensors, indicate that processing is complete
+    return (STARTING_SENSOR_INDEX == context->sensor_index) ? FINISHED : NOT_FINISHED;
+}
+
+sensor_reading_context_ts app_createNewSensorsReadingContext()
+{
+    sensor_reading_context_ts new_sensor_reading_context = {sensors_interface_getSensorsLen(), STARTING_SENSOR_INDEX};
+    return new_sensor_reading_context;
+}
+
+task_status_te app_readAllSensorsAtOnce(output_destination_te output)
+{
+    if(TIME_INDEPENDENT_OUTPUT == isOutputTimeIndependent(output))
+    {
+        size_t number_of_sensors = sensors_interface_getSensorsLen();
+
+        // If there are sensors configured, process each one
         if(SENSORS_INTERFACE_NO_SENSORS_CONFIGURED != number_of_sensors)
         {
-            // Get sensor ID from the current index
-            uint8_t current_sensor_id = sensors_interface_sensorIndexToId(sensor_index);
-            // Process only valid sensor IDs
-            if(INVALID_SENSOR_ID != current_sensor_id)
+            // Loop through all sensor indices and process each one
+            for (uint8_t sensor_index = STARTING_SENSOR_INDEX; sensor_index < number_of_sensors; sensor_index++)
             {
-                error_manager_error_ts error_return; // Shared return struct used to collect return error data
-
-                data_router_input_data_ts sensor_result = data_router_fetchDataFromInput(INPUT_SENSORS, current_sensor_id); // Fetch data from the sensor
-                error_return = sensor_result.error_msg;
-                checkForErrors(error_return);
-
-                if(ALL_OUTPUTS == output || LCD_DISPLAY == output)
+                uint8_t current_sensor_id = sensors_interface_sensorIndexToId(sensor_index);
+                // Only process valid sensor IDs
+                if(INVALID_SENSOR_ID != current_sensor_id)
                 {
-                    error_return = data_router_routeDataToOutput(OUTPUT_DISPLAY, sensor_result); // Send sensor data to display output
-                    checkForErrors(error_return);
-                }
-                if(ALL_OUTPUTS == output || SERIAL_CONSOLE == output)
-                {
-                    error_return = data_router_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, sensor_result); // Send sensor data to serial console output
-                    checkForErrors(error_return);
-                }
-                // Update sensor index for the next iteration
-                sensor_index = cyclicDisplaySensorsUpdateSensorIndex(sensor_index, number_of_sensors);
-                if(STARTING_SENSOR_INDEX == sensor_index && REPEAT_ONCE == repeat)
-                {
-                    continue_with_displaying = CONTINUE_DISPLAYING_NO;
+                    (void)app_readSpecificSensor(current_sensor_id, output);
                 }
             }
         }
     }
+    return FINISHED; // Return FINISHED since all sensors are processed
 }
 
-void app_displayCurrentRtcTime(uint8_t output)
+void app_displayCurrentRtcTime(output_destination_te output)
 {
     error_manager_error_ts error_return; // Shared return struct used to collect return error data
 
@@ -81,7 +109,7 @@ void app_displayCurrentRtcTime(uint8_t output)
     }    
 }
 
-void app_displayAllI2CAddresses(uint8_t output, bool repeat)
+void app_displayAllI2CAddresses(output_destination_te output, bool repeat)
 {
     static bool continue_with_displaying = CONTINUE_DISPLAYING_YES;
 
@@ -115,7 +143,7 @@ void app_displayAllI2CAddresses(uint8_t output, bool repeat)
 /* *************************************** */
 
 /* STATIC FUNCTIONS IMPLEMENTATIONS */
-static uint8_t cyclicDisplaySensorsUpdateSensorIndex(uint8_t current_index, size_t number_of_sensors)
+static uint8_t readAllSensorsPeriodicUpdateSensorIndex(uint8_t current_index, size_t number_of_sensors)
 {
     current_index++;
     // Reset index if it exceeds the total number of sensors
@@ -135,5 +163,20 @@ static void checkForErrors(error_manager_error_ts error_status)
         /* Uncomment when error handler is finished */
         // error_manager_handleError(error_status);
     }
+}
+
+static bool isOutputTimeIndependent(output_destination_te output)
+{
+    // Check if the output is time-dependent (display or all-time dependent outputs)
+    if (LCD_DISPLAY == output || ALL_TIME_DEPENDENT_OUTPUTS == output
+#if defined(OUTPUT_LCD_DISPLAY_USED)
+        || ALL_OUTPUTS == output
+#endif
+    )   
+    {
+        return TIME_DEPENDENT_OUTPUT; // Time-dependent output
+    }
+
+    return TIME_INDEPENDENT_OUTPUT; // Time-independent output
 }
 /* *************************************** */

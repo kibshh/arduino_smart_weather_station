@@ -23,6 +23,8 @@ void task_initTask()
 
 void task_cyclicTask()
 {
+  static sensor_reading_context_ts context1 = app_createNewSensorsReadingContext();
+
   static unsigned long previous_millis = 0;
 
   unsigned long current_millis = millis();
@@ -44,7 +46,7 @@ void task_cyclicTask()
   {
     previous_millis = current_millis;
 
-    app_displayAllSensors(ALL_OUTPUTS, REPEAT_CYCLIC);
+    (void)app_readAllSensorsPeriodic(ALL_OUTPUTS, &context1);
   }
 #endif
 }
