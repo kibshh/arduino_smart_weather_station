@@ -40,7 +40,7 @@ void task_cyclicTask()
   {
     previous_millis = current_millis;
 
-    app_displayCurrentRtcTime(LCD_DISPLAY);
+    app_readCurrentRtcTime(LCD_DISPLAY);
   }
   if (current_millis - previous_millis >= (unsigned long)DISPLAY_DISPLAY_INTERVAL_MS)
   {

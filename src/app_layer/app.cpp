@@ -104,7 +104,7 @@ task_status_te app_readAllSensorsAtOnce(output_destination_t output)
     return FINISHED; // Return FINISHED since all sensors are processed
 }
 
-task_status_te app_displayCurrentRtcTime(output_destination_t output)
+task_status_te app_readCurrentRtcTime(output_destination_t output)
 {
     data_router_input_data_ts rtc_result = data_router_fetchDataFromInput(INPUT_RTC, RTC_DEFAULT_RTC); // Fetch data from the RTC
     checkForErrors(rtc_result.error_msg);
@@ -120,7 +120,7 @@ task_status_te app_displayCurrentRtcTime(output_destination_t output)
     return FINISHED;
 }
 
-task_status_te app_displayAllI2CAddressesPeriodic(output_destination_t output, i2cScan_reading_context_ts *context)
+task_status_te app_readAllI2CAddressesPeriodic(output_destination_t output, i2cScan_reading_context_ts *context)
 {
     // Run the I2C scanner if it's not already completed
     if(I2C_SCANER_RUN == context->run_i2c_scanner)
@@ -168,6 +168,68 @@ i2cScan_reading_context_ts app_createI2CScanReadingContext()
 
     // Return the half initialized scan reading context structure
     return new_i2c_scan_reading_context;
+}
+
+task_status_te app_readAllI2CAddressesAtOnce(output_destination_t output)
+{
+    output = filterOutTimeDependentOutputs(output);
+
+    if(NO_OUTPUTS != output) // Check if all outputs are filtered out
+    {
+        // Fetch the I2C scan result and check for errors
+        data_router_input_data_ts i2c_scan_reading_result = data_router_fetchDataFromInput(INPUT_I2C_SCAN, I2CSCAN_MODE_SCAN_FOR_ALL_DEVICES);
+        checkForErrors(i2c_scan_reading_result.error_msg);
+
+        // Check if an address update function is assigned
+        if(I2CSCAN_NO_ADDRESS_UPDATE_FUNCTION != i2c_scan_reading_result.data.input_return.i2cScan_reading.update_i2c_address)
+        {
+            // Initialize a loop counter or timeout check to prevent infinite loop
+            uint8_t attempt_counter = I2CSCAN_I2C_ADDRESS_MIN;
+            // Timeout based on attempts
+            while(attempt_counter <= I2CSCAN_I2C_ADDRESS_MAX)
+            {
+                // Try updating the I2C address (returns true if a valid address is found)
+                if(I2CSCAN_ADDRESS_NOT_FOUND != updateI2CScanForAllAddressesUpdateNextAddress(&(i2c_scan_reading_result.data.input_return.i2cScan_reading)))
+                {
+                    if(IS_OUTPUT_INCLUDED(output, LCD_DISPLAY))
+                    {
+                        checkForErrors(data_router_routeDataToOutput(OUTPUT_DISPLAY, i2c_scan_reading_result)); // Send I2C scan address to display output and check for errors
+                    }
+                    if(IS_OUTPUT_INCLUDED(output, SERIAL_CONSOLE))
+                    {
+                        checkForErrors(data_router_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, i2c_scan_reading_result)); // Send I2C scan address to serial console output and check for errors
+                    }
+
+                    attempt_counter++; // Increment the attempt counter after a successful address update
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+    }
+
+    return FINISHED; // No update function assigned, just return finished
+}
+
+task_status_te app_readI2CDeviceStatus(uint8_t device_address, output_destination_t output)
+{
+    if(I2CSCAN_MODE_SCAN_FOR_ALL_DEVICES < device_address)
+    {
+        data_router_input_data_ts i2c_device_status_result = data_router_fetchDataFromInput(INPUT_I2C_SCAN, device_address); // Fetch data from the I2C Scan
+        checkForErrors(i2c_device_status_result.error_msg);
+
+        if(IS_OUTPUT_INCLUDED(output, LCD_DISPLAY))
+        {
+            checkForErrors(data_router_routeDataToOutput(OUTPUT_DISPLAY, i2c_device_status_result)); // Send I2C device status data to display output and check for errors
+        }
+        if(IS_OUTPUT_INCLUDED(output, SERIAL_CONSOLE))
+        {
+            checkForErrors(data_router_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, i2c_device_status_result)); // Send I2C device status data to serial console output and check for errors
+        }   
+    }
+    return FINISHED; // Return value is used to notify task component
 }
 /* *************************************** */
 
