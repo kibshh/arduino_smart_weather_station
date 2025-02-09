@@ -9,7 +9,7 @@ void task_initTask()
 #ifdef OUTPUT_SERIAL_MONITOR_USED
   error_code = serial_console_init();
 #endif
-#ifdef OUTPUT_DISPLAY_USED
+#ifdef OUTPUT_LCD_DISPLAY_USED
   error_code = display_init();
 #endif
 #ifdef INPUT_SENSORS_USED
@@ -23,11 +23,9 @@ void task_initTask()
 
 void task_cyclicTask()
 {
+  static sensor_reading_context_ts context1 = app_createNewSensorsReadingContext();
+
   static unsigned long previous_millis = 0;
-
-  static size_t sensors_len = sensors_interface_getSensorsLen();
-
-  static uint8_t sensor_index = TASK_STARTING_SENSOR_INDEX;
 
   unsigned long current_millis = millis();
 
@@ -42,27 +40,13 @@ void task_cyclicTask()
   {
     previous_millis = current_millis;
 
-    data_router_input_data_ts return_data = data_router_fetchDataFromInput(INPUT_RTC, RTC_DEFAULT_RTC);
-
-    error_manager_error_ts error = data_router_routeDataToOutput(OUTPUT_DISPLAY, return_data);
-
-    // handle with error handler
+    app_readCurrentRtcTime(LCD_DISPLAY);
   }
   if (current_millis - previous_millis >= (unsigned long)DISPLAY_DISPLAY_INTERVAL_MS)
   {
     previous_millis = current_millis;
 
-    if (sensor_index >= sensors_len) {
-      sensor_index = TASK_STARTING_SENSOR_INDEX;
-    }
-
-    data_router_input_data_ts return_data = data_router_fetchDataFromInput(INPUT_SENSORS, sensors_interface_sensorIndexToId(sensor_index));
-
-    sensor_index++;
-
-    error_manager_error_ts error = data_router_routeDataToOutput(OUTPUT_DISPLAY, return_data);
-
-    // handle with error handler
+    (void)app_readAllSensorsPeriodic(ALL_OUTPUTS, &context1);
   }
 #endif
 }

@@ -5,7 +5,6 @@
 #include <LiquidCrystal_I2C.h>
 #include <WString.h>
 #include "display_config.h"
-#include "../../error_manager/error_codes.h"
 #include "../../input/sensors/sensors_interface/sensors_interface.h"
 #include "../../input/functionality/calibration/calibration_interface/calibration_interface.h"
 #include "../../data_router/data_router_types.h"

@@ -5,8 +5,6 @@
 #include <Wire.h>
 #include "../../input_types.h"
 
-#define I2CSCAN_CURRENT_ADDRESS_SEARCH_BEGIN  (0u)
-
 #define I2CSCAN_ADDRESS_FOUND                 (true)
 
 #define I2CSCAN_ADDRESS_NOT_FOUND             (false)
@@ -22,6 +20,10 @@
 
 /* The maximum 7-bit I2C address to scan. */
 #define I2CSCAN_I2C_ADDRESS_MAX               (127u)
+
+/* Fixes the problem of iterating over the same I2C address */
+#define I2CSCAN_OFFSET_FOR_NEXT_ADDR          (1u)
+#define I2CSCAN_STARTING_ADDRESS              (I2CSCAN_I2C_ADDRESS_MIN - I2CSCAN_OFFSET_FOR_NEXT_ADDR)
 
 /**
  * @brief Scans the I2C bus or checks the status of a specific device.

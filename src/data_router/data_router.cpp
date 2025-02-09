@@ -55,7 +55,8 @@ error_manager_error_ts data_router_routeDataToOutput(data_router_output_componen
             break;
 
         case OUTPUT_SERIAL_CONSOLE:
-            // Serial console output not implemented yet
+            // Route data to serial console and update error code
+            error_msg.error_code = serial_console_displayData(data.data);
             break;
 
         default:
@@ -123,7 +124,6 @@ static data_router_input_data_ts initializeInputReturnData(data_router_input_te 
 
     // Initialize error part
     return_data.error_msg.error_code = ERROR_CODE_INVALID_INPUT;
-    return_data.error_msg.io_flag = DATA_ROUTER_INPUT;
     return_data.error_msg.component.input_error.input_component = input_component;
     return_data.error_msg.component.input_error.input_id = component_id;
 
@@ -135,7 +135,6 @@ static error_manager_error_ts initializeOutputReturnErrorMsg(data_router_output_
     // Initialize the error message with default values
     error_manager_error_ts error_msg;
     error_msg.error_code = ERROR_CODE_OUTPUT_ROUTER_DATA_CONTAINS_ERRORS;
-    error_msg.io_flag = DATA_ROUTER_OUTPUT;
     error_msg.component.output_error.output_component = output_component;
     error_msg.component.output_error.input_type = data.data.input_type;
     error_msg.component.output_error.input_id = data.data.input_id;

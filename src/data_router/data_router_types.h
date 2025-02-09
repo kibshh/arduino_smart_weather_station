@@ -3,46 +3,8 @@
 
 #include <Arduino.h>
 #include "../input/input_types.h"
-#include "../error_manager/error_manager.h"
-
-/**
- * Enum representing the type of component (input or output).
- *
- * This enumeration is used to specify whether a component is used as an
- * input source or as an output destination in the data routing system.
- */
-typedef enum
-{
-    DATA_ROUTER_INPUT, /**< Represents an input component type. */
-    DATA_ROUTER_OUTPUT /**< Represents an output component type. */
-} data_router_io_type_te;
-
-/**
- * Enum listing all available inputs.
- *
- * This enumeration defines the possible input sources for data
- * within the data routing system.
- */
-typedef enum
-{
-    INPUT_SENSORS,     /**< Input for sensors. */
-    INPUT_RTC,         /**< Input for the Real-Time Clock (RTC). */
-    INPUT_I2C_SCAN,    /**< Input for I2C address scanning. */
-    INPUT_CALIBRATION, /**< Input for calibration. */
-    INPUT_ERROR        /**< Input for error. */
-} data_router_input_te;
-
-/**
- * Enum listing all available output components.
- *
- * This enumeration defines the possible output destinations where data
- * can be forwarded by the data routing system.
- */
-typedef enum
-{
-    OUTPUT_DISPLAY,       /**< Output component for a display device. */
-    OUTPUT_SERIAL_CONSOLE /**< Output component for the serial console. */
-} data_router_output_component_te;
+#include "data_router_input_output_lists.h"
+#include "../error_manager/error_manager_types.h"
 
 /**
  * Union for handling various input types dynamically.
