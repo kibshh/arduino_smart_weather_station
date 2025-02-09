@@ -4,7 +4,6 @@
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 #include <WString.h>
-#include "../../error_manager/error_codes.h"
 #include "../../data_router/data_router_types.h"
 #include "serial_console_config.h"
 #include "../../input/input_types.h"

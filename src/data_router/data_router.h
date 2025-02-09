@@ -9,7 +9,6 @@
 #include "../output/display/display.h"
 #include "../output/serial_console/serial_console.h"
 #include "data_router_types.h"
-#include "../error_manager/error_manager.h"
 
 /**
  * Structure for managing the dual output of data fetching operations.
