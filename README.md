@@ -24,4 +24,4 @@ This project is a weather station using an Arduino and various sensors to monito
 3. Observe live environmental data on the LCD.
 
 ## License
-This project is open-source.
+This project is licensed under the MIT License.
