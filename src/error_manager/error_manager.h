@@ -2,7 +2,6 @@
 #define ERROR_MANAGER_H
 
 #include <Arduino.h>
-#include "error_manager_types.h"
 #include "../data_router/data_router.h"
 
 /**

@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <DHT.h>
-#include "../../sensorsconfig.h"
+#include "../sensorsconfig.h"
 
 
 /**

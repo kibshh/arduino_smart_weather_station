@@ -98,7 +98,7 @@ sensor_return_ts sensors_getReading(uint8_t id);
  * @brief Handles periodic tasks for sensors in the main loop.
  *
  * This function manages sensor-related operations, including handling 
- * time-based processes and calibration routines. It should be called 
+ * time-based processes. It should be called 
  * periodically in the main loop with the current time in milliseconds.
  *
  * @param current_millis The current time in milliseconds (e.g., from millis()).

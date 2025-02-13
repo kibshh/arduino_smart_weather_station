@@ -1,5 +1,47 @@
 #include "serial_console.h"
 
+/* STATIC FUNCTION PROTOTYPES */
+/**
+ * @brief Displays sensor measurements on the serial console.
+ *
+ * This function retrieves sensor metadata and formats the sensor readings
+ * for display on the serial console, including the sensor type, value, and unit.
+ *
+ * @param sensor_data The sensor reading structure containing the data to be displayed.
+ * @return error_manager_error_code_te
+ * - ERROR_CODE_NO_ERROR: Sensor data displayed successfully.
+ * - ERROR_CODE_SERIAL_CONSOLE_SENSOR_NOT_CONFIGURED: Sensor metadata retrieval failed.
+ * - ERROR_CODE_SERIAL_CONSOLE_INVALID_MEASUREMENT_TYPE: Invalid measurement type.
+ */
+static error_manager_error_code_te serial_console_displaySensorMeasurement(sensor_reading_ts sensor_data);
+
+/**
+ * @brief Displays the current RTC time on the serial console.
+ *
+ * This function formats and displays the current time data, including
+ * hours, minutes, seconds, day, month, and year.
+ *
+ * @param time_data The RTC reading structure containing the time information.
+ * @return error_manager_error_code_te
+ * - ERROR_CODE_NO_ERROR: Time data displayed successfully.
+ */
+static error_manager_error_code_te serial_console_displayTime(rtc_reading_ts time_data);
+
+/**
+ * @brief Displays I2C scan results on the serial console.
+ *
+ * This function formats and displays I2C scan results, including the
+ * detected device address and its communication status.
+ *
+ * @param i2c_scan_data The I2C scan reading structure containing the scan results.
+ * @return error_manager_error_code_te
+ * - ERROR_CODE_NO_ERROR: I2C data displayed successfully.
+ * - ERROR_CODE_SERIAL_CONSOLE_UNKNOWN_I2C_DEVICE_STATUS: Unknown device status during communication.
+ */
+static error_manager_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c_scan_data);
+/* *************************************** */
+
+/* EXPORTED FUNCTIONS */
 error_manager_error_code_te serial_console_init()
 {
     // Begin serial communication with the defined baud rate.
@@ -33,9 +75,6 @@ error_manager_error_code_te serial_console_displayData(data_router_data_ts data)
       error_code = serial_console_displayI2cScan(data.input_return.i2cScan_reading); // Display I2C scan results
       break;
 
-    case INPUT_CALIBRATION:
-      error_code = serial_console_displayCalibrationResults(data.input_return.calib_reading); // Display calibration results
-
     default:
       // No action, error code is already set
       break;
@@ -43,8 +82,10 @@ error_manager_error_code_te serial_console_displayData(data_router_data_ts data)
 
   return error_code;
 }
+/* *************************************** */
 
-error_manager_error_code_te serial_console_displaySensorMeasurement(sensor_reading_ts sensor_data)
+/* STATIC FUNCTIONS IMPLEMENTATIONS */
+static error_manager_error_code_te serial_console_displaySensorMeasurement(sensor_reading_ts sensor_data)
 {
   error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
@@ -96,7 +137,7 @@ error_manager_error_code_te serial_console_displaySensorMeasurement(sensor_readi
   return error_code;
 }
 
-error_manager_error_code_te serial_console_displayTime(rtc_reading_ts time_data)
+static error_manager_error_code_te serial_console_displayTime(rtc_reading_ts time_data)
 {
   // Extract time components
   uint16_t year = time_data.year;
@@ -120,7 +161,7 @@ error_manager_error_code_te serial_console_displayTime(rtc_reading_ts time_data)
   return ERROR_CODE_NO_ERROR;
 }
 
-error_manager_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c_scan_data)
+static error_manager_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c_scan_data)
 {
   error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
@@ -179,89 +220,4 @@ error_manager_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c
 
   return error_code;
 }
-
-error_manager_error_code_te serial_console_displayCalibrationResults(calibration_reading_ts calibration_data)
-{
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
-
-  // Fetch metadata for the given calibration ID
-  calibration_interface_metadata_ts calib_metadata = calibration_interface_getCalibrationMetadata(calibration_data.calibration_id);
-
-  // Proceed only if calibration metadata is successfully retrieved
-  if(CALIBRATION_INTERFACE_STATUS_SUCCESS == calib_metadata.success_status)
-  {
-    bool proceed_with_display = SERIAL_CONSOLE_PROCEED_WITH_DISPLAY;
-
-    // Extract metadata fields
-    const char* calibration_type = calib_metadata.metadata.calibration_type;
-    const char* calibration_unit = calib_metadata.metadata.calibration_unit;
-    uint8_t num_of_measurements_type = calib_metadata.metadata.num_of_measurements_type;
-    uint8_t num_of_decimals = calib_metadata.metadata.num_of_decimals;
-
-    // Buffer for formatted display string
-    char display_string[SERIAL_CONSOLE_STRING_RESERVED_GIANT]; // Enough space for formatted output
-
-    if(CALIBRATION_MULTIPLE_MEASUREMENTS == num_of_measurements_type)
-    {
-      switch (calibration_data.current_calibration_status)
-      {
-        case CALIBRATION_STATE_IDLE:
-          // Should never occur since calibration at least goes to 'in progress'
-          snprintf(display_string, sizeof(display_string), "%s: No calibration active", calibration_type);
-          break;
-
-        case CALIBRATION_STATE_IN_PROGRESS:
-          snprintf(display_string, sizeof(display_string), "%s: Calibration in progress...", calibration_type);
-          break;
-
-        case CALIBRATION_STATE_FINISHED:
-        {
-          // Convert float value to string with proper decimal places
-          char val[SERIAL_CONSOLE_DTOSTRF_BUFFER_SIZE]; // Temporary buffer for float conversion
-          dtostrf(calibration_data.value, SERIAL_CONSOLE_MIN_FLOAT_STRING_LEN, num_of_decimals, val); // Convert float to string
-
-          snprintf(display_string, sizeof(display_string), "Calibration for %s: %s%s", calibration_type, val, calibration_unit);
-          break;
-        }
-
-        default:
-          error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_STATUS;
-          proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
-          break;
-      }
-    }
-    else if(CALIBRATION_SINGLE_MEASUREMENT == num_of_measurements_type)
-    {
-      if (CALIBRATION_STATE_FINISHED == calibration_data.current_calibration_status)
-      {
-        // Convert float value to string with proper decimal places
-        char val[SERIAL_CONSOLE_DTOSTRF_BUFFER_SIZE]; // Temporary buffer for float conversion
-        dtostrf(calibration_data.value, SERIAL_CONSOLE_MIN_FLOAT_STRING_LEN, num_of_decimals, val);
-
-        snprintf(display_string, sizeof(display_string), "Calibration for %s: %s%s", calibration_type, val, calibration_unit);
-      }
-      else
-      {
-        error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_STATUS;
-        proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
-      }
-    }
-    else
-    {
-      error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_NUM_OF_MEASUREMENTS_TYPE_CONFIGURED;
-      proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
-    }
-    // Display the message only if there is no error
-    if(SERIAL_CONSOLE_PROCEED_WITH_DISPLAY == proceed_with_display)
-    {
-      Serial.println(display_string);
-    }
-  }
-  else
-  {
-    // Calibration metadata retrieval failed
-    error_code = ERROR_CODE_CALIBRATION_CALIB_NOT_CONFIGURED;
-  }
-
-  return error_code;
-}
+/* *************************************** */

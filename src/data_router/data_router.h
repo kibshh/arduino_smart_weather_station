@@ -2,10 +2,9 @@
 #define DATA_ROUTER_H
 
 #include <Arduino.h>
-#include "../input/functionality/i2c_scan/i2cScan.h"
+#include "../input/i2c_scan/i2cScan.h"
 #include "../input/rtc/rtc.h"
 #include "../input/sensors/sensors.h"
-#include "../input/functionality/calibration/calibration.h"
 #include "../output/display/display.h"
 #include "../output/serial_console/serial_console.h"
 #include "data_router_types.h"

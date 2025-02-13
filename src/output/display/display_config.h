@@ -14,6 +14,5 @@
 #define DISPLAY_TIME_ROW      (1u)  // Row for displaying time
 #define DISPLAY_I2C_SCAN_STRING_ROW  (0u) // Row for displaying I2C scan string
 #define DISPLAY_I2C_SCAN_ADDR_ROW    (1u) // Row for displaying I2C address during scan
-#define DISPLAY_CALIB_ROW     (0u)  // Row for displaying calibration results
 
 #endif

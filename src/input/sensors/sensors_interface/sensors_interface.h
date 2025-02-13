@@ -2,7 +2,7 @@
 #define SENSORS_INTERFACE_H
 
 #include <Arduino.h>
-#include "../sensors_metadata/sensors_metadata.h"
+#include "sensors_metadata/sensors_metadata.h"
 
 /**
  * @file sensors_interface.h

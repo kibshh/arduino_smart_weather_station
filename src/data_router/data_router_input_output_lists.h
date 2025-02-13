@@ -14,7 +14,6 @@ typedef enum
     INPUT_SENSORS,     /**< Input for sensors. */
     INPUT_RTC,         /**< Input for the Real-Time Clock (RTC). */
     INPUT_I2C_SCAN,    /**< Input for I2C address scanning. */
-    INPUT_CALIBRATION, /**< Input for calibration. */
     INPUT_ERROR        /**< Input for error. */
 } data_router_input_te;
 

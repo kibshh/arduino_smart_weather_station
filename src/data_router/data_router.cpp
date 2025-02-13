@@ -98,13 +98,6 @@ data_router_input_data_ts data_router_fetchDataFromInput(data_router_input_te in
         return_data.data.input_return.i2cScan_reading = i2cScan_return.i2cScan_reading;
         break;
 
-    case INPUT_CALIBRATION:
-        // Fetch calibration data and update return data
-        calibration_return_ts calib_return = calibration_getReading(component_id);
-        return_data.error_msg.error_code = calib_return.error_code;
-        return_data.data.input_return.calib_reading = calib_return.calibration_reading;
-        break;
-
     default:
         // Default error code is set to ERROR_CODE_INVALID_INPUT so no need to set it again here.
         break;

@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <Adafruit_BMP280.h>
-#include "../../sensorsconfig.h"
+#include "../sensorsconfig.h"
 
 
 #define BMP280_MODE_NORMAL    Adafruit_BMP280::MODE_NORMAL //The sensor continuously takes measurements based on the configured sampling and standby time.

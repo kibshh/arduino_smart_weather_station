@@ -5,6 +5,44 @@ static LiquidCrystal_I2C lcd(DISPLAY_LCD_I2C_ADDDR, DISPLAY_LCD_WIDTH, DISPLAY_L
 
 /* STATIC FUNCTION PROTOTYPES */
 /**
+ * Displays the sensor measurement data on the LCD based on the provided sensor reading.
+ * It retrieves the metadata for the sensor, formats the sensor value, and updates the display. 
+ * If the measurement type is invalid or metadata is not found, the function returns an error code.
+ *
+ * @param sensor_data The sensor reading containing the sensor ID, value, and measurement type switch.
+ * 
+ * @return error_manager_error_code_te Returns an error code based on the display process:
+ *         - ERROR_CODE_NO_ERROR if the sensor data is successfully displayed.
+ *         - ERROR_CODE_DISPLAY_INVALID_MEASUREMENT_TYPE if the measurement type is invalid.
+ *         - ERROR_CODE_DISPLAY_SENSOR_NOT_CONFIGURED if the sensor metadata is not found.
+ **/
+static error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts sensor_data);
+
+/** 
+ * Displays the current time on the LCD, formatted to fit a 16-character wide display.
+ * This function formats the time and date values from the RTC reading and displays it.
+ *
+ * @param time_data The RTC reading containing the current time (year, month, day, hour, minutes, seconds).
+ * 
+ * @return error_manager_error_code_te Returns an error code:
+ *         - ERROR_CODE_NO_ERROR indicating successful execution.
+ **/
+static error_manager_error_code_te display_displayTime(rtc_reading_ts time_data);
+
+/** 
+ * Displays the results of an I2C bus scan on the LCD. 
+ * If scanning all devices, it will show a scanning message, otherwise it displays the status 
+ * of the specific device address being scanned.
+ *
+ * @param i2c_scan_data The I2C scanning data that contains the device address and scan status.
+ * 
+ * @return error_manager_error_code_te Returns an error code:
+ *         - ERROR_CODE_NO_ERROR for a successful display update.
+ *         - ERROR_CODE_DISPLAY_UNKNOWN_I2C_DEVICE_STATUS for unknown device statuses.
+ **/
+static error_manager_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_data);
+
+/**
  * @brief Formats sensor data for display on an LCD screen.
  * 
  * This function takes sensor metadata and a measurement value, 
@@ -51,10 +89,6 @@ error_manager_error_code_te display_displayData(data_router_data_ts data)
       error_code = display_displayI2cScan(data.input_return.i2cScan_reading);
       break;
 
-    case INPUT_CALIBRATION:
-      error_code = display_displayCalibrationResults(data.input_return.calib_reading);
-      break;
-
     case INPUT_ERROR:
       error_code = ERROR_CODE_NO_ERROR; // Need to implement
       break;
@@ -65,8 +99,10 @@ error_manager_error_code_te display_displayData(data_router_data_ts data)
 
   return error_code;
 }
+/* *************************************** */
 
-error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts sensor_data)
+/* STATIC FUNCTIONS IMPLEMENTATIONS */
+static error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts sensor_data)
 {
   error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR; // Default Error code
   bool proceed_with_display = DISPLAY_DONT_PROCEED_WITH_DISPLAY; // Flag to determine if the display should be updated
@@ -120,7 +156,7 @@ error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts s
   return error_code;
 }
 
-error_manager_error_code_te display_displayTime(rtc_reading_ts time_data)
+static error_manager_error_code_te display_displayTime(rtc_reading_ts time_data)
 {
   lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_TIME_ROW);
 
@@ -140,7 +176,7 @@ error_manager_error_code_te display_displayTime(rtc_reading_ts time_data)
   return ERROR_CODE_NO_ERROR; // Return success error code
 }
 
-error_manager_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_data)
+static error_manager_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_data)
 {
   error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
@@ -215,109 +251,6 @@ error_manager_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_d
   return error_code;
 }
 
-error_manager_error_code_te display_displayCalibrationResults(calibration_reading_ts calibration_data)
-{
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
-
-  // Retrieve calibration metadata for the given calibration ID
-  calibration_interface_metadata_ts calib_metadata = calibration_interface_getCalibrationMetadata(calibration_data.calibration_id);
-
-  // Check if the calibration metadata retrieval was successful
-  if(CALIBRATION_INTERFACE_STATUS_SUCCESS == calib_metadata.success_status)
-  {
-    const char* calibration_type = calib_metadata.metadata.calibration_type;
-    const char* calibration_unit = calib_metadata.metadata.calibration_unit;
-    uint8_t num_of_measurements_type = calib_metadata.metadata.num_of_measurements_type;
-    uint8_t num_of_decimals = calib_metadata.metadata.num_of_decimals;
-    uint8_t display_num_of_letters = calib_metadata.metadata.display_num_of_letters;
-
-    // Flag to control whether display should proceeded
-    bool proceed_with_display = DISPLAY_PROCEED_WITH_DISPLAY;
-
-    // Prepare display strings with appropriate buffer size (+1 for null terminator)
-    char display_string[DISPLAY_MAX_STRING_LEN];  // +1 for null terminator
-    char val[DISPLAY_LCD_WIDTH];  // Buffer for value representation
-
-    // Determine the display string length based on the maximum allowed letters
-    int display_length = min(display_num_of_letters, strlen(calibration_type));
-    strncpy(display_string, calibration_type, display_length); // Copy the calibration type to display_string
-    display_string[display_length] = '\0';  // Null-terminate the string
-
-    // Handle calibration based on the number of measurements
-    if(CALIBRATION_MULTIPLE_MEASUREMENTS == num_of_measurements_type)
-    {
-      // Process different calibration states when multiple measurements are required
-      switch(calibration_data.current_calibration_status)
-      {
-        case CALIBRATION_STATE_IDLE:
-          snprintf(display_string, sizeof(display_string), "%s No calib", calibration_type);
-          break;
-
-        case CALIBRATION_STATE_IN_PROGRESS:
-          snprintf(display_string, sizeof(display_string), "%s Progress", calibration_type);
-          break;
-
-        case CALIBRATION_STATE_FINISHED:
-          snprintf(val, sizeof(val), "%.*f", num_of_decimals, calibration_data.value);
-          snprintf(display_string, sizeof(display_string), "%s: %s%s", calibration_type, val, calibration_unit);
-          break;
-
-        default:
-          // Invalid calibration state
-          error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_STATUS;
-          proceed_with_display = DISPLAY_DONT_PROCEED_WITH_DISPLAY;
-          break;
-      }
-    }
-    else if(CALIBRATION_SINGLE_MEASUREMENT == num_of_measurements_type)
-    {
-      // Process calibration for a single measurement type
-      if(CALIBRATION_STATE_FINISHED == calibration_data.current_calibration_status)
-      {
-        // Calibration finished; display the result value
-        snprintf(val, sizeof(val), "%.*f", num_of_decimals, calibration_data.value);
-        snprintf(display_string, sizeof(display_string), "%s: %s%s", calibration_type, val, calibration_unit);
-      }
-      else
-      {
-        // Invalid calibration state for single measurement
-        error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_STATUS;
-        proceed_with_display = DISPLAY_DONT_PROCEED_WITH_DISPLAY;
-      }
-    }
-    else
-    {
-      // Invalid calibration measurement type configuration
-      error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_NUM_OF_MEASUREMENTS_TYPE_CONFIGURED;
-      proceed_with_display = DISPLAY_DONT_PROCEED_WITH_DISPLAY;
-    }
-
-    // Only proceed to display if no error occurred
-    if(DISPLAY_PROCEED_WITH_DISPLAY == proceed_with_display)
-    {
-      lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_CALIB_ROW);
-      // Calculate the length of the display string and pad with spaces if necessary
-      int len = strlen(display_string);
-      for(int i = len; i < DISPLAY_LCD_WIDTH; ++i)
-      {
-        display_string[i] = ' ';
-      }
-      display_string[DISPLAY_LCD_WIDTH] = '\0';  // Null-terminate the string
-      // Print the final string to the display
-      lcd.print(display_string);
-    }
-  }
-  else
-  {
-    // Calibration metadata retrieval failed
-    error_code = ERROR_CODE_CALIBRATION_CALIB_NOT_CONFIGURED;
-  }
-
-  return error_code;
-}
-/* *************************************** */
-
-/* STATIC FUNCTIONS IMPLEMENTATIONS */
 static String formatDisplaySensorData(sensors_metadata_catalog_ts sensor_metadata, char* val)
 {
   char display_string[DISPLAY_MAX_STRING_LEN]; // Buffer to hold formatted string

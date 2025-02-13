@@ -39,6 +39,19 @@
  * - ERROR_CODE_RTC_INIT_FAILED: RTC initialization failed.
  */
 error_manager_error_code_te rtc_init();
+
+/**
+ * @brief Retrieves the current date and time from the RTC module.
+ *
+ * This function reads the current time from the RTC module and performs basic validation 
+ * to ensure the values fall within expected ranges. If the RTC is found and the values 
+ * are valid, the function returns a structure containing the timestamp. Otherwise, 
+ * it returns an error code indicating that the RTC was not found.
+ *
+ * @param[in] id Identifier for the RTC module. Should be `RTC_DEFAULT_RTC` for the default module.
+ * @return `rtc_return_ts` structure containing the current date and time if valid, 
+ *         or an error code if the RTC is not found or the values are out of range.
+ */
 rtc_return_ts rtc_getTime(uint8_t id);
 
 #endif

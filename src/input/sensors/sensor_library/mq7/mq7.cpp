@@ -3,11 +3,6 @@
 /* STATIC GLOBAL VARIABLES */
 // Global variable for heater status
 static bool mq7_is_heater_hot = MQ7_HEATER_IS_OFF;
-
-#ifdef SENSORS_MQ7_CALIBRATION_ENABLED
-// Initialized to default values and zeros
-static mq7_calibration_helper_struct_ts mq7_calibration_helper_struct = {0, 0, CALIBRATION_STATE_IDLE, 0, 0};
-#endif
 /* *************************************** */
 
 /* STATIC FUNCTION PROTOTYPES */
@@ -51,6 +46,25 @@ float mq7_readPPM()
   return coPPM;
 }
 
+float mq7_readResistanceForCalibration()
+{
+  float calculated_resistance = MQ7_INVALID_VALUE; // Default invalid value
+
+  int sensor_analog_reading = analogRead(SENSORS_MQ7_PIN_ANALOG);
+  
+  if (MQ7_ANALOG_INPUT_MIN <= sensor_analog_reading && sensor_analog_reading <= MQ7_ANALOG_INPUT_MAX) // Ensure valid reading
+  {
+    if (sensor_analog_reading == MQ7_ANALOG_INPUT_MIN)
+    {
+      sensor_analog_reading = MQ7_ANALOG_INPUT_MIN_VALID; // Avoid division by zero
+    }
+    
+    calculated_resistance = (((float)MQ7_ANALOG_INPUT_MAX / sensor_analog_reading) - 1) * MQ7_LOAD_RESISTANCE_VAL; // Calculate resistance
+  }
+
+  return calculated_resistance;
+}
+
 // Needs to be called in loop
 void mq7_heatingCycle(unsigned long current_millis) 
 {
@@ -70,72 +84,6 @@ void mq7_heatingCycle(unsigned long current_millis)
     previous_millis = current_millis; // Update the last transition time
   }
 }
-
-#ifdef SENSORS_MQ7_CALIBRATION_ENABLED
-bool mq7_startCalculatingResistanceForCalibration(unsigned long current_millis) 
-{
-  bool start_calibration_success = MQ7_CALIBRATION_START_FAILED;
-  if(CALIBRATION_STATE_IDLE == mq7_calibration_helper_struct.calibration_state)
-  {
-    // Reset part
-    mq7_calibration_helper_struct.accumulated_resistance = 0;
-    mq7_calibration_helper_struct.current_measurement = 0;
-    mq7_calibration_helper_struct.calculated_resistance = 0;
-
-    // Parameters set part
-    mq7_calibration_helper_struct.last_measurement_time = current_millis;
-
-    // State change part
-    mq7_calibration_helper_struct.calibration_state = CALIBRATION_STATE_IN_PROGRESS;
-    start_calibration_success = MQ7_CALIBRATION_START_SUCCESS; // Mark as success
-  }
-  return start_calibration_success;
-}
-
-// Needs to be called in loop
-void mq7_calibratingLoopFunction(unsigned long current_millis)
-{
-  // Check if the calibration was triggered
-  if (CALIBRATION_STATE_IN_PROGRESS == mq7_calibration_helper_struct.calibration_state) 
-  {
-    // Check if it's time to take a new measurement
-    if (current_millis - mq7_calibration_helper_struct.last_measurement_time >= (unsigned long)SENSORS_MQ7_CALIBRATION_DELAY) 
-    {
-      // Take a measurement
-      int raw_adc = analogRead(SENSORS_MQ7_PIN_ANALOG);
-      //Convert it to resistance and accumulate it
-      float resistance = convertToResistance(raw_adc);
-      mq7_calibration_helper_struct.accumulated_resistance += resistance;
-
-      // Move to the next measurement
-      mq7_calibration_helper_struct.current_measurement++;
-      mq7_calibration_helper_struct.last_measurement_time = current_millis;
-    }
-
-    // Check if all measurements are done
-    if (mq7_calibration_helper_struct.current_measurement >= (uint16_t)SENSORS_MQ7_CALIBRATION_NUM_OF_MEASUREMENTS) 
-    {
-      // Calculate the final resistance
-      float Rs = mq7_calibration_helper_struct.accumulated_resistance / (uint16_t)SENSORS_MQ7_CALIBRATION_NUM_OF_MEASUREMENTS; // Average of all readings
-      mq7_calibration_helper_struct.calculated_resistance = Rs / SENSORS_MQ7_CLEAR_AIR_FACTOR; // Calculate Ro based on clean air factor
-
-      mq7_calibration_helper_struct.calibration_state = CALIBRATION_STATE_FINISHED; // Calibration complete
-    }
-  }
-}
-
-float mq7_getResultsCalculateResistanceForCalibration()
-{
-  float calculated_resistance = CALIBRATION_INVALID_VALUE; // Return Invalid value if calibration has not started or it is still ongoing
-  if(CALIBRATION_STATE_FINISHED == mq7_calibration_helper_struct.calibration_state)
-  {
-    // Retrieve the calculated resistance once calibration is complete
-    mq7_calibration_helper_struct.calibration_state = CALIBRATION_STATE_IDLE; // Reset state for future calibrations
-    calculated_resistance = mq7_calibration_helper_struct.calculated_resistance;
-  }
-  return calculated_resistance;
-}
-#endif
 /* *************************************** */
 
 /* STATIC FUNCTIONS IMPLEMENTATIONS */

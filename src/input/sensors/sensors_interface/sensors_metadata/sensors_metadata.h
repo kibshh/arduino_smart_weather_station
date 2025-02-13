@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <avr/pgmspace.h>
-#include "../sensorsconfig.h"
+#include "sensors_catalog.h"
 
 #define SENSORS_METADATA_NO_SENSORS_CONFIGURED         (0u)      // Indicates that no sensor metadata is configured
 #define SENSORS_METADATA_FIRST_SENSOR_INDEX            (0u)      // The index of the first sensor in the metadata configuration

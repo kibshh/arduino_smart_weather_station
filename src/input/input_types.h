@@ -2,8 +2,8 @@
 #define INPUT_TYPES_H
 
 #include <Arduino.h>
+#include "sensors/sensors_interface/sensors_interface.h"
 #include "../error_manager/error_codes.h"
-#include "functionality/calibration/calibration_types.h"
 
 /**
  * Number of bits in a byte.
@@ -80,34 +80,6 @@ typedef struct
   sensor_reading_ts sensor_reading;
   error_manager_error_code_te error_code;
 } sensor_return_ts;
-/* ***************************************** */
-
-/* CALIBRATION COMPONENT */
-/**
- * Structure representing a single calibration reading.
- * Members:
- *  - value: The measured value from the calibration process.
- *  - calibration_id: ID of the calibration providing the measurement.
- *  - current_calibration_status: Status of the calibration (e.g., idle, active, completed).
- */
-typedef struct
-{
-  float value;
-  uint8_t calibration_id;
-  calibration_state_te current_calibration_status;
-} calibration_reading_ts;
-
-/**
- * Structure containing the result of a calibration reading operation.
- * Members:
- *  - calibration_reading: Contains the actual data retrieved from the calibration process.
- *  - error_code: Indicates whether the operation succeeded or provides an error code in case of failure.
- */
-typedef struct
-{
-  calibration_reading_ts calibration_reading;
-  error_manager_error_code_te error_code;
-} calibration_return_ts;
 /* ***************************************** */
 
 /* RTC COMPONENT */

@@ -2,124 +2,38 @@
 #define MQ7_H
 
 #include <Arduino.h>
-#include "../../sensorsconfig.h"
-#ifdef SENSORS_MQ7_CALIBRATION_ENABLED
-#include "../../../functionality/calibration/calibration_types.h"
-#endif
+#include "../sensorsconfig.h"
 
-/** Maximum value of the analog input reading (10-bit ADC resolution). */
+/* Maximum value of the analog input reading (10-bit ADC resolution). */
 #define MQ7_ANALOG_INPUT_MAX              (1023)
 
-/** Minimum value of the analog input reading. */
+/* Minimum value of the analog input reading. */
 #define MQ7_ANALOG_INPUT_MIN              (0)
 
-/** Analog output value for the heater at 5V. */
+/* Minimum valid analog value to avoid division by zero */
+#define MQ7_ANALOG_INPUT_MIN_VALID        (1)
+
+/* Analog output value for the heater at 5V. */
 #define MQ7_5V_ANALOG_OUTPUT_HEATER       (1023u)  
 
-/** Analog output value for the heater at 1.4V. */
+/* Analog output value for the heater at 1.4V. */
 #define MQ7_1_4V_ANALOG_OUTPUT_HEATER     (71u)   
 
-/** The supply voltage of the sensor (5V). */
+/* The supply voltage of the sensor (5V). */
 #define MQ7_VCC_VOLTAGE                   (5)
 
-/** Heater flags. */
+/* Heater flags. */
 #define MQ7_HEATER_IS_ON                  (true)
 #define MQ7_HEATER_IS_OFF                 (false)
 
-/** Calibration progress flags */
-#define MQ7_CALIBRATION_IN_PROGRESS       (true)
-#define MQ7_CALIBRATION_NOT_IN_PROGRESS   (false)
-
-/** Calibration start success flags */
-#define MQ7_CALIBRATION_START_SUCCESS     (true)
-#define MQ7_CALIBRATION_START_FAILED      (false)
-
-/** Load resistance value in ohms, connected between the analog output of the sensor and ground (based on datasheet). */
+/* Load resistance value in ohms, connected between the analog output of the sensor and ground (based on datasheet). */
 #define MQ7_LOAD_RESISTANCE_VAL           (10000) // Load resistance in ohms
 
-/** Base constant for the calculation of CO PPM, used in logarithmic equation. */
+/* Base constant for the calculation of CO PPM, used in logarithmic equation. */
 #define MQ7_CALCULATION_POW_BASE_CONSTANT (10)
 
-#ifdef SENSORS_MQ7_CALIBRATION_ENABLED
-
-/**
- * @brief Defines the invalid value for the MQ7 sensor readings.
- * 
- * This macro represents a "Not a Number" (NAN) value, which is used to indicate 
- * invalid readings for the MQ7 sensor.
- */
+/* Defines the invalid value for the MQ7 sensor readings */
 #define MQ7_INVALID_VALUE                 (NAN)
-
-/**
- * @brief Structure to hold calibration process data for the MQ7 sensor.
- *
- * This structure stores the accumulated resistance, timing, and measurement information 
- * required to perform and track the progress of the calibration process.
- */
-typedef struct
-{
-  float accumulated_resistance;                       /**< Sum of all resistance values measured during calibration. Used to calculate the average resistance. */
-  unsigned long last_measurement_time;                /**< The timestamp (in milliseconds) when the last measurement was taken. Helps ensure proper delays between measurements. */
-  calibration_state_te calibration_state;             /**< The current state of the calibration process (idle, in progress, or finished). */
-  uint16_t current_measurement;                       /**< Counter for the number of measurements already taken. Tracks progress during calibration. */
-  float calculated_resistance;                        /**< The final calculated resistance (R0) value after the calibration process completes. */
-} mq7_calibration_helper_struct_ts;
-
-/**
- * @brief Initializes the calibration process for the MQ-7 sensor.
- * 
- * This function sets up the calibration parameters and prepares the system 
- * to start measuring the sensor's resistance over a specified number of measurements. 
- * The calibration process calculates the sensor's baseline resistance (\( R0 \)), 
- * which represents the sensor resistance in clean air. This \( R0 \) value is essential 
- * for determining gas concentrations during normal operation.
- * 
- * @param current_millis The current time in milliseconds (e.g., from millis()), 
- *                       used to track the delay between consecutive measurements. 
- * @return `true` if calibration is successfully started ; 
- *         otherwise, returns `false` if it is already started or finished.
- * @note This function must be followed by periodic calls to 
- *       `mq7_calibratingLoopFunction()` in the main loop to complete the calibration process.
- */
-bool mq7_startCalculatingResistanceForCalibration(unsigned long current_millis);
-
-/**
- * @brief Handles the MQ7 sensor calibration by accumulating resistance measurements over time.
- *
- * This function manages the calibration process by taking periodic ADC readings from the MQ7 sensor,
- * converting them to resistance, and accumulating the results. Once the required number of measurements
- * is reached, it calculates the average resistance and updates the calibration state to indicate that
- * calibration is complete.
- *
- * @param current_millis The current time in milliseconds, used to manage timing of measurements 
- *                       and ensure proper delays between consecutive readings.
- * 
- * @note This function does not return any value. The calibration progress and results are updated 
- *       in the `mq7_calibration_helper_struct_ts` structure. Ensure to periodically call this function 
- *       in your loop to complete the calibration process.
- */
-void mq7_calibratingLoopFunction(unsigned long current_millis);
-
-/**
- * @brief Retrieve the calculated resistance after MQ7 sensor calibration is complete.
- *
- * This function provides the final calculated resistance value for the MQ7 sensor 
- * once the calibration process has finished. If the calibration process has not 
- * started or is still ongoing, it returns an invalid value (`CALIBRATION_INVALID_VALUE`). 
- * Once the result is retrieved, the calibration state is reset to `IDLE`, allowing 
- * for future calibrations to be initiated.
- *
- * @return The calculated resistance value if calibration is complete; 
- *         otherwise, returns `CALIBRATION_INVALID_VALUE`.
- *
- * Usage Notes:
- * - Ensure that this function is called only after starting and completing the 
- *   calibration process. 
- * - The calibration state will automatically reset to `IDLE` after calling this function, 
- *   so it must be started again for subsequent calibrations.
- */
-float mq7_getResultsCalculateResistanceForCalibration();
-#endif
 
 /**
  * @brief Initialize the MQ7 sensor by setting up the necessary pins and starting the heating cycle.
@@ -128,15 +42,6 @@ float mq7_getResultsCalculateResistanceForCalibration();
  * It then turns on the heater to start the sensor's heating process, preparing it for measurements.
  */
 void mq7_init();
-
-/**
- * Handles the heating cycle for the MQ-7 sensor.
- * Alternates between heating (high state) and cooling (low state) phases based on time intervals.
- * NEEDS TO BE CALLED IN A LOOP.
- * 
- * @param current_millis The current time in milliseconds (e.g., from millis()).
- */
-void mq7_heatingCycle(unsigned long current_millis);
 
 /**
  * @brief Reads the carbon monoxide concentration in parts per million (PPM) using the MQ7 sensor.
@@ -148,5 +53,25 @@ void mq7_heatingCycle(unsigned long current_millis);
  * @return float The carbon monoxide concentration in PPM or NaN if calibration parameters are missing or invalid.
  */
 float mq7_readPPM();
+
+/**
+ * @brief Reads the resistance of the MQ-7 sensor for calibration.
+ *
+ * This function performs a single ADC reading from the MQ-7 sensor, validates the reading, 
+ * and calculates the sensor resistance (Rs) using the voltage divider formula.
+ *
+ * @return The calculated sensor resistance in ohms, or MQ7_INVALID_VALUE if the reading is out of range.
+ */
+float mq7_readResistanceForCalibration();
+
+/**
+ * @brief Handles the heating cycle for the MQ-7 sensor.
+ * 
+ * Alternates between heating (high state) and cooling (low state) phases based on time intervals.
+ * NEEDS TO BE CALLED IN A LOOP.
+ * 
+ * @param current_millis The current time in milliseconds (e.g., from millis()).
+ */
+void mq7_heatingCycle(unsigned long current_millis);
 
 #endif

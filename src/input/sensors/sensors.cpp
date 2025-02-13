@@ -202,8 +202,5 @@ void sensors_loop(unsigned long current_millis)
 {
 #ifdef MQ7_COPPM
   mq7_heatingCycle(current_millis);
-#ifdef SENSORS_MQ7_CALIBRATION_ENABLED
-  mq7_calibratingLoopFunction(current_millis);
-#endif
 #endif
 }
