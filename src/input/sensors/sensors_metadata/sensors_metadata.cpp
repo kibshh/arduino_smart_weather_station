@@ -112,23 +112,23 @@ const sensors_metadata_catalog_ts sensors_metadata_catalog[] PROGMEM =
 
 bool sensors_metadata_getSensorFromCatalog(uint8_t id, sensors_metadata_catalog_ts * current_sensor)
 {
-    bool success_status = SENSORS_METADATA_RETRIEVE_FAILED;
-    size_t num_of_sensors = sensors_metadata_getSensorsLen();
-    uint8_t current_id = INVALID_SENSOR_ID;
+  bool success_status = SENSORS_METADATA_RETRIEVE_FAILED;
+  size_t num_of_sensors = sensors_metadata_getSensorsLen();
+  uint8_t current_id = INVALID_SENSOR_ID;
 
-    // Loop through all sensors in the catalog
-    for (uint8_t index = SENSORS_METADATA_FIRST_SENSOR_INDEX; index < num_of_sensors; index++)
+  // Loop through all sensors in the catalog
+  for (uint8_t index = SENSORS_METADATA_FIRST_SENSOR_INDEX; index < num_of_sensors; index++)
+  {
+    current_id = pgm_read_byte(&sensors_metadata_catalog[index].sensor_id); // Read from program memory
+    if(id == current_id)
     {
-        current_id = pgm_read_byte(&sensors_metadata_catalog[index].sensor_id); // Read from program memory
-        if(id == current_id)
-        {
-             // Copy the sensor configuration from program memory to the provided structure
-            memcpy_P(current_sensor, &sensors_metadata_catalog[index], sizeof(sensors_metadata_catalog_ts));
-            success_status = SENSORS_METADATA_RETRIEVE_SUCCESS; // Mark as successful
-            break;
-        }
+      // Copy the sensor configuration from program memory to the provided structure
+      memcpy_P(current_sensor, &sensors_metadata_catalog[index], sizeof(sensors_metadata_catalog_ts));
+      success_status = SENSORS_METADATA_RETRIEVE_SUCCESS; // Mark as successful
+      break;
     }
-    return success_status;
+  }
+  return success_status;
 }
 
 size_t sensors_metadata_getSensorsLen()
