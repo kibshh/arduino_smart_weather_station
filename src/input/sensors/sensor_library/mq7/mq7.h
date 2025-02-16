@@ -5,32 +5,32 @@
 #include "../sensors_config.h"
 
 /* Maximum value of the analog input reading (10-bit ADC resolution). */
-#define MQ7_ANALOG_INPUT_MAX              (1023)
+#define MQ7_ANALOG_INPUT_MAX              (int)(1023)
 
 /* Minimum value of the analog input reading. */
-#define MQ7_ANALOG_INPUT_MIN              (0)
+#define MQ7_ANALOG_INPUT_MIN              (int)(0)
 
 /* Minimum valid analog value to avoid division by zero */
-#define MQ7_ANALOG_INPUT_MIN_VALID        (1)
+#define MQ7_ANALOG_INPUT_MIN_VALID        (int)(1)
 
 /* Analog output value for the heater at 5V. */
-#define MQ7_5V_ANALOG_OUTPUT_HEATER       (1023u)  
+#define MQ7_5V_ANALOG_OUTPUT_HEATER       (int)(1023u)  
 
 /* Analog output value for the heater at 1.4V. */
-#define MQ7_1_4V_ANALOG_OUTPUT_HEATER     (71u)   
+#define MQ7_1_4V_ANALOG_OUTPUT_HEATER     (int)(71u)   
 
 /* The supply voltage of the sensor (5V). */
-#define MQ7_VCC_VOLTAGE                   (5)
+#define MQ7_VCC_VOLTAGE                   (float)(5)
 
 /* Heater flags. */
-#define MQ7_HEATER_IS_ON                  (true)
-#define MQ7_HEATER_IS_OFF                 (false)
+#define MQ7_HEATER_IS_ON                  (bool)(true)
+#define MQ7_HEATER_IS_OFF                 (bool)(false)
 
 /* Load resistance value in ohms, connected between the analog output of the sensor and ground (based on datasheet). */
-#define MQ7_LOAD_RESISTANCE_VAL           (10000) // Load resistance in ohms
+#define MQ7_LOAD_RESISTANCE_VAL           (float)(10000) // Load resistance in ohms
 
 /* Base constant for the calculation of CO PPM, used in logarithmic equation. */
-#define MQ7_CALCULATION_POW_BASE_CONSTANT (10)
+#define MQ7_CALCULATION_POW_BASE_CONSTANT (float)(10)
 
 /* Defines the invalid value for the MQ7 sensor readings */
 #define MQ7_INVALID_VALUE                 (NAN)

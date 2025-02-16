@@ -110,7 +110,7 @@ static float convertToResistance(int raw_adc)
   {
     raw_adc += 1; // To avoid division by 0
   }
-  float v_out = raw_adc * ((float)MQ7_VCC_VOLTAGE / MQ7_ANALOG_INPUT_MAX);
+  float v_out = raw_adc * (MQ7_VCC_VOLTAGE / MQ7_ANALOG_INPUT_MAX);
   float Rs = ((MQ7_VCC_VOLTAGE - v_out) / v_out) * MQ7_LOAD_RESISTANCE_VAL; // return in ohms
   return Rs;
 }

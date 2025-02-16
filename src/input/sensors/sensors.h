@@ -28,7 +28,7 @@
 #endif
 
 /* The index of the first sensor in the configuration */
-#define SENSORS_FIRST_SENSOR_INDEX            (0u)
+#define SENSORS_FIRST_SENSOR_INDEX            (uint8_t)(0u)
 
 /* Placeholder for sensors without an indication function */
 #define SENSORS_NO_INDICATION_FUNCTION        (nullptr)
@@ -36,11 +36,11 @@
 #define SENSORS_NO_VALUE_FUNCTION             (nullptr)
 
 /* Placeholders for min_value and max_value in indication sensors */
-#define SENSORS_INDICATION_NO_MIN             (0)       
-#define SENSORS_INDICATION_NO_MAX             (0)
+#define SENSORS_INDICATION_NO_MIN             (float)(0)       
+#define SENSORS_INDICATION_NO_MAX             (float)(0)
 
 /* Flag indicating the sensor is configured in functional catalog */
-#define SENSORS_SENSOR_CONFIGURED             (true)
+#define SENSORS_SENSOR_CONFIGURED             (bool)(true)
 
 /* Function pointer type for sensors returning a float value */
 typedef float (*sensors_sensor_value_function_t)();

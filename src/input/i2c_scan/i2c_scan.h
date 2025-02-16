@@ -5,9 +5,9 @@
 #include <Wire.h>
 #include "../input_types.h"
 
-#define I2C_SCAN_ADDRESS_FOUND                 (true)
+#define I2C_SCAN_ADDRESS_FOUND                 (bool)(true)
 
-#define I2C_SCAN_ADDRESS_NOT_FOUND             (false)
+#define I2C_SCAN_ADDRESS_NOT_FOUND             (bool)(false)
 
 /**
  * This macro is used to indicate that no address update function is assigned.
@@ -16,14 +16,14 @@
 #define I2C_SCAN_NO_ADDRESS_UPDATE_FUNCTION    (nullptr)
 
 /* The minimum 7-bit I2C address to scan. */
-#define I2C_SCAN_I2C_ADDRESS_MIN               (1u)
+#define I2C_SCAN_I2C_ADDRESS_MIN               (uint8_t)(1u)
 
 /* The maximum 7-bit I2C address to scan. */
-#define I2C_SCAN_I2C_ADDRESS_MAX               (127u)
+#define I2C_SCAN_I2C_ADDRESS_MAX               (uint8_t)(127u)
 
 /* Fixes the problem of iterating over the same I2C address */
-#define I2C_SCAN_OFFSET_FOR_NEXT_ADDR          (1u)
-#define I2C_SCAN_STARTING_ADDRESS              (I2C_SCAN_I2C_ADDRESS_MIN - I2C_SCAN_OFFSET_FOR_NEXT_ADDR)
+#define I2C_SCAN_OFFSET_FOR_NEXT_ADDR          (uint8_t)(1u)
+#define I2C_SCAN_STARTING_ADDRESS              (uint8_t)(I2C_SCAN_I2C_ADDRESS_MIN - I2C_SCAN_OFFSET_FOR_NEXT_ADDR)
 
 /**
  * @brief Scans the I2C bus or checks the status of a specific device.

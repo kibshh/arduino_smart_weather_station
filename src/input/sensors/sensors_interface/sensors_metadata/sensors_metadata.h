@@ -6,43 +6,43 @@
 #include "sensors_catalog.h"
 
 /* Indicates that no sensor metadata is configured */
-#define SENSORS_METADATA_NO_SENSORS_CONFIGURED         (0u)
+#define SENSORS_METADATA_NO_SENSORS_CONFIGURED         (size_t)(0u)
 /* The index of the first sensor in the metadata configuration */
-#define SENSORS_METADATA_FIRST_SENSOR_INDEX            (0u)
+#define SENSORS_METADATA_FIRST_SENSOR_INDEX            (uint8_t)(0u)
 
 /* Metadata retrieve success status codes */
-#define SENSORS_METADATA_RETRIEVE_FAILED               (false)
-#define SENSORS_METADATA_RETRIEVE_SUCCESS              (true)
+#define SENSORS_METADATA_RETRIEVE_FAILED               (bool)(false)
+#define SENSORS_METADATA_RETRIEVE_SUCCESS              (bool)(true)
 
 /* Measurement type for sensors providing float values */
-#define SENSORS_MEASUREMENT_TYPE_VALUE                 (0u)
+#define SENSORS_MEASUREMENT_TYPE_VALUE                 (uint8_t)(0u)
 /* Measurement type for sensors providing indications */
-#define SENSORS_MEASUREMENT_TYPE_INDICATION            (1u)
+#define SENSORS_MEASUREMENT_TYPE_INDICATION            (uint8_t)(1u)
 
 /* Macros for defining number of decimals based on sensor type */
-#define SENSORS_DISPLAY_0_DECIMALS    (0u)
-#define SENSORS_DISPLAY_1_DECIMAL     (1u)
-#define SENSORS_DISPLAY_2_DECIMALS    (2u)
-#define SENSORS_DISPLAY_3_DECIMALS    (3u)
-#define SENSORS_DISPLAY_4_DECIMALS    (4u)
-#define SENSORS_DISPLAY_5_DECIMALS    (5u)
-#define SENSORS_DISPLAY_6_DECIMALS    (6u)
+#define SENSORS_DISPLAY_0_DECIMALS    (uint8_t)(0u)
+#define SENSORS_DISPLAY_1_DECIMAL     (uint8_t)(1u)
+#define SENSORS_DISPLAY_2_DECIMALS    (uint8_t)(2u)
+#define SENSORS_DISPLAY_3_DECIMALS    (uint8_t)(3u)
+#define SENSORS_DISPLAY_4_DECIMALS    (uint8_t)(4u)
+#define SENSORS_DISPLAY_5_DECIMALS    (uint8_t)(5u)
+#define SENSORS_DISPLAY_6_DECIMALS    (uint8_t)(6u)
 
 /* Macros for defining the number of letters displayed for sensor names */
 /* These macros help save space when displaying sensor names on limited character outputs based on the sensor type */
-#define SENSORS_DISPLAY_0_LETTERS    (0u)
-#define SENSORS_DISPLAY_1_LETTER     (1u)
-#define SENSORS_DISPLAY_2_LETTERS    (2u)
-#define SENSORS_DISPLAY_3_LETTERS    (3u)
-#define SENSORS_DISPLAY_4_LETTERS    (4u)
-#define SENSORS_DISPLAY_5_LETTERS    (5u)
-#define SENSORS_DISPLAY_6_LETTERS    (6u)
-#define SENSORS_DISPLAY_7_LETTERS    (7u)
-#define SENSORS_DISPLAY_8_LETTERS    (8u)
-#define SENSORS_DISPLAY_9_LETTERS    (9u)
-#define SENSORS_DISPLAY_10_LETTERS   (10u)
-#define SENSORS_DISPLAY_11_LETTERS   (11u)
-#define SENSORS_DISPLAY_12_LETTERS   (12u)
+#define SENSORS_DISPLAY_0_LETTERS    (uint8_t)(0u)
+#define SENSORS_DISPLAY_1_LETTER     (uint8_t)(1u)
+#define SENSORS_DISPLAY_2_LETTERS    (uint8_t)(2u)
+#define SENSORS_DISPLAY_3_LETTERS    (uint8_t)(3u)
+#define SENSORS_DISPLAY_4_LETTERS    (uint8_t)(4u)
+#define SENSORS_DISPLAY_5_LETTERS    (uint8_t)(5u)
+#define SENSORS_DISPLAY_6_LETTERS    (uint8_t)(6u)
+#define SENSORS_DISPLAY_7_LETTERS    (uint8_t)(7u)
+#define SENSORS_DISPLAY_8_LETTERS    (uint8_t)(8u)
+#define SENSORS_DISPLAY_9_LETTERS    (uint8_t)(9u)
+#define SENSORS_DISPLAY_10_LETTERS   (uint8_t)(10u)
+#define SENSORS_DISPLAY_11_LETTERS   (uint8_t)(11u)
+#define SENSORS_DISPLAY_12_LETTERS   (uint8_t)(12u)
 
 /**
  * @brief Structure representing metadata for a sensor.

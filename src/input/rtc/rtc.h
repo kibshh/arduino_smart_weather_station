@@ -17,30 +17,30 @@
 #define RTC_I2C_ADDR        (0x68)
 
 /* Default RTC identifier */
-#define RTC_DEFAULT_RTC     (0u)
+#define RTC_DEFAULT_RTC     (uint8_t)(0u)
 
 /* Minimum valid year for RTC */
-#define RTC_MIN_YEAR        (2024u)
+#define RTC_MIN_YEAR        (uint16_t)(2024u)
 
 /* Maximum anmd minimum valid month for RTC */
-#define RTC_MIN_MONTH       (1u)
-#define RTC_MAX_MONTH       (12u)
+#define RTC_MIN_MONTH       (uint8_t)(1u)
+#define RTC_MAX_MONTH       (uint8_t)(12u)
 
 /* Maximum and minimum valid day for RTC */
-#define RTC_MIN_DAY         (1u)
-#define RTC_MAX_DAY         (31u)
+#define RTC_MIN_DAY         (uint8_t)(1u)
+#define RTC_MAX_DAY         (uint8_t)(31u)
 
 /* Maximum and minimum valid hour for RTC */
-#define RTC_MIN_HOUR        (0u)
-#define RTC_MAX_HOUR        (23u)
+#define RTC_MIN_HOUR        (uint8_t)(0u)
+#define RTC_MAX_HOUR        (uint8_t)(23u)
 
 /* Maximum anmd minimum valid minute for RTC */
-#define RTC_MIN_MINUTE      (0u)
-#define RTC_MAX_MINUTE      (59u)
+#define RTC_MIN_MINUTE      (uint8_t)(0u)
+#define RTC_MAX_MINUTE      (uint8_t)(59u)
 
 /* Maximum and minimum valid second for RTC */
-#define RTC_MIN_SECOND      (0u)
-#define RTC_MAX_SECOND      (59u)
+#define RTC_MIN_SECOND      (uint8_t)(0u)
+#define RTC_MAX_SECOND      (uint8_t)(59u)
 
 /**
  * @brief Initializes the Real-Time Clock (RTC) module.

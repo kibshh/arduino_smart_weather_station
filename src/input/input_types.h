@@ -6,13 +6,13 @@
 #include "../control/control_error_codes.h"
 
 /* Number of bits in a byte */
-#define BITS_IN_BYTE                     (8u)
+#define BITS_IN_BYTE                     (uint8_t)(8u)
 
 /* Flag indicating that bit is set */
-#define BIT_SET                          (1u)
+#define BIT_SET                          (uint8_t)(1u)
 
 /* Maximum number of devices that can be addressed in 7-bit I2C addressing */
-#define I2C_7_BIT_ADDRESSING_MAX_DEVICES (127u)
+#define I2C_7_BIT_ADDRESSING_MAX_DEVICES (uint8_t)(127u)
 
 /**
  * I2C scan mode to detect all devices on the bus.
@@ -21,30 +21,30 @@
  * I2C addresses (1 to 127) and populate the `addresses` field in the 
  * i2c_scan_reading_ts structure with the results.
  */
-#define I2C_SCAN_MODE_SCAN_FOR_ALL_DEVICES     (0u)
+#define I2C_SCAN_MODE_SCAN_FOR_ALL_DEVICES     (uint8_t)(0u)
 
 /**
  * Array size required to store the presence of I2C devices, one bit per device.
  * Each byte will store 8 device states (1 bit per device).
  */
-#define I2C_SCAN_ARRAY_SIZE             ((I2C_7_BIT_ADDRESSING_MAX_DEVICES + BITS_IN_BYTE - 1) / BITS_IN_BYTE)
+#define I2C_SCAN_ARRAY_SIZE             (uint8_t)((I2C_7_BIT_ADDRESSING_MAX_DEVICES + BITS_IN_BYTE - 1) / BITS_IN_BYTE)
 
 /* Transmission result codes for I2C communication: */
 /* Successful transmission; no error occurred. */
-#define I2C_SCAN_TRANSMISSION_RESULT_SUCCESS   (0u)
+#define I2C_SCAN_TRANSMISSION_RESULT_SUCCESS   (uint8_t)(0u)
 
 /* Data too long to fit in transmit buffer */
-#define I2C_SCAN_TRANSMISSION_RESULT_TOOLONG   (1u)
+#define I2C_SCAN_TRANSMISSION_RESULT_TOOLONG   (uint8_t)(1u)
 
 /* Received NACK on transmit of the address */
-#define I2C_SCAN_TRANSMISSION_RESULT_NACKADR   (2u)
+#define I2C_SCAN_TRANSMISSION_RESULT_NACKADR   (uint8_t)(2u)
 
 /* Received NACK on transmit of the data */
-#define I2C_SCAN_TRANSMISSION_RESULT_NACKDAT   (3u)
+#define I2C_SCAN_TRANSMISSION_RESULT_NACKDAT   (uint8_t)(3u)
 
 /* Unknown error occurred during communication 
  * (e.g., arbitration lost or bus issue). */
-#define I2C_SCAN_TRANSMISSION_RESULT_UNKNOWN   (4u)
+#define I2C_SCAN_TRANSMISSION_RESULT_UNKNOWN   (uint8_t)(4u)
 
 /* SENSORS COMPONENT */
 /**

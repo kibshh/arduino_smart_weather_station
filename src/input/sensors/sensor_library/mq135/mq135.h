@@ -5,17 +5,17 @@
 #include "../sensors_config.h"
 
 /* Load resistance in ohms which is connected to from analog output of sensor to ground (default value for the module) */
-#define MQ135_LOAD_RESISTANCE_VAL           (10000)
+#define MQ135_LOAD_RESISTANCE_VAL           (float)(10000)
 
 /* Maximum and minimum analog values (10-bit ADC resolution) */
-#define MQ135_ANALOG_INPUT_MAX              (1023)
-#define MQ135_ANALOG_INPUT_MIN              (0)
+#define MQ135_ANALOG_INPUT_MAX              (int)(1023)
+#define MQ135_ANALOG_INPUT_MIN              (int)(0)
 
 /* Minimum valid analog value to avoid division by zero */
-#define MQ135_ANALOG_INPUT_MIN_VALID        (1)
+#define MQ135_ANALOG_INPUT_MIN_VALID        (int)(1)
 
 /* Minimum valid sensor resistance (R0) in ohms */
-#define MQ135_R_ZERO_MINIMUM                (1u)
+#define MQ135_R_ZERO_MINIMUM                (float)(1u)
 
 /* Defines the invalid value for the MQ135 sensor readings */
 #define MQ135_INVALID_VALUE                 (NAN)

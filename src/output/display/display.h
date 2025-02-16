@@ -18,13 +18,13 @@
 #define DISPLAY_DONT_PROCEED_WITH_DISPLAY (false)
 
 /* Minimum length of the float string for display */
-#define DISPLAY_MIN_FLOAT_STRING_LEN  (1u)
+#define DISPLAY_MIN_FLOAT_STRING_LEN  (signed char)(1)
 /* Size of the buffer for converting float to string */
-#define DISPLAY_DTOSTRF_BUFFER_SIZE   (20u)
+#define DISPLAY_DTOSTRF_BUFFER_SIZE   (uint8_t)(20u)
 /* Size for the null terminator in strings */
-#define DISPLAY_NULL_TERMINATOR_SIZE  (1u)
+#define DISPLAY_NULL_TERMINATOR_SIZE  (uint8_t)(1u)
 /** Defines the maximum string length for the display, including the null terminator. */
-#define DISPLAY_MAX_STRING_LEN        (DISPLAY_LCD_WIDTH + DISPLAY_NULL_TERMINATOR_SIZE)
+#define DISPLAY_MAX_STRING_LEN        (uint8_t)(DISPLAY_LCD_WIDTH + DISPLAY_NULL_TERMINATOR_SIZE)
 
 /**
  * @brief Initializes the LCD display module.

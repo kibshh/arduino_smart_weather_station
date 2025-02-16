@@ -17,11 +17,11 @@
  */
 
 /* Status codes indicating the sensor interface operation success or failure */
-#define SENSORS_INTERFACE_STATUS_FAILED     (false)
-#define SENSORS_INTERFACE_STATUS_SUCCESS    (true)
+#define SENSORS_INTERFACE_STATUS_FAILED     (bool)(false)
+#define SENSORS_INTERFACE_STATUS_SUCCESS    (bool)(true)
 
 /* Indicates that no sensors are configured */
-#define SENSORS_INTERFACE_NO_SENSORS_CONFIGURED (SENSORS_METADATA_NO_SENSORS_CONFIGURED)
+#define SENSORS_INTERFACE_NO_SENSORS_CONFIGURED (size_t)(SENSORS_METADATA_NO_SENSORS_CONFIGURED)
 
 /**
  * @brief Structure representing the sensor metadata interface.

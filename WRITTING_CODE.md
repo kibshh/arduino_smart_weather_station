@@ -3,11 +3,11 @@
 ## 1. **Header Files:**
 
 ### **Commenting Macros**
-   - Macros should be commented with `/* */` style comments. This helps in distinguishing them clearly.
+   - Macros should be commented with `/* */` style comments. This helps in distinguishing them clearly. Also, add type before macro value.
    - Example:
      ```c
      /* Macro to calculate the area of a circle from radius */
-     #define AREA_OF_CIRCLE(radius) (3.1415 * (radius) * (radius))
+     #define AREA_OF_CIRCLE(radius) (double)(3.1415 * (radius) * (radius))
      ```
 
 ### **Commenting Typedefs**

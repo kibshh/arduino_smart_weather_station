@@ -5,10 +5,9 @@
 #include "../app_common.h"
 
 /* Enable the I2C scanner operation */
-#define I2C_SCANER_RUN       (true)
-
+#define I2C_SCANER_RUN       (bool)(true)
 /* Disable the I2C scanner operation, used while data is still being displayed or processed */
-#define I2C_SCANER_DONT_RUN  (false)
+#define I2C_SCANER_DONT_RUN  (bool)(false)
 
 /* Context structure to manage the state of the I2C scanner operation */
 typedef struct

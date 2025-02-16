@@ -5,7 +5,7 @@
 #include "../app_common.h"
 
 /* Initial sensor index for cyclic display */
-#define STARTING_SENSOR_INDEX         (0u)
+#define STARTING_SENSOR_INDEX         (uint8_t)(0u)
 
 /* Context structure to maintain sensor reading state across function calls */
 typedef struct

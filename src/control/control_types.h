@@ -6,7 +6,7 @@
 #include "control_error_codes.h"
 
 /* Represents an unused or invalid input ID */
-#define ERROR_INPUT_ID_UNUSED (0xFF)
+#define ERROR_INPUT_ID_UNUSED (uint8_t)(0xFF)
 
 /**
  * Enum listing all available inputs.
