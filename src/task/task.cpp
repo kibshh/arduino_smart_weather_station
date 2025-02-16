@@ -34,7 +34,7 @@ void task_initTask()
 
 void task_cyclicTask()
 {
-  static i2cScan_reading_context_ts context_i2c_scan = app_createI2CScanReadingContext();
+  static i2c_scan_reading_context_ts context_i2c_scan = app_createI2CScanReadingContext();
   static sensor_reading_context_ts context_sensor_reading = app_createNewSensorsReadingContext();
   static task_state_machine_te current_state = STATE_SCANNING_FOR_I2C_ADDRESSES;
 

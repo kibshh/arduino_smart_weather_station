@@ -2,7 +2,7 @@
 #define ARDUINO_RAIN_SENSOR_H
 
 #include <Arduino.h>
-#include "../sensorsconfig.h"
+#include "../sensors_config.h"
 
 /* Define the digital output value indicating rain detected by the sensor, used in digital read mode */
 /* NOTE: The sensor uses reverse logic — 0 means rain is detected, and 1 means no rain */

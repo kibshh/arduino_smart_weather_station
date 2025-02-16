@@ -1,7 +1,7 @@
 #include "dht11.h"
 
 /* STATIC GLOBAL VARIABLES */
-static Adafruit_BMP280 bmp;
+static DHT dht(SENSORS_DHT11_PIN, DHT11);
 /* *************************************** */
 
 /* EXPORTED FUNCTIONS */

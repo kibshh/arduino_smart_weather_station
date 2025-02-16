@@ -1,5 +1,5 @@
-#ifndef SENSORSCONFIG_H
-#define SENSORSCONFIG_H
+#ifndef SENSORS_CONFIG_H
+#define SENSORS_CONFIG_H
 
 #include <Arduino.h>
 

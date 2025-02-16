@@ -19,9 +19,9 @@
  * 
  * This value is used to indicate that the scan should check all possible 
  * I2C addresses (1 to 127) and populate the `addresses` field in the 
- * i2cScan_reading_ts structure with the results.
+ * i2c_scan_reading_ts structure with the results.
  */
-#define I2CSCAN_MODE_SCAN_FOR_ALL_DEVICES     (0u)
+#define I2C_SCAN_MODE_SCAN_FOR_ALL_DEVICES     (0u)
 
 /**
  * Array size required to store the presence of I2C devices, one bit per device.
@@ -31,20 +31,20 @@
 
 /* Transmission result codes for I2C communication: */
 /* Successful transmission; no error occurred. */
-#define I2CSCAN_TRANSMISSION_RESULT_SUCCESS   (0u)
+#define I2C_SCAN_TRANSMISSION_RESULT_SUCCESS   (0u)
 
 /* Data too long to fit in transmit buffer */
-#define I2CSCAN_TRANSMISSION_RESULT_TOOLONG   (1u)
+#define I2C_SCAN_TRANSMISSION_RESULT_TOOLONG   (1u)
 
 /* Received NACK on transmit of the address */
-#define I2CSCAN_TRANSMISSION_RESULT_NACKADR   (2u)
+#define I2C_SCAN_TRANSMISSION_RESULT_NACKADR   (2u)
 
 /* Received NACK on transmit of the data */
-#define I2CSCAN_TRANSMISSION_RESULT_NACKDAT   (3u)
+#define I2C_SCAN_TRANSMISSION_RESULT_NACKDAT   (3u)
 
 /* Unknown error occurred during communication 
  * (e.g., arbitration lost or bus issue). */
-#define I2CSCAN_TRANSMISSION_RESULT_UNKNOWN   (4u)
+#define I2C_SCAN_TRANSMISSION_RESULT_UNKNOWN   (4u)
 
 /* SENSORS COMPONENT */
 /**
@@ -112,7 +112,7 @@ typedef struct
 
 /* I2C SCAN COMPONENT */
 /* Forward declaration of the structure */
-struct i2cScan_reading;
+struct i2c_scan_reading;
 /**
  * Structure representing the result of an I2C scan operation.
  * 
@@ -131,26 +131,26 @@ struct i2cScan_reading;
  *                                to the next detected I2C address in `addresses` bit-field.
  *  - current_i2c_addr: Stores the currently selected I2C address during iteration.
  */
-typedef struct i2cScan_reading
+typedef struct i2c_scan_reading
 {
   uint8_t addresses[I2C_SCAN_ARRAY_SIZE];
   uint8_t single_device_status;
   uint8_t device_address;
-  bool (*update_i2c_address)(struct i2cScan_reading *i2cScan_data);
+  bool (*update_i2c_address)(struct i2c_scan_reading *i2c_scan_data);
   uint8_t current_i2c_addr;
-} i2cScan_reading_ts;
+} i2c_scan_reading_ts;
 
 /**
  * Structure containing the result of an I2C scan operation.
  * Members:
- *  - i2cScan_reading: Contains the data from the I2C scan.
+ *  - i2c_scan_reading: Contains the data from the I2C scan.
  *  - error_code: Indicates whether the operation succeeded or provides an error code in case of failure.
  */
 typedef struct 
 {
-  i2cScan_reading_ts i2cScan_reading;
+  i2c_scan_reading_ts i2c_scan_reading;
   control_error_code_te error_code;
-} i2cScan_return_ts;
+} i2c_scan_return_ts;
 /* ***************************************** */
 
 #endif

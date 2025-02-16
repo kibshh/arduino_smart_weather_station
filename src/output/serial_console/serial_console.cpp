@@ -38,7 +38,7 @@ static control_error_code_te serial_console_displayTime(rtc_reading_ts time_data
  * - ERROR_CODE_NO_ERROR: I2C data displayed successfully.
  * - ERROR_CODE_SERIAL_CONSOLE_UNKNOWN_I2C_DEVICE_STATUS: Unknown device status during communication.
  */
-static control_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c_scan_data);
+static control_error_code_te serial_console_displayI2cScan(i2c_scan_reading_ts i2c_scan_data);
 /* *************************************** */
 
 /* EXPORTED FUNCTIONS */
@@ -72,7 +72,7 @@ control_error_code_te serial_console_displayData(control_data_ts data)
       break;
 
     case INPUT_I2C_SCAN:
-      error_code = serial_console_displayI2cScan(data.input_return.i2cScan_reading); // Display I2C scan results
+      error_code = serial_console_displayI2cScan(data.input_return.i2c_scan_reading); // Display I2C scan results
       break;
 
     default:
@@ -161,7 +161,7 @@ static control_error_code_te serial_console_displayTime(rtc_reading_ts time_data
   return ERROR_CODE_NO_ERROR;
 }
 
-static control_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c_scan_data)
+static control_error_code_te serial_console_displayI2cScan(i2c_scan_reading_ts i2c_scan_data)
 {
   control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
@@ -171,7 +171,7 @@ static control_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2
   char addr_string[SERIAL_CONSOLE_HEX_ADDR_STRING_LEN]; // Buffer for hexadecimal address representation
 
   // Handle scan for all devices mode
-  if(I2CSCAN_MODE_SCAN_FOR_ALL_DEVICES == i2c_scan_data.device_address)
+  if(I2C_SCAN_MODE_SCAN_FOR_ALL_DEVICES == i2c_scan_data.device_address)
   {
     snprintf(addr_string, sizeof(addr_string), "%02X", i2c_scan_data.current_i2c_addr);
     snprintf(display_string, sizeof(display_string), "I2C scan - I2C device found at address: 0x%s", addr_string);
@@ -185,19 +185,19 @@ static control_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2
     // Interpret and append the device status
     switch (i2c_scan_data.single_device_status)
     {
-      case I2CSCAN_TRANSMISSION_RESULT_SUCCESS:
+      case I2C_SCAN_TRANSMISSION_RESULT_SUCCESS:
         strncpy(status_msg, "Successful transmission", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
         break;
-      case I2CSCAN_TRANSMISSION_RESULT_TOOLONG:
+      case I2C_SCAN_TRANSMISSION_RESULT_TOOLONG:
         strncpy(status_msg, "Data too long to fit in transmit buffer", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
         break;
-      case I2CSCAN_TRANSMISSION_RESULT_NACKADR:
+      case I2C_SCAN_TRANSMISSION_RESULT_NACKADR:
         strncpy(status_msg, "Received NACK on transmit of the address", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
         break;
-      case I2CSCAN_TRANSMISSION_RESULT_NACKDAT:
+      case I2C_SCAN_TRANSMISSION_RESULT_NACKDAT:
         strncpy(status_msg, "Received NACK on transmit of the data", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
         break;
-      case I2CSCAN_TRANSMISSION_RESULT_UNKNOWN:
+      case I2C_SCAN_TRANSMISSION_RESULT_UNKNOWN:
         strncpy(status_msg, "Unknown error occurred during communication", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
         break;
       default:

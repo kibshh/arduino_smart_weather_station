@@ -2,7 +2,7 @@
 #define GY_ML8511_H
 
 #include <Arduino.h>
-#include "../sensorsconfig.h"
+#include "../sensors_config.h"
 
 /* Minimum output voltage of the GY-ML8511 UV sensor (in volts) */
 #define GY_ML8511_OUTPUT_VOLTAGE_MIN    (0.99)

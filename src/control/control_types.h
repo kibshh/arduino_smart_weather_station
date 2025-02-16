@@ -113,17 +113,17 @@ typedef struct
  *  - sensor_reading:     Contains data specific to sensor readings, such as value,
  *                        measurement type, and sensor ID.
  *  - rtc_reading:        Contains data specific to RTC readings, such as date and time.
- *  - i2cScan_reading:    Contains data specific to I2C scan readings,
+ *  - i2c_scan_reading:    Contains data specific to I2C scan readings,
  *                        such as addresses bit fields or I2C device status.
  *  - error_msg           Contains data specific to the error message, such as error source,
  *                        input/output flag and specific error code.
  */
 typedef union
 {
-    sensor_reading_ts sensor_reading;     /**< Data structure for sensor readings. */
-    rtc_reading_ts rtc_reading;           /**< Data structure for RTC readings. */
-    i2cScan_reading_ts i2cScan_reading;   /**< Data structure for I2C scan readings. */
-    control_error_ts error_msg;           /**< Data structure for error message. */
+    sensor_reading_ts sensor_reading;       /**< Data structure for sensor readings. */
+    rtc_reading_ts rtc_reading;             /**< Data structure for RTC readings. */
+    i2c_scan_reading_ts i2c_scan_reading;   /**< Data structure for I2C scan readings. */
+    control_error_ts error_msg;             /**< Data structure for error message. */
 } input_return_tu;
 
 /**

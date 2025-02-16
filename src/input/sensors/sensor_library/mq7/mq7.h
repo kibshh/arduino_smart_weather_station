@@ -2,7 +2,7 @@
 #define MQ7_H
 
 #include <Arduino.h>
-#include "../sensorsconfig.h"
+#include "../sensors_config.h"
 
 /* Maximum value of the analog input reading (10-bit ADC resolution). */
 #define MQ7_ANALOG_INPUT_MAX              (1023)

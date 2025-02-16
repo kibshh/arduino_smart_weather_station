@@ -2,7 +2,7 @@
 #define CONTROL_H
 
 #include <Arduino.h>
-#include "../input/i2c_scan/i2cScan.h"
+#include "../input/i2c_scan/i2c_scan.h"
 #include "../input/rtc/rtc.h"
 #include "../input/sensors/sensors.h"
 #include "../output/display/display.h"

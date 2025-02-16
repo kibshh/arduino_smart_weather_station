@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <BH1750.h>
-#include "../sensorsconfig.h"
+#include "../sensors_config.h"
 
 /**
  * @brief Initializes the BH1750 light sensor.

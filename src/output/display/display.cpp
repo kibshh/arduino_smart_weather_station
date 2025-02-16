@@ -41,7 +41,7 @@ static control_error_code_te display_displayTime(rtc_reading_ts time_data);
  *         - ERROR_CODE_NO_ERROR for a successful display update.
  *         - ERROR_CODE_DISPLAY_UNKNOWN_I2C_DEVICE_STATUS for unknown device statuses.
  **/
-static control_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_data);
+static control_error_code_te display_displayI2cScan(i2c_scan_reading_ts i2c_scan_data);
 
 /**
  * @brief Formats sensor data for display on an LCD screen.
@@ -88,7 +88,7 @@ control_error_code_te display_displayData(control_data_ts data)
       break;
 
     case INPUT_I2C_SCAN:
-      error_code = display_displayI2cScan(data.input_return.i2cScan_reading);
+      error_code = display_displayI2cScan(data.input_return.i2c_scan_reading);
       break;
 
     case INPUT_ERROR:
@@ -178,14 +178,14 @@ static control_error_code_te display_displayTime(rtc_reading_ts time_data)
   return ERROR_CODE_NO_ERROR; // Return success error code
 }
 
-static control_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_data)
+static control_error_code_te display_displayI2cScan(i2c_scan_reading_ts i2c_scan_data)
 {
   control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
   // Create buffer for display strings
   char display_string[DISPLAY_MAX_STRING_LEN];  // +1 for null terminator
 
-  if(I2CSCAN_MODE_SCAN_FOR_ALL_DEVICES == i2c_scan_data.device_address)
+  if(I2C_SCAN_MODE_SCAN_FOR_ALL_DEVICES == i2c_scan_data.device_address)
   {
     // Print user friendly scanning message
     lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_I2C_SCAN_STRING_ROW);
@@ -206,23 +206,23 @@ static control_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_
 
     switch(i2c_scan_data.single_device_status)
     {
-      case I2CSCAN_TRANSMISSION_RESULT_SUCCESS:
+      case I2C_SCAN_TRANSMISSION_RESULT_SUCCESS:
         snprintf(status_string, sizeof(status_string), "Successful");
         break;
 
-      case I2CSCAN_TRANSMISSION_RESULT_TOOLONG:
+      case I2C_SCAN_TRANSMISSION_RESULT_TOOLONG:
         snprintf(status_string, sizeof(status_string), "Result too long");
         break;
 
-      case I2CSCAN_TRANSMISSION_RESULT_NACKADR:
+      case I2C_SCAN_TRANSMISSION_RESULT_NACKADR:
         snprintf(status_string, sizeof(status_string), "Result NACK");
         break;
 
-      case I2CSCAN_TRANSMISSION_RESULT_NACKDAT:
+      case I2C_SCAN_TRANSMISSION_RESULT_NACKDAT:
         snprintf(status_string, sizeof(status_string), "Result NACKDAT");
         break;
 
-      case I2CSCAN_TRANSMISSION_RESULT_UNKNOWN:
+      case I2C_SCAN_TRANSMISSION_RESULT_UNKNOWN:
         snprintf(status_string, sizeof(status_string), "Unknown error");
         break;
 

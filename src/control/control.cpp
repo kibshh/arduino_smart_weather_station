@@ -97,9 +97,9 @@ control_input_data_ts control_fetchDataFromInput(control_input_te input_componen
     case INPUT_I2C_SCAN:
         // Fetch I2C scan data and update return data
         uint8_t i2c_addr = component_id;
-        i2cScan_return_ts i2cScan_return = i2cScan_getReading(i2c_addr);
-        return_data.error_msg.error_code = i2cScan_return.error_code;
-        return_data.data.input_return.i2cScan_reading = i2cScan_return.i2cScan_reading;
+        i2c_scan_return_ts i2c_scan_return = i2c_scan_getReading(i2c_addr);
+        return_data.error_msg.error_code = i2c_scan_return.error_code;
+        return_data.data.input_return.i2c_scan_reading = i2c_scan_return.i2c_scan_reading;
         break;
 
     default:
