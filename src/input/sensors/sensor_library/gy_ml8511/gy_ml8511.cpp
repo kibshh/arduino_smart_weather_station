@@ -1,6 +1,6 @@
 #include "gy_ml8511.h"
 
-
+/* EXPORTED FUNCTIONS */
 void gy_ml8511_init()
 {
   pinMode(SENSORS_GY_ML8511_PIN_ANALOG, INPUT);
@@ -17,3 +17,4 @@ float gy_ml8511_readUvIntensity()
 
   return calculated_intensity;
 }
+/* *************************************** */

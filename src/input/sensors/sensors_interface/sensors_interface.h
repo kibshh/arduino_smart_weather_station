@@ -2,7 +2,7 @@
 #define SENSORS_INTERFACE_H
 
 #include <Arduino.h>
-#include "../sensors_metadata/sensors_metadata.h"
+#include "sensors_metadata/sensors_metadata.h"
 
 /**
  * @file sensors_interface.h
@@ -16,12 +16,12 @@
  * promoting modularity and reducing dependencies on internal structures.
  */
 
-// Status codes indicating the sensor interface operation success or failure
-#define SENSORS_INTERFACE_STATUS_FAILED     (false)
-#define SENSORS_INTERFACE_STATUS_SUCCESS    (true)
+/* Status codes indicating the sensor interface operation success or failure */
+#define SENSORS_INTERFACE_STATUS_FAILED     (bool)(false)
+#define SENSORS_INTERFACE_STATUS_SUCCESS    (bool)(true)
 
-// Indicates that no sensors are configured.
-#define SENSORS_INTERFACE_NO_SENSORS_CONFIGURED (SENSORS_METADATA_NO_SENSORS_CONFIGURED)
+/* Indicates that no sensors are configured */
+#define SENSORS_INTERFACE_NO_SENSORS_CONFIGURED (size_t)(SENSORS_METADATA_NO_SENSORS_CONFIGURED)
 
 /**
  * @brief Structure representing the sensor metadata interface.
@@ -31,8 +31,8 @@
  */
 typedef struct
 {
-    sensors_metadata_catalog_ts metadata; // Metadata details for a sensor
-    bool success_status;                  // Status of the metadata retrieval operation
+    sensors_metadata_catalog_ts metadata; /* Metadata details for a sensor */
+    bool success_status;                  /* Status of the metadata retrieval operation */
 } sensors_interface_metadata_ts;
 
 /**

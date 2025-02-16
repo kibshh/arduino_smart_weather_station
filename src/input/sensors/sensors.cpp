@@ -95,10 +95,12 @@ const sensors_functional_catalog_ts sensors_functional_catalog[] PROGMEM =
   },
 #endif
 };
+/* *************************************** */
 
-error_manager_error_code_te sensors_init()
+/* EXPORTED FUNCTIONS */
+control_error_code_te sensors_init()
 {
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
+  control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
 #if defined(DHT11_TEMPERATURE) || defined(DHT11_HUMIDITY)
   dht11_init();
@@ -202,8 +204,6 @@ void sensors_loop(unsigned long current_millis)
 {
 #ifdef MQ7_COPPM
   mq7_heatingCycle(current_millis);
-#ifdef SENSORS_MQ7_CALIBRATION_ENABLED
-  mq7_calibratingLoopFunction(current_millis);
-#endif
 #endif
 }
+/* *************************************** */

@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 
-
 /**
  * Uncomment if serial monitor is used for debugging or logging.
  * Make sure the serial monitor is properly initialized and the baud rate is set correctly.

@@ -13,7 +13,7 @@ static size_t getNumOfTasks();
 
 void task_initTask()
 {
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR; // Default Error code if every init goes correct
+  control_error_code_te error_code = ERROR_CODE_NO_ERROR; // Default Error code if every init goes correct
 
   Wire.begin(); // I2C initialization - unconditionally called, as it is used by many components.
 
@@ -34,7 +34,7 @@ void task_initTask()
 
 void task_cyclicTask()
 {
-  static i2cScan_reading_context_ts context_i2c_scan = app_createI2CScanReadingContext();
+  static i2c_scan_reading_context_ts context_i2c_scan = app_createI2CScanReadingContext();
   static sensor_reading_context_ts context_sensor_reading = app_createNewSensorsReadingContext();
   static task_state_machine_te current_state = STATE_SCANNING_FOR_I2C_ADDRESSES;
 
