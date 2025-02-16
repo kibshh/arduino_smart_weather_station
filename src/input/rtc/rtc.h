@@ -8,23 +8,37 @@
 #include <RTClib.h>
 #include "../input_types.h"
 
-
+/* Macro for RTC compile date */
 #define RTC_COMPILE_DATE    __DATE__
+/* Macro for RTC compile time */
 #define RTC_COMPILE_TIME    __TIME__
 
+/* Macro for RTC I2C address */
 #define RTC_I2C_ADDR        (0x68)
 
+/* Default RTC identifier */
 #define RTC_DEFAULT_RTC     (0u)
 
+/* Minimum valid year for RTC */
 #define RTC_MIN_YEAR        (2024u)
+
+/* Maximum anmd minimum valid month for RTC */
 #define RTC_MIN_MONTH       (1u)
 #define RTC_MAX_MONTH       (12u)
+
+/* Maximum and minimum valid day for RTC */
 #define RTC_MIN_DAY         (1u)
 #define RTC_MAX_DAY         (31u)
+
+/* Maximum and minimum valid hour for RTC */
 #define RTC_MIN_HOUR        (0u)
 #define RTC_MAX_HOUR        (23u)
+
+/* Maximum anmd minimum valid minute for RTC */
 #define RTC_MIN_MINUTE      (0u)
 #define RTC_MAX_MINUTE      (59u)
+
+/* Maximum and minimum valid second for RTC */
 #define RTC_MIN_SECOND      (0u)
 #define RTC_MAX_SECOND      (59u)
 

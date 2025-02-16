@@ -4,13 +4,15 @@
 #include <Arduino.h>
 #include "../app_common.h"
 
-/***
- * Retrieves the current RTC time and sends it to the specified output destinations.
- * @param output The output destinations where the RTC time should be displayed (e.g., LCD display, serial console).
- * @return FINISHED after processing.
+/**
+ * @brief Reads the current RTC time and routes it to the specified output.
  *
- * This function fetches the current time from the RTC module and routes the data 
- * to the selected outputs. It checks for errors in data retrieval and output routing.
+ * Fetches the current time from the RTC module and sends it to the selected 
+ * output(s) (LCD, serial console, or both). Handles any errors encountered 
+ * during data retrieval or routing.
+ *
+ * @param output The output destination (LCD, serial console, or both).
+ * @return task_status_te Returns FINISHED to notify the task component.
  */
 task_status_te app_readCurrentRtcTime(output_destination_t output);
 

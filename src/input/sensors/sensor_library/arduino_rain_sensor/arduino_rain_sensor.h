@@ -4,11 +4,11 @@
 #include <Arduino.h>
 #include "../sensorsconfig.h"
 
-// Define the digital output value indicating rain detected by the sensor, used in digital read mode.
-// NOTE: The sensor uses reverse logic — 0 means rain is detected, and 1 means no rain.
+/* Define the digital output value indicating rain detected by the sensor, used in digital read mode */
+/* NOTE: The sensor uses reverse logic — 0 means rain is detected, and 1 means no rain */
 #define ARDUINO_RAIN_SENSOR_RAIN_DETECTED    (0)
 
-// Define the threshold value for analog readings; values below this indicate rain
+/* Define the threshold value for analog readings; values below this indicate rain */
 #define ARDUINO_RAIN_SENSOR_ANALOG_THRESHOLD (500u)
 
 /**

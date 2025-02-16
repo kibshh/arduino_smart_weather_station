@@ -4,16 +4,16 @@
 #include <Arduino.h>
 #include "../sensorsconfig.h"
 
-// Minimum output voltage of the GY-ML8511 UV sensor (in volts)
+/* Minimum output voltage of the GY-ML8511 UV sensor (in volts) */
 #define GY_ML8511_OUTPUT_VOLTAGE_MIN    (0.99)
 
-// Maximum output voltage of the GY-ML8511 UV sensor (in volts)
+/* Maximum output voltage of the GY-ML8511 UV sensor (in volts) */
 #define GY_ML8511_OUTPUT_VOLTAGE_MAX    (2.9)
 
-// Maximum analog input value for the Arduino ADC (10-bit resolution, range 0-1023)
+/* Maximum analog input value for the Arduino ADC (10-bit resolution, range 0-1023) */
 #define GY_ML8511_ANALOG_INPUT_MAX      (1023)
 
-// Supply voltage for the GY-ML8511 UV sensor, typically 3.3V
+/* Supply voltage for the GY-ML8511 UV sensor, typically 3.3V */
 #define GY_ML8511_VCC_VOLTAGE           (3.3)
 
 /**

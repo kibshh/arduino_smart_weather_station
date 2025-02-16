@@ -4,7 +4,8 @@
 #include <Arduino.h>
 #include "../app_common.h"
 
-#define STARTING_SENSOR_INDEX         (0u)  // Initial sensor index for cyclic display
+/* Initial sensor index for cyclic display */
+#define STARTING_SENSOR_INDEX         (0u)
 
 /* Context structure to maintain sensor reading state across function calls */
 typedef struct
@@ -13,13 +14,12 @@ typedef struct
     uint8_t sensor_index;     // Remembers the current sensor index, resetting if the function is called with a different context
 } sensor_reading_context_ts;
 
-/***
- * Reads data from a specific sensor and routes it to the defined output(s).
- * 
- * This function fetches data from the specified sensor and routes the 
- * retrieved data to one or more output destinations (LCD display, serial console, or both).
- * Any errors encountered during data retrieval or routing are handled internally.
- * 
+/**
+ * @brief Reads sensor data and routes it to the specified output.
+ *
+ * Fetches data from the given sensor and sends it to the selected output(s) 
+ * (LCD, serial console, or both). Handles any retrieval or routing errors internally.
+ *
  * @param sensor_id The ID of the sensor to be read.
  * @param output The output destination (LCD, serial console, or both).
  * @return task_status_te Returns FINISHED to notify the task component.

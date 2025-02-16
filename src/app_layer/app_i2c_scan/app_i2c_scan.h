@@ -4,14 +4,17 @@
 #include <Arduino.h>
 #include "../app_common.h"
 
-#define I2C_SCANER_RUN       (true)  // Enable the I2C scanner operation
-#define I2C_SCANER_DONT_RUN  (false) // Disable the I2C scanner operation, used while data is still being displayed or processed
+/* Enable the I2C scanner operation */
+#define I2C_SCANER_RUN       (true)
+
+/* Disable the I2C scanner operation, used while data is still being displayed or processed */
+#define I2C_SCANER_DONT_RUN  (false)
 
 /* Context structure to manage the state of the I2C scanner operation */
 typedef struct
 {
     control_input_data_ts i2c_scan_return; // Stores the result of the I2C scan operation
-    bool run_i2c_scanner;                      // Flag indicating whether the I2C scanner should be run
+    bool run_i2c_scanner;                  // Flag indicating whether the I2C scanner should be run
 } i2cScan_reading_context_ts;
 
 /**

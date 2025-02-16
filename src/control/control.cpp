@@ -2,7 +2,7 @@
 
 /* STATIC FUNCTION PROTOTYPES */
 /**
- * Routes error to the specified output component.
+ * @brief error to the specified output component.
  *
  * This function forwards error recieved from an input component to one of the
  * defined output components. It returns an error code that can be passed
@@ -19,12 +19,26 @@ static control_error_ts routeErrorToOutput(control_output_component_te output_co
                                            control_error_ts error_msg);
 
 /**
- * Initializes the input return data structure before fetching data.
+ * @brief Initializes input return data structure.
+ *
+ * Sets up the return data structure with the specified input component 
+ * and ID, initializing error handling fields to indicate an invalid input by default.
+ *
+ * @param input_component The input component type.
+ * @param component_id The unique identifier of the input component.
+ * @return control_input_data_ts The initialized return data structure.
  */
 static control_input_data_ts initializeInputReturnData(control_input_te input_component, uint8_t component_id);
 
 /**
- * Initializes the output return error message.
+ * @brief Initializes an error message for output routing failures.
+ *
+ * Sets up the error message structure with a default error code and 
+ * associates it with the specified output component and input data details.
+ *
+ * @param output_component The output component where the error occurred.
+ * @param data The input data associated with the error.
+ * @return control_error_ts The initialized error message structure.
  */
 static control_error_ts initializeOutputReturnErrorMsg(control_output_component_te output_component, control_input_data_ts data);
 /* *************************************** */

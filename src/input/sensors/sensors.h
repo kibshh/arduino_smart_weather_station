@@ -27,19 +27,25 @@
 #include "sensor_library/arduino_rain_sensor/arduino_rain_sensor.h"
 #endif
 
-#define SENSORS_FIRST_SENSOR_INDEX            (0u)      // The index of the first sensor in the configuration
+/* The index of the first sensor in the configuration */
+#define SENSORS_FIRST_SENSOR_INDEX            (0u)
 
-#define SENSORS_NO_INDICATION_FUNCTION        (nullptr) // Placeholder for sensors without an indication function
-#define SENSORS_NO_VALUE_FUNCTION             (nullptr) // Placeholder for sensors without a value function
+/* Placeholder for sensors without an indication function */
+#define SENSORS_NO_INDICATION_FUNCTION        (nullptr)
+/* Placeholder for sensors without a value function */
+#define SENSORS_NO_VALUE_FUNCTION             (nullptr)
 
-// Placeholders for min_value and max_value in indication sensors
+/* Placeholders for min_value and max_value in indication sensors */
 #define SENSORS_INDICATION_NO_MIN             (0)       
 #define SENSORS_INDICATION_NO_MAX             (0)
 
-#define SENSORS_SENSOR_CONFIGURED             (true)    // Flag indicating the sensor is configured in functional catalog
+/* Flag indicating the sensor is configured in functional catalog */
+#define SENSORS_SENSOR_CONFIGURED             (true)
 
-typedef float (*sensors_sensor_value_function_t)();     // Function pointer type for sensors returning a float value
-typedef bool (*sensors_sensor_indication_function_t)(); // Function pointer type for sensors returning a bool indication
+/* Function pointer type for sensors returning a float value */
+typedef float (*sensors_sensor_value_function_t)();
+/* Function pointer type for sensors returning a bool indication */
+typedef bool (*sensors_sensor_indication_function_t)();
 
 /**
  * @brief Defines the functional properties of a sensor.
@@ -49,11 +55,11 @@ typedef bool (*sensors_sensor_indication_function_t)(); // Function pointer type
  */
 typedef struct
 {
-  float min_value; // The minimum valid value for the sensor's reading. Values below this are considered invalid.
-  float max_value; // The maximum valid value for the sensor's reading. Values above this are considered invalid.
-  sensors_sensor_value_function_t sensor_value_function; // Function pointer for obtaining a numerical reading from the sensor. Optional.
-  sensors_sensor_indication_function_t sensor_indication_function; // Function pointer for obtaining a boolean status/indication from the sensor. Optional.
-  uint8_t sensor_id; // Unique identifier for the sensor. Used to reference the sensor. From config file.
+  float min_value;                                                 /* The minimum valid value for the sensor's reading. Values below this are considered invalid. */
+  float max_value;                                                 /* The maximum valid value for the sensor's reading. Values above this are considered invalid. */
+  sensors_sensor_value_function_t sensor_value_function;           /* Function pointer for obtaining a numerical reading from the sensor. Optional. */
+  sensors_sensor_indication_function_t sensor_indication_function; /* Function pointer for obtaining a boolean status/indication from the sensor. Optional. */
+  uint8_t sensor_id;                                               /* Unique identifier for the sensor. Used to reference the sensor. From config file. */
 } sensors_functional_catalog_ts;
 
 /**

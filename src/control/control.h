@@ -30,7 +30,7 @@ typedef struct
 } control_input_data_ts;
 
 /**
- * Routes data to the specified output component.
+ * @brief Routes data to the specified output component.
  *
  * This function forwards data fetched from an input component to one of the
  * defined output components. It returns an error code that can be passed
@@ -48,7 +48,7 @@ control_error_ts control_routeDataToOutput(control_output_component_te output_co
                                                  control_input_data_ts data);
 
 /**
- * Fetches data from the specified input component.
+ * @brief Fetches data from the specified input component.
  *
  * This function retrieves data from a specified input component (e.g., sensors, RTC)
  * and returns it as a structured result. One part of the fetched data can then be used by
@@ -67,7 +67,7 @@ control_input_data_ts control_fetchDataFromInput(control_input_te input_componen
                                                  uint8_t component_id);
 
 /**
- * Handles errors by routing them to output components
+ * @brief Handles errors by routing them to output components
  * 
  * This function retrieves the specific error structure and tries to display it
  * using output components. It tries each one of the output components sequentially if some

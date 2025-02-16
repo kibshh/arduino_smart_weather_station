@@ -5,17 +5,21 @@
 #include <avr/pgmspace.h>
 #include "sensors_catalog.h"
 
-#define SENSORS_METADATA_NO_SENSORS_CONFIGURED         (0u)      // Indicates that no sensor metadata is configured
-#define SENSORS_METADATA_FIRST_SENSOR_INDEX            (0u)      // The index of the first sensor in the metadata configuration
+/* Indicates that no sensor metadata is configured */
+#define SENSORS_METADATA_NO_SENSORS_CONFIGURED         (0u)
+/* The index of the first sensor in the metadata configuration */
+#define SENSORS_METADATA_FIRST_SENSOR_INDEX            (0u)
 
-// Metadata retrieve success status codes
+/* Metadata retrieve success status codes */
 #define SENSORS_METADATA_RETRIEVE_FAILED               (false)
 #define SENSORS_METADATA_RETRIEVE_SUCCESS              (true)
 
-#define SENSORS_MEASUREMENT_TYPE_VALUE                 (0u)      // Measurement type for sensors providing float values
-#define SENSORS_MEASUREMENT_TYPE_INDICATION            (1u)      // Measurement type for sensors providing indications
+/* Measurement type for sensors providing float values */
+#define SENSORS_MEASUREMENT_TYPE_VALUE                 (0u)
+/* Measurement type for sensors providing indications */
+#define SENSORS_MEASUREMENT_TYPE_INDICATION            (1u)
 
-// Macros for defining number of decimals based on sensor type
+/* Macros for defining number of decimals based on sensor type */
 #define SENSORS_DISPLAY_0_DECIMALS    (0u)
 #define SENSORS_DISPLAY_1_DECIMAL     (1u)
 #define SENSORS_DISPLAY_2_DECIMALS    (2u)
@@ -24,8 +28,8 @@
 #define SENSORS_DISPLAY_5_DECIMALS    (5u)
 #define SENSORS_DISPLAY_6_DECIMALS    (6u)
 
-// Macros for defining the number of letters displayed for sensor names.
-// These macros help save space when displaying sensor names on limited character outputs based on the sensor type.
+/* Macros for defining the number of letters displayed for sensor names */
+/* These macros help save space when displaying sensor names on limited character outputs based on the sensor type */
 #define SENSORS_DISPLAY_0_LETTERS    (0u)
 #define SENSORS_DISPLAY_1_LETTER     (1u)
 #define SENSORS_DISPLAY_2_LETTERS    (2u)

@@ -1,5 +1,6 @@
 #include "sensors_interface.h"
 
+/* EXPORTED FUNCTIONS */
 sensors_interface_metadata_ts sensors_interface_getSensorMetadata(uint8_t id)
 {
     sensors_interface_metadata_ts metadata_return;
@@ -22,3 +23,4 @@ uint8_t sensors_interface_sensorIndexToId(uint8_t index)
 {
     return sensors_metadata_sensorIndexToId(index);
 }
+/* *************************************** */

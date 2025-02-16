@@ -1,6 +1,7 @@
 #include "mq135.h"
 
 
+/* EXPORTED FUNCTIONS */
 void mq135_init()
 {
   pinMode(SENSORS_MQ135_PIN_ANALOG, INPUT);
@@ -42,4 +43,5 @@ float mq135_readResistanceForCalibration()
   }
   return calculated_resistance;
 }
+/* *************************************** */
 

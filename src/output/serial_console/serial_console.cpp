@@ -211,7 +211,7 @@ static control_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2
       strncat(display_string, status_msg, sizeof(display_string) - strlen(display_string) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
     }
   }
-  /* IMPORTANT: Check of invalid I2C address is done on I2C scanner side and it should not arrive on the Serial Console */
+  // IMPORTANT: Check of invalid I2C address is done on I2C scanner side and it should not arrive on the Serial Console
   // Display the formatted string if no error occurred
   if(SERIAL_CONSOLE_PROCEED_WITH_DISPLAY == proceed_with_display)
   {

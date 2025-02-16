@@ -7,17 +7,23 @@
 #include "display_config.h"
 #include "../../control/control_types.h"
 
-#define DISPLAY_START_COLUMN  (0u)  // Start column for display cursor
-#define DISPLAY_START_ROW     (0u)  // Start row for display cursor
+/* Start column for display cursor */
+#define DISPLAY_START_COLUMN  (0u)
+/* Start row for display cursor */
+#define DISPLAY_START_ROW     (0u)
 
-#define DISPLAY_PROCEED_WITH_DISPLAY      (true)  // Flag to proceed with displaying data
-#define DISPLAY_DONT_PROCEED_WITH_DISPLAY (false) // Flag to prevent displaying data
+/* Flag to proceed with displaying data */
+#define DISPLAY_PROCEED_WITH_DISPLAY      (true)
+/* Flag to prevent displaying data */
+#define DISPLAY_DONT_PROCEED_WITH_DISPLAY (false)
 
-#define DISPLAY_FIRST_LETTER_IN_STR   (0u)  // Index of the first letter in a string
-#define DISPLAY_MIN_FLOAT_STRING_LEN  (1u)  // Minimum length of the float string for display
-#define DISPLAY_DTOSTRF_BUFFER_SIZE   (20u) // Size of the buffer for converting float to string
-#define DISPLAY_NULL_TERMINATOR_SIZE  (1u)  // Size for the null terminator in strings
-
+/* Minimum length of the float string for display */
+#define DISPLAY_MIN_FLOAT_STRING_LEN  (1u)
+/* Size of the buffer for converting float to string */
+#define DISPLAY_DTOSTRF_BUFFER_SIZE   (20u)
+/* Size for the null terminator in strings */
+#define DISPLAY_NULL_TERMINATOR_SIZE  (1u)
+/** Defines the maximum string length for the display, including the null terminator. */
 #define DISPLAY_MAX_STRING_LEN        (DISPLAY_LCD_WIDTH + DISPLAY_NULL_TERMINATOR_SIZE)
 
 /**

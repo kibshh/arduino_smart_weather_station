@@ -5,7 +5,7 @@
 #include "../input/input_types.h"
 #include "control_error_codes.h"
 
-// Represents an unused or invalid input ID
+/* Represents an unused or invalid input ID */
 #define ERROR_INPUT_ID_UNUSED (0xFF)
 
 /**
@@ -30,8 +30,8 @@ typedef enum
  */
 typedef enum
 {
-    OUTPUT_DISPLAY,       /**< Output component for a display device. */
-    OUTPUT_SERIAL_CONSOLE /**< Output component for the serial console. */
+    OUTPUT_DISPLAY,         /**< Output component for a display device. */
+    OUTPUT_SERIAL_CONSOLE   /**< Output component for the serial console. */
 } control_output_component_te;
 
 /**

@@ -95,7 +95,9 @@ const sensors_functional_catalog_ts sensors_functional_catalog[] PROGMEM =
   },
 #endif
 };
+/* *************************************** */
 
+/* EXPORTED FUNCTIONS */
 control_error_code_te sensors_init()
 {
   control_error_code_te error_code = ERROR_CODE_NO_ERROR;
@@ -204,3 +206,4 @@ void sensors_loop(unsigned long current_millis)
   mq7_heatingCycle(current_millis);
 #endif
 }
+/* *************************************** */

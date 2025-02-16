@@ -1,7 +1,10 @@
 #include "dht11.h"
 
-static DHT dht(SENSORS_DHT11_PIN, DHT11);
+/* STATIC GLOBAL VARIABLES */
+static Adafruit_BMP280 bmp;
+/* *************************************** */
 
+/* EXPORTED FUNCTIONS */
 void dht11_init()
 {
     dht.begin();
@@ -16,3 +19,4 @@ float dht11_readHumidity()
 {
     return dht.readHumidity();
 }
+/* *************************************** */

@@ -1,11 +1,12 @@
 #include "display.h"
 
-
+/* STATIC GLOBAL VARIABLES */
 static LiquidCrystal_I2C lcd(DISPLAY_LCD_I2C_ADDDR, DISPLAY_LCD_WIDTH, DISPLAY_LCD_HEIGHT);
+/* *************************************** */
 
 /* STATIC FUNCTION PROTOTYPES */
 /**
- * Displays the sensor measurement data on the LCD based on the provided sensor reading.
+ * @brief Displays the sensor measurement data on the LCD based on the provided sensor reading.
  * It retrieves the metadata for the sensor, formats the sensor value, and updates the display. 
  * If the measurement type is invalid or metadata is not found, the function returns an error code.
  *
@@ -19,7 +20,7 @@ static LiquidCrystal_I2C lcd(DISPLAY_LCD_I2C_ADDDR, DISPLAY_LCD_WIDTH, DISPLAY_L
 static control_error_code_te display_displaySensorMeasurement(sensor_reading_ts sensor_data);
 
 /** 
- * Displays the current time on the LCD, formatted to fit a 16-character wide display.
+ * @brief Displays the current time on the LCD, formatted to fit a 16-character wide display.
  * This function formats the time and date values from the RTC reading and displays it.
  *
  * @param time_data The RTC reading containing the current time (year, month, day, hour, minutes, seconds).
@@ -30,7 +31,7 @@ static control_error_code_te display_displaySensorMeasurement(sensor_reading_ts 
 static control_error_code_te display_displayTime(rtc_reading_ts time_data);
 
 /** 
- * Displays the results of an I2C bus scan on the LCD. 
+ * @brief Displays the results of an I2C bus scan on the LCD. 
  * If scanning all devices, it will show a scanning message, otherwise it displays the status 
  * of the specific device address being scanned.
  *
@@ -55,7 +56,8 @@ static control_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_
 static String formatDisplaySensorData(sensors_metadata_catalog_ts sensor_metadata, char* val);
 
 /** 
- * Clears a specific row on the LCD by printing blank spaces.
+ * @brief Clears a specific row on the LCD by printing blank spaces.
+ * 
  * @param row The row index to clear.
  */
 static void displayEmptyLine(uint8_t row);

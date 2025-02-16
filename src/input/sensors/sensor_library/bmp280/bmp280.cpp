@@ -1,7 +1,10 @@
 #include "bmp280.h"
 
+/* STATIC GLOBAL VARIABLES */
 static Adafruit_BMP280 bmp;
+/* *************************************** */
 
+/* EXPORTED FUNCTIONS */
 bool bmp280_init()
 {
   if(!bmp.begin(SENSORS_BMP280_I2C_ADDR))
@@ -30,3 +33,4 @@ float bmp280_readAltitude()
 {
     return bmp.readAltitude(SENSORS_BMP280_LOCAL_SEA_LEVEL_PRESSURE);
 }
+/* *************************************** */

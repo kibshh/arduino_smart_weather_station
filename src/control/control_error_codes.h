@@ -3,6 +3,13 @@
 
 #include <Arduino.h>
 
+/**
+ * @brief Enumerates error codes for system components.
+ *
+ * Defines various error codes related to sensor operations, 
+ * input/output validation, RTC, I2C communication, and display handling. 
+ * Used for error detection and debugging throughout the system.
+ */
 typedef enum
 {
   ERROR_CODE_NO_ERROR,

@@ -7,7 +7,7 @@ void checkForErrors(control_error_ts error_status)
     // If an error occurred, handle it
     if(ERROR_CODE_NO_ERROR != error_status.error_code)
     {
-        /* Uncomment when error handler is finished */
+        // Uncomment when error handler is finished
         // control_handleError(error_status);
     }
 }

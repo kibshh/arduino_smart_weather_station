@@ -16,11 +16,11 @@
  * promoting modularity and reducing dependencies on internal structures.
  */
 
-// Status codes indicating the sensor interface operation success or failure
+/* Status codes indicating the sensor interface operation success or failure */
 #define SENSORS_INTERFACE_STATUS_FAILED     (false)
 #define SENSORS_INTERFACE_STATUS_SUCCESS    (true)
 
-// Indicates that no sensors are configured.
+/* Indicates that no sensors are configured */
 #define SENSORS_INTERFACE_NO_SENSORS_CONFIGURED (SENSORS_METADATA_NO_SENSORS_CONFIGURED)
 
 /**
@@ -31,8 +31,8 @@
  */
 typedef struct
 {
-    sensors_metadata_catalog_ts metadata; // Metadata details for a sensor
-    bool success_status;                  // Status of the metadata retrieval operation
+    sensors_metadata_catalog_ts metadata; /* Metadata details for a sensor */
+    bool success_status;                  /* Status of the metadata retrieval operation */
 } sensors_interface_metadata_ts;
 
 /**

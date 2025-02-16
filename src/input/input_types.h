@@ -5,19 +5,13 @@
 #include "sensors/sensors_interface/sensors_interface.h"
 #include "../control/control_error_codes.h"
 
-/**
- * Number of bits in a byte.
- */
+/* Number of bits in a byte */
 #define BITS_IN_BYTE                     (8u)
 
-/**
- * Flag indicating that bit is set.
- */
+/* Flag indicating that bit is set */
 #define BIT_SET                          (1u)
 
-/**
- * Maximum number of devices that can be addressed in 7-bit I2C addressing.
- */
+/* Maximum number of devices that can be addressed in 7-bit I2C addressing */
 #define I2C_7_BIT_ADDRESSING_MAX_DEVICES (127u)
 
 /**

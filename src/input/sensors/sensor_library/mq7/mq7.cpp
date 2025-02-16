@@ -7,17 +7,34 @@ static bool mq7_is_heater_hot = MQ7_HEATER_IS_OFF;
 
 /* STATIC FUNCTION PROTOTYPES */
 /** 
- * Converts the raw ADC reading to sensor resistance in ohms. 
+ * @brief Converts raw ADC reading to resistance value.
+ * 
+ * This function takes the raw ADC value from the MQ7 sensor and converts it to a resistance value
+ * using the sensor's voltage and a predefined load resistance. It avoids division by zero by adjusting 
+ * the raw ADC value when it's equal to the minimum.
+ * 
+ * @param raw_adc The raw ADC value from the MQ7 sensor.
+ * @return float The calculated resistance in ohms.
  */
 static float convertToResistance(int raw_adc);
 
 /** 
- * Turns the heater on by setting it to the required high voltage level. 
+ * @brief Turns the heater on for the MQ7 sensor.
+ * 
+ * This function sets the heater of the MQ7 sensor to 5V, enabling it to start heating. 
+ * It returns a status indicating that the heater is on.
+ * 
+ * @return bool The status of the heater (true if on).
  */
 static bool heaterOn();
 
 /** 
- * Turns the heater off by setting it to the required low voltage level. 
+ * @brief Turns the heater off for the MQ7 sensor.
+ * 
+ * This function sets the heater of the MQ7 sensor to 1.4V, turning it off. 
+ * It returns a status indicating that the heater is off.
+ * 
+ * @return bool The status of the heater (true if off).
  */
 static bool heaterOff();
 /* *************************************** */
