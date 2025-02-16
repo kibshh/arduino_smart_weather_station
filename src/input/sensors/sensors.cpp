@@ -96,9 +96,9 @@ const sensors_functional_catalog_ts sensors_functional_catalog[] PROGMEM =
 #endif
 };
 
-error_manager_error_code_te sensors_init()
+control_error_code_te sensors_init()
 {
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
+  control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
 #if defined(DHT11_TEMPERATURE) || defined(DHT11_HUMIDITY)
   dht11_init();

@@ -3,9 +3,9 @@
 //GLOBAL VARIABLES
 RTC_DS3231 rtc;
 
-error_manager_error_code_te rtc_init()
+control_error_code_te rtc_init()
 {
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
+  control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
   if (!rtc.begin()) 
   {

@@ -1,5 +1,5 @@
-#ifndef DATA_ROUTER_H
-#define DATA_ROUTER_H
+#ifndef CONTROL_H
+#define CONTROL_H
 
 #include <Arduino.h>
 #include "../input/i2c_scan/i2cScan.h"
@@ -7,7 +7,7 @@
 #include "../input/sensors/sensors.h"
 #include "../output/display/display.h"
 #include "../output/serial_console/serial_console.h"
-#include "data_router_types.h"
+#include "control_types.h"
 
 /**
  * Structure for managing the dual output of data fetching operations.
@@ -18,16 +18,16 @@
  * (`error_msg`) contains an error message to be handled by the Error Manager.
  *
  * Members:
- *  - data:      Contains the fetched data, encapsulated in the `data_router_data_ts`
+ *  - data:      Contains the fetched data, encapsulated in the `control_data_ts`
  *               structure, to be forwarded to an output component (e.g., display, console).
- *  - error_msg: Represents the error message of type `error_manager_error_ts`
+ *  - error_msg: Represents the error message of type `control_error_ts`
  *               that can be passed to the Error Manager for further processing.
  */
 typedef struct
 {
-    data_router_data_ts data;         /**< The fetched data for output forwarding. */
-    error_manager_error_ts error_msg; /**< The error message for the Error Manager. */
-} data_router_input_data_ts;
+    control_data_ts data;             /**< The fetched data for output forwarding. */
+    control_error_ts error_msg; /**< The error message for the Error Manager. */
+} control_input_data_ts;
 
 /**
  * Routes data to the specified output component.
@@ -41,11 +41,11 @@ typedef struct
  * @param data             The actual data to be forwarded, which must match
  *                         the format/type returned by the data fetch function.
  *
- * @return An error message of type `error_manager_error_ts` indicating the
+ * @return An error message of type `control_error_ts` indicating the
  *         status of the routing operation.
  */
-error_manager_error_ts data_router_routeDataToOutput(data_router_output_component_te output_component,
-                                                     data_router_input_data_ts data);
+control_error_ts control_routeDataToOutput(control_output_component_te output_component,
+                                                 control_input_data_ts data);
 
 /**
  * Fetches data from the specified input component.
@@ -58,29 +58,23 @@ error_manager_error_ts data_router_routeDataToOutput(data_router_output_componen
  *                        (e.g., sensors, RTC).
  * @param component_id    The specific ID within the input component (e.g., sensor ID).
  *
- * @return A structure of type `data_router_input_data_ts` has two parts.
+ * @return A structure of type `control_input_data_ts` has two parts.
  *         `data` - containing the fetched data, input type, and component ID.
  *         `error_msg` - containing error code, flag for input/output and the details of the
  *         component( ID, etc.)
  */
-data_router_input_data_ts data_router_fetchDataFromInput(data_router_input_te input_component,
-                                                         uint8_t component_id);
+control_input_data_ts control_fetchDataFromInput(control_input_te input_component,
+                                                 uint8_t component_id);
 
 /**
- * Routes error to the specified output component.
- *
- * This function forwards error recieved from an input component to one of the
- * defined output components. It returns an error code that can be passed
- * to the Error Manager for handling.
- *
- * @param output_component The ID of the output component to which the error
- *                         is forwarded (e.g., display, serial console).
- * @param error_msg            A structure containing the information about the error.
- *
- * @return An error message of type `error_manager_error_ts` indicating the
- *         status of the routing operation.
+ * Handles errors by routing them to output components
+ * 
+ * This function retrieves the specific error structure and tries to display it
+ * using output components. It tries each one of the output components sequentially if some
+ * of them produce an error. If all of the attempts are unsuccessful, it aborts the operation.
+ * 
+ * @param error_msg A structure containing the information about the error.
  */
-error_manager_error_ts data_router_routeErrorToOutput(data_router_output_component_te output_component,
-                                                      error_manager_error_ts error_msg);
+void control_handleError(control_error_ts error_msg);
 
 #endif

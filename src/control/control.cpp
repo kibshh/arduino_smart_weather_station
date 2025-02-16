@@ -1,49 +1,39 @@
-#include "data_router.h"
+#include "control.h"
 
 /* STATIC FUNCTION PROTOTYPES */
 /**
+ * Routes error to the specified output component.
+ *
+ * This function forwards error recieved from an input component to one of the
+ * defined output components. It returns an error code that can be passed
+ * to the Error Manager for handling.
+ *
+ * @param output_component The ID of the output component to which the error
+ *                         is forwarded (e.g., display, serial console).
+ * @param error_msg            A structure containing the information about the error.
+ *
+ * @return An error message of type `control_error_ts` indicating the
+ *         status of the routing operation.
+ */
+static control_error_ts routeErrorToOutput(control_output_component_te output_component,
+                                           control_error_ts error_msg);
+
+/**
  * Initializes the input return data structure before fetching data.
  */
-static data_router_input_data_ts initializeInputReturnData(data_router_input_te input_component, uint8_t component_id);
+static control_input_data_ts initializeInputReturnData(control_input_te input_component, uint8_t component_id);
 
 /**
  * Initializes the output return error message.
  */
-static error_manager_error_ts initializeOutputReturnErrorMsg(data_router_output_component_te output_component, data_router_input_data_ts data);
+static control_error_ts initializeOutputReturnErrorMsg(control_output_component_te output_component, control_input_data_ts data);
 /* *************************************** */
 
 /* EXPORTED FUNCTIONS */
-error_manager_error_ts data_router_routeErrorToOutput(data_router_output_component_te output_component, error_manager_error_ts error_msg)
-{
-    data_router_data_ts data;
-    data.input_id = ERROR_INPUT_ID_UNUSED;
-    data.input_type = INPUT_ERROR;
-    data.input_return.error_msg = error_msg;
-
-    switch (output_component)
-    {
-    case OUTPUT_DISPLAY:
-        // Route data to display and update error code
-        error_msg.error_code = display_displayData(data);
-        break;
-
-    case OUTPUT_SERIAL_CONSOLE:
-        // Serial console output not implemented yet
-        break;
-
-    default:
-        // Set error code for invalid output
-        error_msg.error_code = ERROR_CODE_INVALID_OUTPUT;
-        break;
-    }
-
-    return error_msg;
-}
-
-error_manager_error_ts data_router_routeDataToOutput(data_router_output_component_te output_component, data_router_input_data_ts data)
+control_error_ts control_routeDataToOutput(control_output_component_te output_component, control_input_data_ts data)
 {
     // Initialize error message with default values
-    error_manager_error_ts error_msg = initializeOutputReturnErrorMsg(output_component, data);
+    control_error_ts error_msg = initializeOutputReturnErrorMsg(output_component, data);
 
     if (ERROR_CODE_NO_ERROR != data.error_msg.error_code)
     {
@@ -69,10 +59,10 @@ error_manager_error_ts data_router_routeDataToOutput(data_router_output_componen
     return error_msg;
 }
 
-data_router_input_data_ts data_router_fetchDataFromInput(data_router_input_te input_component, uint8_t component_id)
+control_input_data_ts control_fetchDataFromInput(control_input_te input_component, uint8_t component_id)
 {
     // Initialize input return data with defaults
-    data_router_input_data_ts return_data = initializeInputReturnData(input_component, component_id);
+    control_input_data_ts return_data = initializeInputReturnData(input_component, component_id);
 
     switch (input_component)
     {
@@ -104,12 +94,48 @@ data_router_input_data_ts data_router_fetchDataFromInput(data_router_input_te in
     }
     return return_data;
 }
+
+void control_handleError(control_error_ts error_msg)
+{
+    control_error_ts error_msg_serial = routeErrorToOutput(OUTPUT_SERIAL_CONSOLE, error_msg);
+    if (error_msg_serial.error_code != ERROR_CODE_NO_ERROR)
+    {
+        routeErrorToOutput(OUTPUT_DISPLAY, error_msg);
+    }
+}
 /* *************************************** */
 
 /* STATIC FUNCTIONS IMPLEMENTATIONS */
-static data_router_input_data_ts initializeInputReturnData(data_router_input_te input_component, uint8_t component_id)
+static control_error_ts routeErrorToOutput(control_output_component_te output_component, control_error_ts error_msg)
 {
-    data_router_input_data_ts return_data;
+    control_data_ts data;
+    data.input_id = ERROR_INPUT_ID_UNUSED;
+    data.input_type = INPUT_ERROR;
+    data.input_return.error_msg = error_msg;
+
+    switch (output_component)
+    {
+    case OUTPUT_DISPLAY:
+        // Route data to display and update error code
+        error_msg.error_code = display_displayData(data);
+        break;
+
+    case OUTPUT_SERIAL_CONSOLE:
+        // Serial console output not implemented yet
+        break;
+
+    default:
+        // Set error code for invalid output
+        error_msg.error_code = ERROR_CODE_INVALID_OUTPUT;
+        break;
+    }
+
+    return error_msg;
+}
+
+static control_input_data_ts initializeInputReturnData(control_input_te input_component, uint8_t component_id)
+{
+    control_input_data_ts return_data;
 
     // Initialize data part
     return_data.data.input_type = input_component;
@@ -123,10 +149,10 @@ static data_router_input_data_ts initializeInputReturnData(data_router_input_te 
     return return_data;
 }
 
-static error_manager_error_ts initializeOutputReturnErrorMsg(data_router_output_component_te output_component, data_router_input_data_ts data)
+static control_error_ts initializeOutputReturnErrorMsg(control_output_component_te output_component, control_input_data_ts data)
 {
     // Initialize the error message with default values
-    error_manager_error_ts error_msg;
+    control_error_ts error_msg;
     error_msg.error_code = ERROR_CODE_OUTPUT_ROUTER_DATA_CONTAINS_ERRORS;
     error_msg.component.output_error.output_component = output_component;
     error_msg.component.output_error.input_type = data.data.input_type;

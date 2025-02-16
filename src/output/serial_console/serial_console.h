@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 #include <WString.h>
-#include "../../data_router/data_router_types.h"
+#include "../../control/control_types.h"
 #include "serial_console_config.h"
 
 #define SERIAL_CONSOLE_PROCEED_WITH_DISPLAY      (true)  // Flag to proceed with displaying data
@@ -32,11 +32,11 @@
  * This function begins serial communication at the specified baud rate
  * and does not block the program execution if the serial port is not available.
  *
- * @return error_manager_error_code_te
+ * @return control_error_code_te
  * - ERROR_CODE_NO_ERROR: Serial communication initialized successfully.
  * - ERROR_CODE_SERIAL_INIT_FAILED: Failed to initialize the serial communication.
  */
-error_manager_error_code_te serial_console_init();
+control_error_code_te serial_console_init();
 
 /**
  * @brief Displays data on the serial console based on input type.
@@ -45,10 +45,10 @@ error_manager_error_code_te serial_console_init();
  * based on the type of input provided (e.g., sensor data, RTC time, or I2C scan results).
  *
  * @param data The data structure containing the input type and associated readings.
- * @return error_manager_error_code_te
+ * @return control_error_code_te
  * - ERROR_CODE_NO_ERROR: Data displayed successfully.
  * - ERROR_CODE_INVALID_INPUT_TYPE: Invalid input type specified.
  */
-error_manager_error_code_te serial_console_displayData(data_router_data_ts data);
+control_error_code_te serial_console_displayData(control_data_ts data);
 
 #endif

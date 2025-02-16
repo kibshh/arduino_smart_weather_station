@@ -8,12 +8,12 @@
  * for display on the serial console, including the sensor type, value, and unit.
  *
  * @param sensor_data The sensor reading structure containing the data to be displayed.
- * @return error_manager_error_code_te
+ * @return control_error_code_te
  * - ERROR_CODE_NO_ERROR: Sensor data displayed successfully.
  * - ERROR_CODE_SERIAL_CONSOLE_SENSOR_NOT_CONFIGURED: Sensor metadata retrieval failed.
  * - ERROR_CODE_SERIAL_CONSOLE_INVALID_MEASUREMENT_TYPE: Invalid measurement type.
  */
-static error_manager_error_code_te serial_console_displaySensorMeasurement(sensor_reading_ts sensor_data);
+static control_error_code_te serial_console_displaySensorMeasurement(sensor_reading_ts sensor_data);
 
 /**
  * @brief Displays the current RTC time on the serial console.
@@ -22,10 +22,10 @@ static error_manager_error_code_te serial_console_displaySensorMeasurement(senso
  * hours, minutes, seconds, day, month, and year.
  *
  * @param time_data The RTC reading structure containing the time information.
- * @return error_manager_error_code_te
+ * @return control_error_code_te
  * - ERROR_CODE_NO_ERROR: Time data displayed successfully.
  */
-static error_manager_error_code_te serial_console_displayTime(rtc_reading_ts time_data);
+static control_error_code_te serial_console_displayTime(rtc_reading_ts time_data);
 
 /**
  * @brief Displays I2C scan results on the serial console.
@@ -34,15 +34,15 @@ static error_manager_error_code_te serial_console_displayTime(rtc_reading_ts tim
  * detected device address and its communication status.
  *
  * @param i2c_scan_data The I2C scan reading structure containing the scan results.
- * @return error_manager_error_code_te
+ * @return control_error_code_te
  * - ERROR_CODE_NO_ERROR: I2C data displayed successfully.
  * - ERROR_CODE_SERIAL_CONSOLE_UNKNOWN_I2C_DEVICE_STATUS: Unknown device status during communication.
  */
-static error_manager_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c_scan_data);
+static control_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c_scan_data);
 /* *************************************** */
 
 /* EXPORTED FUNCTIONS */
-error_manager_error_code_te serial_console_init()
+control_error_code_te serial_console_init()
 {
     // Begin serial communication with the defined baud rate.
     Serial.begin(SERIAL_CONSOLE_BAUDRATE);
@@ -56,10 +56,10 @@ error_manager_error_code_te serial_console_init()
     return ERROR_CODE_NO_ERROR;
 }
 
-error_manager_error_code_te serial_console_displayData(data_router_data_ts data)
+control_error_code_te serial_console_displayData(control_data_ts data)
 {
   // Default error code for invalid input type
-  error_manager_error_code_te error_code = ERROR_CODE_INVALID_INPUT_TYPE;
+  control_error_code_te error_code = ERROR_CODE_INVALID_INPUT_TYPE;
 
   switch(data.input_type)
   {
@@ -85,9 +85,9 @@ error_manager_error_code_te serial_console_displayData(data_router_data_ts data)
 /* *************************************** */
 
 /* STATIC FUNCTIONS IMPLEMENTATIONS */
-static error_manager_error_code_te serial_console_displaySensorMeasurement(sensor_reading_ts sensor_data)
+static control_error_code_te serial_console_displaySensorMeasurement(sensor_reading_ts sensor_data)
 {
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
+  control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
   // Retrieve sensor metadata
   sensors_interface_metadata_ts sensor_metadata = sensors_interface_getSensorMetadata(sensor_data.sensor_id);
@@ -137,7 +137,7 @@ static error_manager_error_code_te serial_console_displaySensorMeasurement(senso
   return error_code;
 }
 
-static error_manager_error_code_te serial_console_displayTime(rtc_reading_ts time_data)
+static control_error_code_te serial_console_displayTime(rtc_reading_ts time_data)
 {
   // Extract time components
   uint16_t year = time_data.year;
@@ -161,9 +161,9 @@ static error_manager_error_code_te serial_console_displayTime(rtc_reading_ts tim
   return ERROR_CODE_NO_ERROR;
 }
 
-static error_manager_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c_scan_data)
+static control_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c_scan_data)
 {
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
+  control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
   bool proceed_with_display = SERIAL_CONSOLE_PROCEED_WITH_DISPLAY;
 

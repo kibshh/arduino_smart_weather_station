@@ -13,7 +13,7 @@ static size_t getNumOfTasks();
 
 void task_initTask()
 {
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR; // Default Error code if every init goes correct
+  control_error_code_te error_code = ERROR_CODE_NO_ERROR; // Default Error code if every init goes correct
 
   Wire.begin(); // I2C initialization - unconditionally called, as it is used by many components.
 

@@ -34,11 +34,11 @@
  * This function initializes the RTC module, checks its power status, 
  * and sets the RTC time if the module has lost power or is being used for the first time.
  *
- * @return error_manager_error_code_te
+ * @return control_error_code_te
  * - ERROR_CODE_NO_ERROR: RTC initialized successfully.
  * - ERROR_CODE_RTC_INIT_FAILED: RTC initialization failed.
  */
-error_manager_error_code_te rtc_init();
+control_error_code_te rtc_init();
 
 /**
  * @brief Retrieves the current date and time from the RTC module.

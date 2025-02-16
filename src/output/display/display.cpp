@@ -11,12 +11,12 @@ static LiquidCrystal_I2C lcd(DISPLAY_LCD_I2C_ADDDR, DISPLAY_LCD_WIDTH, DISPLAY_L
  *
  * @param sensor_data The sensor reading containing the sensor ID, value, and measurement type switch.
  * 
- * @return error_manager_error_code_te Returns an error code based on the display process:
+ * @return control_error_code_te Returns an error code based on the display process:
  *         - ERROR_CODE_NO_ERROR if the sensor data is successfully displayed.
  *         - ERROR_CODE_DISPLAY_INVALID_MEASUREMENT_TYPE if the measurement type is invalid.
  *         - ERROR_CODE_DISPLAY_SENSOR_NOT_CONFIGURED if the sensor metadata is not found.
  **/
-static error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts sensor_data);
+static control_error_code_te display_displaySensorMeasurement(sensor_reading_ts sensor_data);
 
 /** 
  * Displays the current time on the LCD, formatted to fit a 16-character wide display.
@@ -24,10 +24,10 @@ static error_manager_error_code_te display_displaySensorMeasurement(sensor_readi
  *
  * @param time_data The RTC reading containing the current time (year, month, day, hour, minutes, seconds).
  * 
- * @return error_manager_error_code_te Returns an error code:
+ * @return control_error_code_te Returns an error code:
  *         - ERROR_CODE_NO_ERROR indicating successful execution.
  **/
-static error_manager_error_code_te display_displayTime(rtc_reading_ts time_data);
+static control_error_code_te display_displayTime(rtc_reading_ts time_data);
 
 /** 
  * Displays the results of an I2C bus scan on the LCD. 
@@ -36,11 +36,11 @@ static error_manager_error_code_te display_displayTime(rtc_reading_ts time_data)
  *
  * @param i2c_scan_data The I2C scanning data that contains the device address and scan status.
  * 
- * @return error_manager_error_code_te Returns an error code:
+ * @return control_error_code_te Returns an error code:
  *         - ERROR_CODE_NO_ERROR for a successful display update.
  *         - ERROR_CODE_DISPLAY_UNKNOWN_I2C_DEVICE_STATUS for unknown device statuses.
  **/
-static error_manager_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_data);
+static control_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_data);
 
 /**
  * @brief Formats sensor data for display on an LCD screen.
@@ -62,7 +62,7 @@ static void displayEmptyLine(uint8_t row);
 /* *************************************** */
 
 /* EXPORTED FUNCTIONS */
-error_manager_error_code_te display_init()
+control_error_code_te display_init()
 {
   lcd.begin(DISPLAY_LCD_WIDTH, DISPLAY_LCD_HEIGHT); // Initialize a 16x2 LCD
   lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_START_ROW);
@@ -71,9 +71,9 @@ error_manager_error_code_te display_init()
   return ERROR_CODE_NO_ERROR;
 }
 
-error_manager_error_code_te display_displayData(data_router_data_ts data)
+control_error_code_te display_displayData(control_data_ts data)
 {
-  error_manager_error_code_te error_code = ERROR_CODE_INVALID_INPUT_TYPE; // Error code if input type is invalid
+  control_error_code_te error_code = ERROR_CODE_INVALID_INPUT_TYPE; // Error code if input type is invalid
 
   switch(data.input_type)
   {
@@ -102,9 +102,9 @@ error_manager_error_code_te display_displayData(data_router_data_ts data)
 /* *************************************** */
 
 /* STATIC FUNCTIONS IMPLEMENTATIONS */
-static error_manager_error_code_te display_displaySensorMeasurement(sensor_reading_ts sensor_data)
+static control_error_code_te display_displaySensorMeasurement(sensor_reading_ts sensor_data)
 {
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR; // Default Error code
+  control_error_code_te error_code = ERROR_CODE_NO_ERROR; // Default Error code
   bool proceed_with_display = DISPLAY_DONT_PROCEED_WITH_DISPLAY; // Flag to determine if the display should be updated
   char val[DISPLAY_MAX_STRING_LEN]; // Holds the formatted sensor value or indication
 
@@ -156,7 +156,7 @@ static error_manager_error_code_te display_displaySensorMeasurement(sensor_readi
   return error_code;
 }
 
-static error_manager_error_code_te display_displayTime(rtc_reading_ts time_data)
+static control_error_code_te display_displayTime(rtc_reading_ts time_data)
 {
   lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_TIME_ROW);
 
@@ -176,9 +176,9 @@ static error_manager_error_code_te display_displayTime(rtc_reading_ts time_data)
   return ERROR_CODE_NO_ERROR; // Return success error code
 }
 
-static error_manager_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_data)
+static control_error_code_te display_displayI2cScan(i2cScan_reading_ts i2c_scan_data)
 {
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
+  control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
   // Create buffer for display strings
   char display_string[DISPLAY_MAX_STRING_LEN];  // +1 for null terminator

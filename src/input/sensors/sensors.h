@@ -62,14 +62,14 @@ typedef struct
  * This function checks which sensors are defined at compile time and initializes them.
  * If an initialization function fails, an appropriate error code is returned.
  *
- * @return error_manager_error_code_te
+ * @return control_error_code_te
  * - ERROR_CODE_NO_ERROR: All sensors initialized successfully.
  *
  * @note
  * - Each sensor has its own initialization function.
  * - Sensors are included based on preprocessor definitions.
  */
-error_manager_error_code_te sensors_init();
+control_error_code_te sensors_init();
 
 /**
  * Retrieves a sensor reading based on the provided sensor ID.

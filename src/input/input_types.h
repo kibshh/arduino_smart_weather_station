@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include "sensors/sensors_interface/sensors_interface.h"
-#include "../error_manager/error_codes.h"
+#include "../control/control_error_codes.h"
 
 /**
  * Number of bits in a byte.
@@ -78,7 +78,7 @@ typedef struct
 typedef struct
 {
   sensor_reading_ts sensor_reading;
-  error_manager_error_code_te error_code;
+  control_error_code_te error_code;
 } sensor_return_ts;
 /* ***************************************** */
 
@@ -112,7 +112,7 @@ typedef struct
 typedef struct
 {
   rtc_reading_ts rtc_reading;
-  error_manager_error_code_te error_code;
+  control_error_code_te error_code;
 } rtc_return_ts;
 /* ***************************************** */
 
@@ -155,7 +155,7 @@ typedef struct i2cScan_reading
 typedef struct 
 {
   i2cScan_reading_ts i2cScan_reading;
-  error_manager_error_code_te error_code;
+  control_error_code_te error_code;
 } i2cScan_return_ts;
 /* ***************************************** */
 

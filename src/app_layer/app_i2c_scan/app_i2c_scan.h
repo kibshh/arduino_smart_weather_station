@@ -10,7 +10,7 @@
 /* Context structure to manage the state of the I2C scanner operation */
 typedef struct
 {
-    data_router_input_data_ts i2c_scan_return; // Stores the result of the I2C scan operation
+    control_input_data_ts i2c_scan_return; // Stores the result of the I2C scan operation
     bool run_i2c_scanner;                      // Flag indicating whether the I2C scanner should be run
 } i2cScan_reading_context_ts;
 

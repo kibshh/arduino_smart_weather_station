@@ -2,8 +2,7 @@
 #define APP_COMMON_H
 
 #include <Arduino.h>
-#include "../data_router/data_router.h"
-#include "../error_manager/error_manager.h"
+#include "../control/control.h"
 
 // Macro to check if a specific output bit is set in the output variable
 // It returns true if the specified bit (bit_mask) is set in the output, otherwise false
@@ -35,7 +34,7 @@ typedef enum
  * Checks for errors and handles them if any occur.
  * @param error_status The error status structure.
  */
-void checkForErrors(error_manager_error_ts error_status);
+void checkForErrors(control_error_ts error_status);
 
 /***
  * Filters out time-dependent outputs from the provided output mask.

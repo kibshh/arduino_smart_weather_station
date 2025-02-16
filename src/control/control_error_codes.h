@@ -1,5 +1,5 @@
-#ifndef ERROR_CODES_H
-#define ERROR_CODES_H
+#ifndef CONTROL_ERROR_CODES_H
+#define CONTROL_ERROR_CODES_H
 
 #include <Arduino.h>
 
@@ -38,6 +38,6 @@ typedef enum
   ERROR_CODE_SERIAL_CONSOLE_INVALID_MEASUREMENT_TYPE,
   ERROR_CODE_SERIAL_CONSOLE_UNKNOWN_I2C_DEVICE_STATUS,
   ERROR_CODE_I2C_SCAN_DATA_NOT_READ
-} error_manager_error_code_te;
+} control_error_code_te;
 
 #endif
