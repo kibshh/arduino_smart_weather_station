@@ -17,7 +17,9 @@
 typedef enum
 {
     INPUT_SENSORS,     /**< Input for sensors. */
+#ifdef RTC_COMPONENT
     INPUT_RTC,         /**< Input for the Real-Time Clock (RTC). */
+#endif
     INPUT_I2C_SCAN,    /**< Input for I2C address scanning. */
     INPUT_ERROR        /**< Input for error. */
 } control_input_te;
@@ -30,8 +32,12 @@ typedef enum
  */
 typedef enum
 {
+#ifdef LCD_DISPLAY_COMPONENT
     OUTPUT_DISPLAY,         /**< Output component for a display device. */
+#endif
+#ifdef SERIAL_CONSOLE_COMPONENT
     OUTPUT_SERIAL_CONSOLE   /**< Output component for the serial console. */
+#endif
 } control_output_component_te;
 
 /**

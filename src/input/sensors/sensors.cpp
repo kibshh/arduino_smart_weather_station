@@ -98,39 +98,53 @@ const sensors_functional_catalog_ts sensors_functional_catalog[] PROGMEM =
 /* *************************************** */
 
 /* EXPORTED FUNCTIONS */
-control_error_code_te sensors_init()
+control_error_code_te sensors_init(uint8_t sensor)
 {
-  control_error_code_te error_code = ERROR_CODE_NO_ERROR;
-
-#if defined(DHT11_TEMPERATURE) || defined(DHT11_HUMIDITY)
-  dht11_init();
-#endif
-#if defined(BMP280_PRESSURE) || defined(BMP280_TEMPERATURE) || defined(BMP280_ALTITUDE)
-  if(!bmp280_init())
+  switch(sensor)
   {
-    error_code = ERROR_CODE_SENSORS_INIT_BMP280;
-  }
-#endif
-#if defined(BH1750_LUMINANCE)
-  if(!bh1750_init())
-  {
-    error_code = ERROR_CODE_SENSORS_INIT_BH1750;
-  }
-#endif
-#if defined(MQ135_PPM)
-  mq135_init();
-#endif
-#if defined(MQ7_COPPM)
-  mq7_init();
-#endif
-#if defined(GYML8511_UV)
-  gy_ml8511_init();
-#endif
-#if defined(ARDUINORAIN_RAINING)
-  arduino_rain_sensor_init();
-#endif
+    // DHT11
+    case DHT11_COMPONENT:
+      dht11_init();
+      return ERROR_CODE_NO_ERROR;
 
-  return error_code;
+    // BMP280
+    case BMP280_COMPONENT:
+      if(!bmp280_init())
+      {
+        return ERROR_CODE_INIT_FAILED;
+      }
+      return ERROR_CODE_NO_ERROR;
+    
+    // BH1750
+    case BH1750_COMPONENT:
+      if(!bh1750_init())
+      {
+        return ERROR_CODE_INIT_FAILED;
+      }
+      return ERROR_CODE_NO_ERROR;
+
+    // MQ135
+    case MQ135_COMPONENT:
+      mq135_init();
+      return ERROR_CODE_NO_ERROR;
+
+    // MQ7
+    case MQ7_COMPONENT:
+      mq7_init();
+      return ERROR_CODE_NO_ERROR;
+
+    // GYML8511
+    case GYML8511_COMPONENT:
+      gy_ml8511_init();
+      return ERROR_CODE_NO_ERROR;
+
+    // ARDUINO RAIN SENSOR
+    case ARDUINORAIN_COMPONENT:
+      arduino_rain_sensor_init();
+      return ERROR_CODE_NO_ERROR;
+  }
+
+  return ERROR_CODE_INIT_FAILED;
 }
 
 sensor_return_ts sensors_getReading(uint8_t id)

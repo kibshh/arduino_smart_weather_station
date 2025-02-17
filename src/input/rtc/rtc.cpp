@@ -11,7 +11,7 @@ control_error_code_te rtc_init()
 
   if (!rtc.begin()) 
   {
-    error_code = ERROR_CODE_RTC_INIT_FAILED;
+    error_code = ERROR_CODE_INIT_FAILED;
   }
 
   if (rtc.lostPower()) // When time needs to be set on a new device, or after a power loss

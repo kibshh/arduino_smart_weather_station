@@ -9,6 +9,40 @@
 #include "../output/serial_console/serial_console.h"
 #include "control_types.h"
 
+/** Index for components that are used in the system. */
+#define CONTROL_COMPONENTS_STATUS_USED_INDEX     (uint8_t)(0u)
+
+/** Index for components that are currently functioning. */
+#define CONTROL_COMPONENTS_STATUS_WORKING_INDEX  (uint8_t)(1u)
+
+/** Total number of component status entries. */
+#define CONTROL_COMPONENTS_STATUS_SIZE           (uint8_t)(2u)
+
+
+/**
+ * @brief Structure to track the status of system components.
+ *
+ * This structure contains bit fields where each bit represents the status of a specific component.  
+ * A bit set to 1 indicates that the component is in use or functioning, while a bit set to 0 indicates it is not.
+ *
+ * Fields:
+ * - `sensors_status` (uint64_t):  
+ *   - Each bit (0-63) represents the status of a sensor.  
+ *   - Supports up to 64 different sensors.
+ * - `other_inputs_status` (uint8_t):  
+ *   - Each bit (0-7) represents the status of other input components (e.g., RTC, buttons, etc.).  
+ *   - Supports up to 8 different other input components.
+ * - `outputs_status` (uint8_t):  
+ *   - Each bit (0-7) represents the status of output components (e.g., display, serial console, etc.).  
+ *   - Supports up to 8 different output components.
+ */
+typedef struct
+{
+    uint64_t sensors_status;
+    uint8_t other_inputs_status;
+    uint8_t outputs_status;
+} components_status_ts;
+
 /**
  * Structure for managing the dual output of data fetching operations.
  *
@@ -28,6 +62,15 @@ typedef struct
     control_data_ts data;             /**< The fetched data for output forwarding. */
     control_error_ts error_msg; /**< The error message for the Error Manager. */
 } control_input_data_ts;
+
+/**
+ * @brief Initializes all enabled system components.
+ *
+ * This function initializes various system components such as the serial console, 
+ * display, RTC, and multiple sensors. It updates the status of each component, 
+ * marking them as used and verifying if they are working after initialization.
+ */
+void control_init();
 
 /**
  * @brief Routes data to the specified output component.

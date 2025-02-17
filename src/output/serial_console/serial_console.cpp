@@ -50,7 +50,7 @@ control_error_code_te serial_console_init()
     // Check if serial is available but don't block program execution.
     if (!Serial) {
         // Return an error code if serial is not available.
-        return ERROR_CODE_SERIAL_CONSOLE_INIT_FAILED;
+        return ERROR_CODE_INIT_FAILED;
     }
     // If no error occurred during initialization, return success code.
     return ERROR_CODE_NO_ERROR;

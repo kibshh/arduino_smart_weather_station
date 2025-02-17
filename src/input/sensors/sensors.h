@@ -5,25 +5,25 @@
 #include <avr/pgmspace.h>
 #include "../input_types.h"
 #include "sensors_interface/sensors_interface.h"
-#if defined(DHT11_TEMPERATURE) || defined(DHT11_HUMIDITY)
+#ifdef DHT11_COMPONENT
 #include "sensor_library/dht11/dht11.h"
 #endif
-#if defined(BMP280_PRESSURE) || defined(BMP280_TEMPERATURE) || defined(BMP280_ALTITUDE)
+#ifdef BMP280_COMPONENT
 #include "sensor_library/bmp280/bmp280.h"
 #endif
-#if defined(BH1750_LUMINANCE)
+#ifdef BH1750_COMPONENT
 #include "sensor_library/bh1750/bh1750.h"
 #endif
-#if defined(GYML8511_UV)
+#ifdef GYML8511_COMPONENT
 #include "sensor_library/gy_ml8511/gy_ml8511.h"
 #endif
-#if defined(MQ135_PPM)
+#ifdef MQ135_COMPONENT
 #include "sensor_library/mq135/mq135.h"
 #endif
-#if defined(MQ7_COPPM)
+#ifdef MQ7_COMPONENT
 #include "sensor_library/mq7/mq7.h"
 #endif
-#if defined(ARDUINORAIN_RAINING)
+#ifdef ARDUINORAIN_COMPONENT
 #include "sensor_library/arduino_rain_sensor/arduino_rain_sensor.h"
 #endif
 
@@ -63,19 +63,19 @@ typedef struct
 } sensors_functional_catalog_ts;
 
 /**
- * @brief Initializes all configured sensors based on their compile-time definitions.
+ * @brief Initializes a specific sensor.
  *
- * This function checks which sensors are defined at compile time and initializes them.
- * If an initialization function fails, an appropriate error code is returned.
+ * This function initializes a sensor.
+ * If the initialization fails for certain sensors (e.g., BMP280, BH1750), 
+ * an error code is returned. Otherwise, it returns a success code.
  *
- * @return control_error_code_te
- * - ERROR_CODE_NO_ERROR: All sensors initialized successfully.
+ * @param sensor Sensor to initialize.
  *
- * @note
- * - Each sensor has its own initialization function.
- * - Sensors are included based on preprocessor definitions.
+ * @return control_error_code_te 
+ *         - ERROR_CODE_NO_ERROR if initialization succeeds.
+ *         - ERROR_CODE_INIT_FAILED if initialization fails.
  */
-control_error_code_te sensors_init();
+control_error_code_te sensors_init(uint8_t sensor);
 
 /**
  * Retrieves a sensor reading based on the provided sensor ID.

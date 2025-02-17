@@ -1,5 +1,9 @@
 #include "control.h"
 
+/* STATIC GLOBAL VARIABLES */
+static components_status_ts components_status[CONTROL_COMPONENTS_STATUS_SIZE] = {0};
+/* *************************************** */
+
 /* STATIC FUNCTION PROTOTYPES */
 /**
  * @brief error to the specified output component.
@@ -41,9 +45,74 @@ static control_input_data_ts initializeInputReturnData(control_input_te input_co
  * @return control_error_ts The initialized error message structure.
  */
 static control_error_ts initializeOutputReturnErrorMsg(control_output_component_te output_component, control_input_data_ts data);
+
+/**
+ * @brief Initializes a sensor and updates its status.
+ *
+ * This function marks the specified sensor as used and attempts to initialize it.
+ * If initialization is successful, the sensor is also marked as working.
+ *
+ * @param sensor The sensor ID to initialize.
+ */
+static void initSensor(uint8_t sensor);
 /* *************************************** */
 
 /* EXPORTED FUNCTIONS */
+void control_init()
+{
+#ifdef SERIAL_CONSOLE_COMPONENT
+    components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].outputs_status |= (1 << SERIAL_CONSOLE_COMPONENT);
+    if(ERROR_CODE_NO_ERROR == serial_console_init())
+    {
+        components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].outputs_status |= (1 << SERIAL_CONSOLE_COMPONENT);
+    }
+#endif  
+
+#ifdef LCD_DISPLAY_COMPONENT
+    components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].outputs_status |= (1 << LCD_DISPLAY_COMPONENT);
+    if(ERROR_CODE_NO_ERROR == display_init())
+    {
+        components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].outputs_status |= (1 << LCD_DISPLAY_COMPONENT);
+    }
+#endif  
+
+#ifdef RTC_COMPONENT
+    components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].other_inputs_status |= (1 << RTC_COMPONENT);
+    if(ERROR_CODE_NO_ERROR == rtc_init())
+    {
+        components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].other_inputs_status |= (1 << RTC_COMPONENT);
+    }
+#endif  
+
+#ifdef DHT11_COMPONENT
+    initSensor(DHT11_COMPONENT);
+#endif
+
+#ifdef BMP280_COMPONENT
+    initSensor(BMP280_COMPONENT);
+#endif
+
+#ifdef BH1750_COMPONENT
+    initSensor(BH1750_COMPONENT);
+#endif
+
+#ifdef MQ135_COMPONENT
+    initSensor(MQ135_COMPONENT);
+#endif
+
+#ifdef MQ7_COMPONENT
+    initSensor(MQ7_COMPONENT);
+#endif
+
+#ifdef GYML8511_COMPONENT
+    initSensor(GYML8511_COMPONENT);
+#endif
+
+#ifdef ARDUINORAIN_COMPONENT
+    initSensor(ARDUINORAIN_COMPONENT);
+#endif
+}
+
 control_error_ts control_routeDataToOutput(control_output_component_te output_component, control_input_data_ts data)
 {
     // Initialize error message with default values
@@ -173,5 +242,14 @@ static control_error_ts initializeOutputReturnErrorMsg(control_output_component_
     error_msg.component.output_error.input_id = data.data.input_id;
 
     return error_msg;
+}
+
+static void initSensor(uint8_t sensor)
+{
+    components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].sensors_status |= (1 << sensor);
+    if(ERROR_CODE_NO_ERROR == sensors_init(sensor))
+    {
+        components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].sensors_status |= (1 << sensor);
+    }
 }
 /* *************************************** */

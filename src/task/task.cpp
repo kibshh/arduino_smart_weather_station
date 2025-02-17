@@ -13,23 +13,7 @@ static size_t getNumOfTasks();
 
 void task_initTask()
 {
-  control_error_code_te error_code = ERROR_CODE_NO_ERROR; // Default Error code if every init goes correct
 
-  Wire.begin(); // I2C initialization - unconditionally called, as it is used by many components.
-
-#ifdef OUTPUT_SERIAL_MONITOR_USED
-  error_code = serial_console_init();
-#endif
-#ifdef OUTPUT_LCD_DISPLAY_USED
-  error_code = display_init();
-#endif
-#ifdef INPUT_SENSORS_USED
-  error_code = sensors_init();
-#endif
-#ifdef INPUT_RTC_USED
-  error_code = rtc_init();
-#endif
-  /* Needs to check error_code with error manager */
 }
 
 void task_cyclicTask()
