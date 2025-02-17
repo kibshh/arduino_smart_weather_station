@@ -55,62 +55,50 @@ static control_error_ts initializeOutputReturnErrorMsg(control_output_component_
  * @param sensor The sensor ID to initialize.
  */
 static void initSensor(uint8_t sensor);
+
+/**
+ * @brief Selects uninitialized components by performing a bitwise XOR operation 
+ *        between the "used" and "working" component status.
+ * 
+ * This function calculates which components are uninitialized by taking the 
+ * XOR of the status fields from two different indices in the components_status array:
+ * - CONTROL_COMPONENTS_STATUS_USED_INDEX: Represents the components that should be in use.
+ * - CONTROL_COMPONENTS_STATUS_WORKING_INDEX: Represents the components that are currently working.
+ * 
+ * The XOR operation identifies bits that differ, effectively marking components 
+ * that are either missing or uninitialized.
+ * 
+ * @return components_status_ts A structure containing the uninitialized components' status.
+ */
+static components_status_ts selectUninitialized();
+
+/**
+ * @brief Initializes or reinitializes system components.
+ * 
+ * This function handles the initialization of all system components, including
+ * outputs (such as serial console and LCD display), inputs (such as RTC), and 
+ * sensors (such as DHT11, BMP280, MQ135, etc.). If reinitialization is requested, 
+ * it selectively reinitializes only the components that were not successfully 
+ * initialized previously.
+ * 
+ * @param reinit Flag to determine whether this is the first initialization 
+ *               (CONTROL_FIRST_INIT) or a reinitialization attempt (CONTROL_REINIT).
+ * 
+ * @return CONTROL_INITIALIZATION_SUCCESSFUL if all components are successfully 
+ *         initialized, otherwise CONTROL_INITIALIZATION_FAILED.
+ */
+static bool control_initialize(bool reinit);
 /* *************************************** */
 
 /* EXPORTED FUNCTIONS */
-void control_init()
+bool control_init()
 {
-#ifdef SERIAL_CONSOLE_COMPONENT
-    components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].outputs_status |= (1 << SERIAL_CONSOLE_COMPONENT);
-    if(ERROR_CODE_NO_ERROR == serial_console_init())
-    {
-        components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].outputs_status |= (1 << SERIAL_CONSOLE_COMPONENT);
-    }
-#endif  
+    return control_initialize(CONTROL_FIRST_INIT);
+}
 
-#ifdef LCD_DISPLAY_COMPONENT
-    components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].outputs_status |= (1 << LCD_DISPLAY_COMPONENT);
-    if(ERROR_CODE_NO_ERROR == display_init())
-    {
-        components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].outputs_status |= (1 << LCD_DISPLAY_COMPONENT);
-    }
-#endif  
-
-#ifdef RTC_COMPONENT
-    components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].other_inputs_status |= (1 << RTC_COMPONENT);
-    if(ERROR_CODE_NO_ERROR == rtc_init())
-    {
-        components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].other_inputs_status |= (1 << RTC_COMPONENT);
-    }
-#endif  
-
-#ifdef DHT11_COMPONENT
-    initSensor(DHT11_COMPONENT);
-#endif
-
-#ifdef BMP280_COMPONENT
-    initSensor(BMP280_COMPONENT);
-#endif
-
-#ifdef BH1750_COMPONENT
-    initSensor(BH1750_COMPONENT);
-#endif
-
-#ifdef MQ135_COMPONENT
-    initSensor(MQ135_COMPONENT);
-#endif
-
-#ifdef MQ7_COMPONENT
-    initSensor(MQ7_COMPONENT);
-#endif
-
-#ifdef GYML8511_COMPONENT
-    initSensor(GYML8511_COMPONENT);
-#endif
-
-#ifdef ARDUINORAIN_COMPONENT
-    initSensor(ARDUINORAIN_COMPONENT);
-#endif
+bool control_reinit()
+{
+    return control_initialize(CONTROL_REINIT);
 }
 
 control_error_ts control_routeDataToOutput(control_output_component_te output_component, control_input_data_ts data)
@@ -251,5 +239,119 @@ static void initSensor(uint8_t sensor)
     {
         components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].sensors_status |= (1 << sensor);
     }
+}
+
+static components_status_ts selectUninitialized()
+{
+    // Initialize return structure with all fields set to zero
+    components_status_ts return_status_struct = {0};
+
+    // Compute XOR between "used" and "working" statuses to identify uninitialized components
+    return_status_struct.outputs_status = components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].outputs_status ^ 
+                                          components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].outputs_status;
+
+    return_status_struct.other_inputs_status = components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].other_inputs_status ^ 
+                                               components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].other_inputs_status;
+
+    return_status_struct.sensors_status = components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].sensors_status ^ 
+                                          components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].sensors_status;
+
+    return return_status_struct;
+}
+
+static bool control_initialize(bool reinit)
+{
+    // Re-check uninitialized components if reinitializing
+    components_status_ts uninitialized_components;
+    if (CONTROL_REINIT == reinit)
+    {
+        uninitialized_components = selectUninitialized();
+    }
+
+#ifdef SERIAL_CONSOLE_COMPONENT
+    if (CONTROL_FIRST_INIT == reinit || CONTROL_COMPONENT_INITIALIZED != (uninitialized_components.outputs_status & (1 << SERIAL_CONSOLE_COMPONENT)))
+    {
+        components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].outputs_status |= (1 << SERIAL_CONSOLE_COMPONENT);
+        if (ERROR_CODE_NO_ERROR == serial_console_init())
+        {
+            components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].outputs_status |= (1 << SERIAL_CONSOLE_COMPONENT);
+        }
+    }
+#endif  
+
+#ifdef LCD_DISPLAY_COMPONENT
+    if (CONTROL_FIRST_INIT == reinit || CONTROL_COMPONENT_INITIALIZED != (uninitialized_components.outputs_status & (1 << LCD_DISPLAY_COMPONENT)))
+    {
+        components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].outputs_status |= (1 << LCD_DISPLAY_COMPONENT);
+        if (ERROR_CODE_NO_ERROR == display_init())
+        {
+            components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].outputs_status |= (1 << LCD_DISPLAY_COMPONENT);
+        }
+    }
+#endif  
+
+#ifdef RTC_COMPONENT
+    if (CONTROL_FIRST_INIT == reinit || CONTROL_COMPONENT_INITIALIZED != (uninitialized_components.other_inputs_status & (1 << RTC_COMPONENT)))
+    {
+        components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].other_inputs_status |= (1 << RTC_COMPONENT);
+        if (ERROR_CODE_NO_ERROR == rtc_init())
+        {
+            components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].other_inputs_status |= (1 << RTC_COMPONENT);
+        }
+    }
+#endif  
+
+#ifdef DHT11_COMPONENT
+    if (CONTROL_FIRST_INIT == reinit || CONTROL_COMPONENT_INITIALIZED != (uninitialized_components.sensors_status & (1 << DHT11_COMPONENT)))
+    {
+        initSensor(DHT11_COMPONENT);
+    }
+#endif
+#ifdef BMP280_COMPONENT
+    if (CONTROL_FIRST_INIT == reinit || CONTROL_COMPONENT_INITIALIZED != (uninitialized_components.sensors_status & (1 << BMP280_COMPONENT)))
+    {
+        initSensor(BMP280_COMPONENT);
+    }
+#endif
+#ifdef BH1750_COMPONENT
+    if (CONTROL_FIRST_INIT == reinit || CONTROL_COMPONENT_INITIALIZED != (uninitialized_components.sensors_status & (1 << BH1750_COMPONENT)))
+    {
+        initSensor(BH1750_COMPONENT);
+    }
+#endif
+#ifdef MQ135_COMPONENT
+    if (CONTROL_FIRST_INIT == reinit || CONTROL_COMPONENT_INITIALIZED != (uninitialized_components.sensors_status & (1 << MQ135_COMPONENT)))
+    {
+        initSensor(MQ135_COMPONENT);
+    }
+#endif
+#ifdef MQ7_COMPONENT
+    if (CONTROL_FIRST_INIT == reinit || CONTROL_COMPONENT_INITIALIZED != (uninitialized_components.sensors_status & (1 << MQ7_COMPONENT)))
+    {
+        initSensor(MQ7_COMPONENT);
+    }
+#endif
+#ifdef GYML8511_COMPONENT
+    if (CONTROL_FIRST_INIT == reinit || CONTROL_COMPONENT_INITIALIZED != (uninitialized_components.sensors_status & (1 << GYML8511_COMPONENT)))
+    {
+        initSensor(GYML8511_COMPONENT);
+    }
+#endif
+#ifdef ARDUINORAIN_COMPONENT
+    if (CONTROL_FIRST_INIT == reinit || CONTROL_COMPONENT_INITIALIZED != (uninitialized_components.sensors_status & (1 << ARDUINORAIN_COMPONENT)))
+    {
+        initSensor(ARDUINORAIN_COMPONENT);
+    }
+#endif
+
+    // Check initialization status
+    uninitialized_components = selectUninitialized();
+    if (uninitialized_components.outputs_status == CONTROL_ALL_INITIALIZED &&
+            uninitialized_components.other_inputs_status == CONTROL_ALL_INITIALIZED &&
+            uninitialized_components.sensors_status == CONTROL_ALL_INITIALIZED)
+    {
+        return CONTROL_INITIALIZATION_SUCCESSFUL;
+    }
+    return CONTROL_INITIALIZATION_FAILED;
 }
 /* *************************************** */

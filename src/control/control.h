@@ -9,15 +9,32 @@
 #include "../output/serial_console/serial_console.h"
 #include "control_types.h"
 
-/** Index for components that are used in the system. */
+/* Index for components that are used in the system. */
 #define CONTROL_COMPONENTS_STATUS_USED_INDEX     (uint8_t)(0u)
 
-/** Index for components that are currently functioning. */
+/* Index for components that are currently functioning. */
 #define CONTROL_COMPONENTS_STATUS_WORKING_INDEX  (uint8_t)(1u)
 
-/** Total number of component status entries. */
+/* Total number of component status entries. */
 #define CONTROL_COMPONENTS_STATUS_SIZE           (uint8_t)(2u)
 
+/* Macro defining a value (0) indicating all components are initialized */
+#define CONTROL_ALL_INITIALIZED                  (uint8_t)(0u)
+
+/* Macro defining a value (0) indicating component is initialized */
+#define CONTROL_COMPONENT_INITIALIZED            (uint8_t)(0u)
+
+/* Macro indicating successful initialization */
+#define CONTROL_INITIALIZATION_SUCCESSFUL        (bool)(true)
+
+/* Macro indicating failed initialization */
+#define CONTROL_INITIALIZATION_FAILED            (bool)(false)
+
+/* Macro used for first initialization */
+#define CONTROL_FIRST_INIT                       (bool)(false)
+
+/* Macro used for reinitialization */
+#define CONTROL_REINIT                           (bool)(true)
 
 /**
  * @brief Structure to track the status of system components.
@@ -64,13 +81,26 @@ typedef struct
 } control_input_data_ts;
 
 /**
- * @brief Initializes all enabled system components.
- *
- * This function initializes various system components such as the serial console, 
- * display, RTC, and multiple sensors. It updates the status of each component, 
- * marking them as used and verifying if they are working after initialization.
+ * @brief Performs the first-time initialization of all system components.
+ * 
+ * Calls the control_initialize function with CONTROL_FIRST_INIT to initialize 
+ * all outputs, inputs, and sensors from a fresh state.
+ * 
+ * @return CONTROL_INITIALIZATION_SUCCESSFUL if all components initialize correctly, 
+ *         otherwise CONTROL_INITIALIZATION_FAILED.
  */
-void control_init();
+bool control_init();
+
+/**
+ * @brief Attempts to reinitialize any uninitialized system components.
+ * 
+ * Calls the control_initialize function with CONTROL_REINIT to check for and 
+ * reattempt initialization of components that failed during the initial startup.
+ * 
+ * @return CONTROL_INITIALIZATION_SUCCESSFUL if all components are successfully 
+ *         initialized after reattempt, otherwise CONTROL_INITIALIZATION_FAILED.
+ */
+bool control_reinit();
 
 /**
  * @brief Routes data to the specified output component.
