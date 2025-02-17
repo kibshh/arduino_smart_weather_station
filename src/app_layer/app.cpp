@@ -2,13 +2,12 @@
 #include "app_common.h"
 
 /* EXPORTED FUNCTIONS */
-void checkForErrors(control_error_ts error_status)
+void checkForErrors(control_error_code_te error_code, control_component_te component, uint8_t component_id)
 {
     // If an error occurred, handle it
-    if(ERROR_CODE_NO_ERROR != error_status.error_code)
+    if(ERROR_CODE_NO_ERROR != error_code)
     {
-        // Uncomment when error handler is finished
-        // control_handleError(error_status);
+        control_handleError(error_code, component, component_id);
     }
 }
 

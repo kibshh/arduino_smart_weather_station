@@ -41,14 +41,18 @@ typedef enum
 } task_status_te;
 
 /**
- * @brief Checks for errors and handles them if present.
+ * @brief Checks for errors and triggers error handling if needed.
  *
- * Evaluates the given error status and, if an error is detected, 
- * invokes the appropriate error handling mechanism.
+ * This function evaluates the provided error code and, if an error is detected,  
+ * calls the error handling mechanism with the corresponding component and ID.  
+ * It ensures that errors are properly processed and logged for diagnostics.
  *
- * @param error_status The error status to check.
+ * @param error_code   The error code to check.
+ * @param component    The component associated with the error.
+ * @param component_id The unique identifier of the component.
  */
-void checkForErrors(control_error_ts error_status);
+void checkForErrors(control_error_code_te error_code, control_component_te component, uint8_t component_id);
+
 
 /**
  * @brief Filters out time-dependent outputs.

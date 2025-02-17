@@ -19,7 +19,7 @@ static components_status_ts components_status[CONTROL_COMPONENTS_STATUS_SIZE] = 
  * @return An error message of type `control_error_ts` indicating the
  *         status of the routing operation.
  */
-static control_error_ts routeErrorToOutput(control_output_component_te output_component,
+static control_error_ts routeErrorToOutput(control_component_te output_component,
                                            control_error_ts error_msg);
 
 /**
@@ -32,7 +32,7 @@ static control_error_ts routeErrorToOutput(control_output_component_te output_co
  * @param component_id The unique identifier of the input component.
  * @return control_input_data_ts The initialized return data structure.
  */
-static control_input_data_ts initializeInputReturnData(control_input_te input_component, uint8_t component_id);
+static control_input_data_ts initializeInputReturnData(control_component_te input_component, uint8_t component_id);
 
 /**
  * @brief Initializes an error message for output routing failures.
@@ -41,10 +41,9 @@ static control_input_data_ts initializeInputReturnData(control_input_te input_co
  * associates it with the specified output component and input data details.
  *
  * @param output_component The output component where the error occurred.
- * @param data The input data associated with the error.
- * @return control_error_ts The initialized error message structure.
+ * @return control_output_data_ts The initialized output error message structure.
  */
-static control_error_ts initializeOutputReturnErrorMsg(control_output_component_te output_component, control_input_data_ts data);
+static control_output_data_ts initializeOutputReturnErrorMsg(control_component_te output_component);
 
 /**
  * @brief Initializes a sensor and updates its status.
@@ -101,36 +100,28 @@ bool control_reinit()
     return control_initialize(CONTROL_REINIT);
 }
 
-control_error_ts control_routeDataToOutput(control_output_component_te output_component, control_input_data_ts data)
+control_output_data_ts control_routeDataToOutput(control_component_te output_component, control_data_ts data)
 {
     // Initialize error message with default values
-    control_error_ts error_msg = initializeOutputReturnErrorMsg(output_component, data);
+    control_output_data_ts error_msg = initializeOutputReturnErrorMsg(output_component);
 
-    if (ERROR_CODE_NO_ERROR != data.error_msg.error_code)
+    switch (output_component)
     {
-        switch (output_component)
-        {
-        case OUTPUT_DISPLAY:
-            // Route data to display and update error code
-            error_msg.error_code = display_displayData(data.data);
-            break;
+    case OUTPUT_DISPLAY:
+        // Route data to display and update error code
+        error_msg.error_code = display_displayData(data);
+        break;
 
-        case OUTPUT_SERIAL_CONSOLE:
-            // Route data to serial console and update error code
-            error_msg.error_code = serial_console_displayData(data.data);
-            break;
-
-        default:
-            // Set error code for invalid output
-            error_msg.error_code = ERROR_CODE_INVALID_OUTPUT;
-            break;
-        }
+    case OUTPUT_SERIAL_CONSOLE:
+        // Route data to serial console and update error code
+        error_msg.error_code = serial_console_displayData(data);
+        break;
     }
-    // Default error code is set to ERROR_CODE_OUTPUT_ROUTER_DATA_CONTAINS_ERRORS so there is not need for else statement.
+    // Default error code is set to ERROR_CODE_INVALID_OUTPUT so there is no need to set it in default.
     return error_msg;
 }
 
-control_input_data_ts control_fetchDataFromInput(control_input_te input_component, uint8_t component_id)
+control_input_data_ts control_fetchDataFromInput(control_component_te input_component, uint8_t component_id)
 {
     // Initialize input return data with defaults
     control_input_data_ts return_data = initializeInputReturnData(input_component, component_id);
@@ -140,22 +131,27 @@ control_input_data_ts control_fetchDataFromInput(control_input_te input_componen
     case INPUT_SENSORS:
         // Fetch sensor reading and update return data
         sensor_return_ts sensor_return = sensors_getReading(component_id);
-        return_data.error_msg.error_code = sensor_return.error_code;
+        return_data.error_code = sensor_return.error_code;
+        return_data.data.input_type = INPUT_SENSORS;
+        return_data.data.input_id = component_id;
         return_data.data.input_return.sensor_reading = sensor_return.sensor_reading;
         break;
 
     case INPUT_RTC:
         // Fetch RTC data and update return data
         rtc_return_ts rtc_return = rtc_getTime(component_id);
-        return_data.error_msg.error_code = rtc_return.error_code;
+        return_data.error_code = rtc_return.error_code;
+        return_data.data.input_type = INPUT_RTC;
+        return_data.data.input_id = component_id;
         return_data.data.input_return.rtc_reading = rtc_return.rtc_reading;
         break;
 
     case INPUT_I2C_SCAN:
         // Fetch I2C scan data and update return data
-        uint8_t i2c_addr = component_id;
-        i2c_scan_return_ts i2c_scan_return = i2c_scan_getReading(i2c_addr);
-        return_data.error_msg.error_code = i2c_scan_return.error_code;
+        i2c_scan_return_ts i2c_scan_return = i2c_scan_getReading(component_id);
+        return_data.error_code = i2c_scan_return.error_code;
+        return_data.data.input_type = INPUT_I2C_SCAN;
+        return_data.data.input_id = component_id;
         return_data.data.input_return.i2c_scan_reading = i2c_scan_return.i2c_scan_reading;
         break;
 
@@ -166,21 +162,22 @@ control_input_data_ts control_fetchDataFromInput(control_input_te input_componen
     return return_data;
 }
 
-void control_handleError(control_error_ts error_msg)
+void control_handleError(control_error_code_te error_code, control_component_te component, uint8_t component_id)
 {
-    control_error_ts error_msg_serial = routeErrorToOutput(OUTPUT_SERIAL_CONSOLE, error_msg);
+    control_error_ts error_package = {error_code, component, component_id};
+    control_error_ts error_msg_serial = routeErrorToOutput(OUTPUT_SERIAL_CONSOLE, error_package);
     if (error_msg_serial.error_code != ERROR_CODE_NO_ERROR)
     {
-        routeErrorToOutput(OUTPUT_DISPLAY, error_msg);
+        routeErrorToOutput(OUTPUT_DISPLAY, error_package);
     }
 }
 /* *************************************** */
 
 /* STATIC FUNCTIONS IMPLEMENTATIONS */
-static control_error_ts routeErrorToOutput(control_output_component_te output_component, control_error_ts error_msg)
+static control_error_ts routeErrorToOutput(control_component_te output_component, control_error_ts error_msg)
 {
     control_data_ts data;
-    data.input_id = ERROR_INPUT_ID_UNUSED;
+    data.input_id = CONTROL_ID_UNUSED;
     data.input_type = INPUT_ERROR;
     data.input_return.error_msg = error_msg;
 
@@ -189,6 +186,8 @@ static control_error_ts routeErrorToOutput(control_output_component_te output_co
     case OUTPUT_DISPLAY:
         // Route data to display and update error code
         error_msg.error_code = display_displayData(data);
+        error_msg.component = OUTPUT_DISPLAY;
+        error_msg.component_id = CONTROL_ID_UNUSED;
         break;
 
     case OUTPUT_SERIAL_CONSOLE:
@@ -204,7 +203,7 @@ static control_error_ts routeErrorToOutput(control_output_component_te output_co
     return error_msg;
 }
 
-static control_input_data_ts initializeInputReturnData(control_input_te input_component, uint8_t component_id)
+static control_input_data_ts initializeInputReturnData(control_component_te input_component, uint8_t component_id)
 {
     control_input_data_ts return_data;
 
@@ -213,21 +212,17 @@ static control_input_data_ts initializeInputReturnData(control_input_te input_co
     return_data.data.input_id = component_id;
 
     // Initialize error part
-    return_data.error_msg.error_code = ERROR_CODE_INVALID_INPUT;
-    return_data.error_msg.component.input_error.input_component = input_component;
-    return_data.error_msg.component.input_error.input_id = component_id;
+    return_data.error_code = ERROR_CODE_INVALID_INPUT;
 
     return return_data;
 }
 
-static control_error_ts initializeOutputReturnErrorMsg(control_output_component_te output_component, control_input_data_ts data)
+static control_output_data_ts initializeOutputReturnErrorMsg(control_component_te output_component)
 {
     // Initialize the error message with default values
-    control_error_ts error_msg;
-    error_msg.error_code = ERROR_CODE_OUTPUT_ROUTER_DATA_CONTAINS_ERRORS;
-    error_msg.component.output_error.output_component = output_component;
-    error_msg.component.output_error.input_type = data.data.input_type;
-    error_msg.component.output_error.input_id = data.data.input_id;
+    control_output_data_ts error_msg;
+    error_msg.error_code = ERROR_CODE_INVALID_OUTPUT;
+    error_msg.output_type = output_component;
 
     return error_msg;
 }
@@ -235,16 +230,14 @@ static control_error_ts initializeOutputReturnErrorMsg(control_output_component_
 static void initSensor(uint8_t sensor)
 {
     components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].sensors_status |= (1 << sensor);
-    if(ERROR_CODE_NO_ERROR == sensors_init(sensor))
+    control_error_code_te error_code = sensors_init(sensor);
+    if(ERROR_CODE_NO_ERROR == error_code)
     {
         components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].sensors_status |= (1 << sensor);
     }
     else
     {
-        error_msg.io_flag = CONTROL_INPUT_ERROR;
-        error_msg.component.input_error.input_component = INPUT_SENSORS;
-        error_msg.component.input_error.input_id = sensor;
-        control_handleError(error_msg);
+        control_handleError(error_code, INPUT_SENSORS, sensor);
     }
 }
 
@@ -268,9 +261,7 @@ static components_status_ts selectUninitialized()
 
 static bool control_initialize(bool reinit)
 {
-    control_error_ts error_msg;
-    error_msg.error_code = ERROR_CODE_INIT_FAILED;
-
+    control_error_code_te error_code = ERROR_CODE_INIT_FAILED;
 
     // Re-check uninitialized components if reinitializing
     components_status_ts uninitialized_components;
@@ -283,15 +274,16 @@ static bool control_initialize(bool reinit)
     if (CONTROL_FIRST_INIT == reinit || CONTROL_COMPONENT_INITIALIZED != (uninitialized_components.outputs_status & (1 << SERIAL_CONSOLE_COMPONENT)))
     {
         components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].outputs_status |= (1 << SERIAL_CONSOLE_COMPONENT);
-        if (ERROR_CODE_NO_ERROR == serial_console_init())
+
+        error_code = serial_console_init();
+
+        if (ERROR_CODE_NO_ERROR == error_code)
         {
             components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].outputs_status |= (1 << SERIAL_CONSOLE_COMPONENT);
         }
         else
         {
-            error_msg.io_flag = CONTROL_OUTPUT_ERROR;
-            error_msg.component.output_error.output_component = OUTPUT_SERIAL_CONSOLE;
-            control_handleError(error_msg);
+            control_handleError(error_code, OUTPUT_SERIAL_CONSOLE, CONTROL_ID_UNUSED);
         }
     }
 #endif  
@@ -300,15 +292,16 @@ static bool control_initialize(bool reinit)
     if (CONTROL_FIRST_INIT == reinit || CONTROL_COMPONENT_INITIALIZED != (uninitialized_components.outputs_status & (1 << LCD_DISPLAY_COMPONENT)))
     {
         components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].outputs_status |= (1 << LCD_DISPLAY_COMPONENT);
-        if (ERROR_CODE_NO_ERROR == display_init())
+
+        error_code = display_init();
+
+        if (ERROR_CODE_NO_ERROR == error_code)
         {
             components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].outputs_status |= (1 << LCD_DISPLAY_COMPONENT);
         }
         else
         {
-            error_msg.io_flag = CONTROL_OUTPUT_ERROR;
-            error_msg.component.output_error.output_component = OUTPUT_DISPLAY;
-            control_handleError(error_msg);
+            control_handleError(error_code, OUTPUT_DISPLAY, CONTROL_ID_UNUSED);
         }
     }
 #endif  
@@ -317,15 +310,16 @@ static bool control_initialize(bool reinit)
     if (CONTROL_FIRST_INIT == reinit || CONTROL_COMPONENT_INITIALIZED != (uninitialized_components.other_inputs_status & (1 << RTC_COMPONENT)))
     {
         components_status[CONTROL_COMPONENTS_STATUS_USED_INDEX].other_inputs_status |= (1 << RTC_COMPONENT);
-        if (ERROR_CODE_NO_ERROR == rtc_init())
+
+        error_code = rtc_init();
+
+        if (ERROR_CODE_NO_ERROR == error_code)
         {
             components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].other_inputs_status |= (1 << RTC_COMPONENT);
         }
         else
         {
-            error_msg.io_flag = CONTROL_INPUT_ERROR;
-            error_msg.component.input_error.input_component = INPUT_RTC;
-            control_handleError(error_msg);
+            control_handleError(error_code, INPUT_RTC, RTC_DEFAULT_RTC);
         }
     }
 #endif  

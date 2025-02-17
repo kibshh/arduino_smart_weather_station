@@ -22,7 +22,7 @@ task_status_te app_readAllI2CAddressesPeriodic(output_destination_t output, i2c_
     {
         // Fetch the I2C scan result and check for errors
         context->i2c_scan_return = control_fetchDataFromInput(INPUT_I2C_SCAN, I2C_SCAN_MODE_SCAN_FOR_ALL_DEVICES);
-        checkForErrors(context->i2c_scan_return.error_msg);
+        checkForErrors(context->i2c_scan_return.error_code, INPUT_I2C_SCAN, I2C_SCAN_MODE_SCAN_FOR_ALL_DEVICES);
         // Mark scanner as stopped after fetching the data
         context->run_i2c_scanner = I2C_SCANER_DONT_RUN;
     }
@@ -35,11 +35,13 @@ task_status_te app_readAllI2CAddressesPeriodic(output_destination_t output, i2c_
         {
             if(IS_OUTPUT_INCLUDED(output, LCD_DISPLAY))
             {
-                checkForErrors(control_routeDataToOutput(OUTPUT_DISPLAY, context->i2c_scan_return)); // Send I2C scan address to display output and check for errors
+                 // Send I2C scan address to display output and check for errors
+                checkForErrors(control_routeDataToOutput(OUTPUT_DISPLAY, context->i2c_scan_return.data).error_code, OUTPUT_DISPLAY, CONTROL_ID_UNUSED);
             }
             if(IS_OUTPUT_INCLUDED(output, SERIAL_CONSOLE))
             {
-                checkForErrors(control_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, context->i2c_scan_return)); // Send I2C scan address to serial console output and check for errors
+                // Send I2C scan address to serial console output and check for errors
+                checkForErrors(control_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, context->i2c_scan_return.data).error_code, OUTPUT_SERIAL_CONSOLE, CONTROL_ID_UNUSED);
             }
 
             return NOT_FINISHED;
@@ -58,7 +60,7 @@ task_status_te app_readAllI2CAddressesAtOnce(output_destination_t output)
     {
         // Fetch the I2C scan result and check for errors
         control_input_data_ts i2c_scan_reading_result = control_fetchDataFromInput(INPUT_I2C_SCAN, I2C_SCAN_MODE_SCAN_FOR_ALL_DEVICES);
-        checkForErrors(i2c_scan_reading_result.error_msg);
+        checkForErrors(i2c_scan_reading_result.error_code, INPUT_I2C_SCAN, I2C_SCAN_MODE_SCAN_FOR_ALL_DEVICES);
 
         // Check if an address update function is assigned
         if(I2C_SCAN_NO_ADDRESS_UPDATE_FUNCTION != i2c_scan_reading_result.data.input_return.i2c_scan_reading.update_i2c_address)
@@ -73,11 +75,13 @@ task_status_te app_readAllI2CAddressesAtOnce(output_destination_t output)
                 {
                     if(IS_OUTPUT_INCLUDED(output, LCD_DISPLAY))
                     {
-                        checkForErrors(control_routeDataToOutput(OUTPUT_DISPLAY, i2c_scan_reading_result)); // Send I2C scan address to display output and check for errors
+                        // Send I2C scan address to display output and check for errors
+                        checkForErrors(control_routeDataToOutput(OUTPUT_DISPLAY, i2c_scan_reading_result.data).error_code, OUTPUT_DISPLAY, CONTROL_ID_UNUSED); 
                     }
                     if(IS_OUTPUT_INCLUDED(output, SERIAL_CONSOLE))
                     {
-                        checkForErrors(control_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, i2c_scan_reading_result)); // Send I2C scan address to serial console output and check for errors
+                        // Send I2C scan address to serial console output and check for errors
+                        checkForErrors(control_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, i2c_scan_reading_result.data).error_code, OUTPUT_SERIAL_CONSOLE, CONTROL_ID_UNUSED);
                     }
 
                     attempt_counter++; // Increment the attempt counter after a successful address update
@@ -98,15 +102,17 @@ task_status_te app_readI2CDeviceStatus(uint8_t device_address, output_destinatio
     if(I2C_SCAN_MODE_SCAN_FOR_ALL_DEVICES < device_address)
     {
         control_input_data_ts i2c_device_status_result = control_fetchDataFromInput(INPUT_I2C_SCAN, device_address); // Fetch data from the I2C Scan
-        checkForErrors(i2c_device_status_result.error_msg);
+        checkForErrors(i2c_device_status_result.error_code, INPUT_I2C_SCAN, device_address);
 
         if(IS_OUTPUT_INCLUDED(output, LCD_DISPLAY))
         {
-            checkForErrors(control_routeDataToOutput(OUTPUT_DISPLAY, i2c_device_status_result)); // Send I2C device status data to display output and check for errors
+            // Send I2C device status data to display output and check for errors
+            checkForErrors(control_routeDataToOutput(OUTPUT_DISPLAY, i2c_device_status_result.data).error_code, OUTPUT_DISPLAY, CONTROL_ID_UNUSED);
         }
         if(IS_OUTPUT_INCLUDED(output, SERIAL_CONSOLE))
         {
-            checkForErrors(control_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, i2c_device_status_result)); // Send I2C device status data to serial console output and check for errors
+            // Send I2C device status data to serial console output and check for errors
+            checkForErrors(control_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, i2c_device_status_result.data).error_code, OUTPUT_SERIAL_CONSOLE, CONTROL_ID_UNUSED);
         }   
     }
     return FINISHED; // Return value is used to notify task component

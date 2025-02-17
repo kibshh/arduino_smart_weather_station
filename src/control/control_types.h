@@ -5,8 +5,8 @@
 #include "../input/input_types.h"
 #include "control_error_codes.h"
 
-/* Represents an unused or invalid input ID */
-#define ERROR_INPUT_ID_UNUSED (uint8_t)(0xFF)
+/* Represents an unused or invalid ID */
+#define CONTROL_ID_UNUSED     (uint8_t)(0xFF)
 
 /* Flag indicating error happened in input component */
 #define CONTROL_INPUT_ERROR   (bool)(true)
@@ -15,86 +15,26 @@
 #define CONTROL_OUTPUT_ERROR  (bool)(false)
 
 /**
- * Enum listing all available inputs.
+ * Enum listing all available inputs and outputs.
  *
- * This enumeration defines the possible input sources for data
+ * This enumeration defines the possible inputs and outputs
  * within the data routing system.
  */
 typedef enum
-{
-    INPUT_SENSORS,     /**< Input for sensors. */
+{   
+    INPUT_SENSORS,          /**< Input for sensors. */
 #ifdef RTC_COMPONENT
-    INPUT_RTC,         /**< Input for the Real-Time Clock (RTC). */
+    INPUT_RTC,              /**< Input for the Real-Time Clock (RTC). */
 #endif
-    INPUT_I2C_SCAN,    /**< Input for I2C address scanning. */
-    INPUT_ERROR        /**< Input for error. */
-} control_input_te;
-
-/**
- * Enum listing all available output components.
- *
- * This enumeration defines the possible output destinations where data
- * can be forwarded by the data routing system.
- */
-typedef enum
-{
+    INPUT_I2C_SCAN,         /**< Input for I2C address scanning. */
+    INPUT_ERROR,            /**< Input for error. */
 #ifdef LCD_DISPLAY_COMPONENT
     OUTPUT_DISPLAY,         /**< Output component for a display device. */
 #endif
 #ifdef SERIAL_CONSOLE_COMPONENT
     OUTPUT_SERIAL_CONSOLE   /**< Output component for the serial console. */
 #endif
-} control_output_component_te;
-
-/**
- * Structure representing an error related to an output component.
- * 
- * This structure provides details about errors that occur while routing
- * data to an output component.
- * 
- * Members:
- *  - output_component: The specific output component where the error occurred (e.g., display, serial console).
- *  - input_type: The type of input component associated with the error.
- *  - input_id: The ID of the input component that generated the data routed to the output.
- */
-typedef struct
-{
-    control_output_component_te output_component;     /**< The output component where the error occurred. */
-    control_input_te input_type;                      /**< The associated input component type. */
-    uint8_t input_id;                                 /**< The ID of the input component. */
-} control_output_error_ts;
-
-/**
- * Structure representing an error related to an input component.
- * 
- * This structure provides details about errors that occur while fetching
- * data from an input component.
- * 
- * Members:
- *  - input_component: The specific input component where the error occurred (e.g., sensors, RTC).
- *  - input_id: The ID of the input component where the error occurred.
- */
-typedef struct
-{
-    control_input_te input_component;               /**< The input component where the error occurred. */
-    uint8_t input_id;                               /**< The ID of the input component. */
-} control_input_error_ts;
-
-/**
- * Union for managing input and output error details.
- * 
- * This union allows the error manager to encapsulate error details for both 
- * input and output components dynamically, based on the context.
- * 
- * Members:
- *  - output_error: Details about an output component error.
- *  - input_error: Details about an input component error.
- */
-typedef union
-{
-    control_output_error_ts output_error; /**< Details of the output error. */
-    control_input_error_ts input_error;   /**< Details of the input error. */
-} control_error_type_tu;
+} control_component_te;
 
 /**
  * Structure representing a generic error in the system.
@@ -106,13 +46,13 @@ typedef union
  * Members:
  *  - error_code: The error code identifying the specific type of error.
  *  - component: Contains detailed information about the affected input/output component.
- *  - io_flag: Flag which indicates if error is input or output type.
+ *  - component_id: The ID of the component where the error occurred.
  */
 typedef struct
 {
     control_error_code_te error_code; /**< The specific error code. */
-    control_error_type_tu component;  /**< Detailed information about the error source. */
-    bool io_flag;                     /**< Flag which indicates if error is input or output type. */
+    control_component_te component;   /**< Detailed information about the error source. */
+    uint8_t component_id;             /**< The ID of the component. */
 } control_error_ts;
 
 /**
@@ -152,7 +92,7 @@ typedef union
  *  - input_return: A union (`input_return_tu`) holding the actual data returned from
  *                  the input. The specific type (e.g., sensor data, RTC data)
  *                  is determined dynamically based on the `input_type`.
- *  - input_type:   An enumeration (`control_input_te`) specifying the
+ *  - input_type:   An enumeration (`control_component_te`) specifying the
  *                  type of input (e.g., sensors, RTC).
  *  - input_id:     A unique identifier for the input (e.g., sensor ID) to
  *                  differentiate between multiple components of the same type.
@@ -160,8 +100,46 @@ typedef union
 typedef struct
 {
     input_return_tu input_return;    /**< Union holding the returned input data. */
-    control_input_te input_type;     /**< Type of the input. */
+    control_component_te input_type; /**< Type of the input. */
     uint8_t input_id;                /**< ID of the specific input instance. */
 } control_data_ts;
+
+/**
+ * Structure for managing the dual output of data fetching operations.
+ *
+ * This structure is designed to encapsulate two outputs resulting from
+ * a data fetch operation. One part (`data`) contains the fetched data
+ * that can be forwarded to an output component, while the other part
+ * (`error_code`) contains an error message to be handled by the Error Handler.
+ *
+ * Members:
+ *  - data:       Contains the fetched data, encapsulated in the `control_data_ts`
+ *                structure, to be forwarded to an output component (e.g., display, console).
+ *  - error_code: Represents the error message of type `control_error_code_te`
+ *                that can be passed to the Error Handler for further processing.
+ */
+typedef struct
+{
+    control_data_ts data;             /**< The fetched data for output forwarding. */
+    control_error_code_te error_code;  /**< The error code for the Error Handler. */
+} control_input_data_ts;
+
+/**
+ * Structure for managing the output of data processing operations.
+ *
+ * This structure encapsulates the result of a data processing operation,
+ * including the type of output destination and any associated error code.
+ * 
+ * Members:
+ *  - output_type: Specifies the type of the output component (e.g., display, console),
+ *                 represented by `control_component_te`.
+ *  - error_code:  Holds an error status of type `control_error_code_te`, 
+ *                 which can be passed to the Error Handler for diagnostics and recovery.
+ */
+typedef struct
+{
+    control_component_te  output_type; /**< Type of the output. */
+    control_error_code_te error_code;  /**< The error code for the Error Handler. */
+} control_output_data_ts;
 
 #endif

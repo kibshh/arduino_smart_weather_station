@@ -51,16 +51,14 @@
  * Structure representing a single sensor reading.
  * Members:
  *  - value: The measured value from the sensor.
- *  - sensor_id: ID of the sensor providing the measurement.
- *  - measurement_type_switch: Identifier for the type of measurement (float value / indication).
  *  - indication: A flag for indication (for example raining / not raining).
+ *  - measurement_type_switch: Identifier for the type of measurement (float value / indication).
  */
 typedef struct
 {
   float value;
-  uint8_t sensor_id;
-  uint8_t measurement_type_switch;
   bool indication;
+  uint8_t measurement_type_switch;
 }sensor_reading_ts;
 
 /**

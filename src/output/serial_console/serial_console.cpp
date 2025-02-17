@@ -7,13 +7,13 @@
  * This function retrieves sensor metadata and formats the sensor readings
  * for display on the serial console, including the sensor type, value, and unit.
  *
- * @param sensor_data The sensor reading structure containing the data to be displayed.
+ * @param control_data_ts Data containing sensor reading with value, and measurement type switch and sensor ID.
  * @return control_error_code_te
  * - ERROR_CODE_NO_ERROR: Sensor data displayed successfully.
  * - ERROR_CODE_SERIAL_CONSOLE_SENSOR_NOT_CONFIGURED: Sensor metadata retrieval failed.
  * - ERROR_CODE_SERIAL_CONSOLE_INVALID_MEASUREMENT_TYPE: Invalid measurement type.
  */
-static control_error_code_te serial_console_displaySensorMeasurement(sensor_reading_ts sensor_data);
+static control_error_code_te serial_console_displaySensorMeasurement(control_data_ts data);
 
 /**
  * @brief Displays the current RTC time on the serial console.
@@ -21,11 +21,11 @@ static control_error_code_te serial_console_displaySensorMeasurement(sensor_read
  * This function formats and displays the current time data, including
  * hours, minutes, seconds, day, month, and year.
  *
- * @param time_data The RTC reading structure containing the time information.
+ * @param control_data_ts Data containing RTC reading with the current time (year, month, day, hour, minutes, seconds).
  * @return control_error_code_te
  * - ERROR_CODE_NO_ERROR: Time data displayed successfully.
  */
-static control_error_code_te serial_console_displayTime(rtc_reading_ts time_data);
+static control_error_code_te serial_console_displayTime(control_data_ts data);
 
 /**
  * @brief Displays I2C scan results on the serial console.
@@ -33,12 +33,12 @@ static control_error_code_te serial_console_displayTime(rtc_reading_ts time_data
  * This function formats and displays I2C scan results, including the
  * detected device address and its communication status.
  *
- * @param i2c_scan_data The I2C scan reading structure containing the scan results.
+ * @param control_data_ts Data containing I2C scanning data that contains the device address and scan status.
  * @return control_error_code_te
  * - ERROR_CODE_NO_ERROR: I2C data displayed successfully.
  * - ERROR_CODE_SERIAL_CONSOLE_UNKNOWN_I2C_DEVICE_STATUS: Unknown device status during communication.
  */
-static control_error_code_te serial_console_displayI2cScan(i2c_scan_reading_ts i2c_scan_data);
+static control_error_code_te serial_console_displayI2cScan(control_data_ts data);
 /* *************************************** */
 
 /* EXPORTED FUNCTIONS */
@@ -64,15 +64,15 @@ control_error_code_te serial_console_displayData(control_data_ts data)
   switch(data.input_type)
   {
     case INPUT_SENSORS:
-      error_code = serial_console_displaySensorMeasurement(data.input_return.sensor_reading); // Display sensor data
+      error_code = serial_console_displaySensorMeasurement(data); // Display sensor data
       break;
 
     case INPUT_RTC:
-      error_code = serial_console_displayTime(data.input_return.rtc_reading); // Display RTC time data 
+      error_code = serial_console_displayTime(data); // Display RTC time data 
       break;
 
     case INPUT_I2C_SCAN:
-      error_code = serial_console_displayI2cScan(data.input_return.i2c_scan_reading); // Display I2C scan results
+      error_code = serial_console_displayI2cScan(data); // Display I2C scan results
       break;
 
     default:
@@ -85,12 +85,15 @@ control_error_code_te serial_console_displayData(control_data_ts data)
 /* *************************************** */
 
 /* STATIC FUNCTIONS IMPLEMENTATIONS */
-static control_error_code_te serial_console_displaySensorMeasurement(sensor_reading_ts sensor_data)
+static control_error_code_te serial_console_displaySensorMeasurement(control_data_ts data)
 {
+  sensor_reading_ts sensor_data = data.input_return.sensor_reading;
+  uint8_t sensor_id = data.input_id;
+
   control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
   // Retrieve sensor metadata
-  sensors_interface_metadata_ts sensor_metadata = sensors_interface_getSensorMetadata(sensor_data.sensor_id);
+  sensors_interface_metadata_ts sensor_metadata = sensors_interface_getSensorMetadata(sensor_id);
 
   // Check if metadata retrieval was successful
   if(SENSORS_INTERFACE_STATUS_SUCCESS == sensor_metadata.success_status)
@@ -137,8 +140,10 @@ static control_error_code_te serial_console_displaySensorMeasurement(sensor_read
   return error_code;
 }
 
-static control_error_code_te serial_console_displayTime(rtc_reading_ts time_data)
+static control_error_code_te serial_console_displayTime(control_data_ts data)
 {
+  rtc_reading_ts time_data = data.input_return.rtc_reading;
+
   // Extract time components
   uint16_t year = time_data.year;
   uint8_t month = time_data.month;
@@ -161,8 +166,10 @@ static control_error_code_te serial_console_displayTime(rtc_reading_ts time_data
   return ERROR_CODE_NO_ERROR;
 }
 
-static control_error_code_te serial_console_displayI2cScan(i2c_scan_reading_ts i2c_scan_data)
+static control_error_code_te serial_console_displayI2cScan(control_data_ts data)
 {
+  i2c_scan_reading_ts i2c_scan_data = data.input_return.i2c_scan_reading;
+
   control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
   bool proceed_with_display = SERIAL_CONSOLE_PROCEED_WITH_DISPLAY;

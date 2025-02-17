@@ -172,7 +172,6 @@ sensor_return_ts sensors_getReading(uint8_t id)
     {
       sensors_functional_catalog_ts current_sensor;
       memcpy_P(&current_sensor, &sensors_functional_catalog[sensor_index], sizeof(sensors_functional_catalog_ts)); // Copy the sensor configuration from program memory to a local structure
-      return_data.sensor_reading.sensor_id = id;
 
       if(SENSORS_NO_VALUE_FUNCTION != current_sensor.sensor_value_function) // Check if the sensor has a value function defined
       {

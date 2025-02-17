@@ -18,14 +18,16 @@ static uint8_t readAllSensorsPeriodicUpdateSensorIndex(uint8_t current_index, si
 task_status_te app_readSpecificSensor(uint8_t sensor_id, output_destination_t output)
 {
     control_input_data_ts sensor_reading_result = control_fetchDataFromInput(INPUT_SENSORS, sensor_id); // Fetch data from the sensor
-    checkForErrors(sensor_reading_result.error_msg);
+    checkForErrors(sensor_reading_result.error_code, INPUT_SENSORS, sensor_id);
     if(IS_OUTPUT_INCLUDED(output, LCD_DISPLAY))
     {
-        checkForErrors(control_routeDataToOutput(OUTPUT_DISPLAY, sensor_reading_result)); // Send sensor data to display output
+        // Send sensor data to display output
+        checkForErrors(control_routeDataToOutput(OUTPUT_DISPLAY, sensor_reading_result.data).error_code, OUTPUT_DISPLAY, CONTROL_ID_UNUSED); 
     }
     if(IS_OUTPUT_INCLUDED(output, SERIAL_CONSOLE))
     {
-        checkForErrors(control_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, sensor_reading_result)); // Send sensor data to serial console output
+        // Send sensor data to serial console output
+        checkForErrors(control_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, sensor_reading_result.data).error_code, OUTPUT_SERIAL_CONSOLE, CONTROL_ID_UNUSED); 
     }
     return FINISHED; // Return value is used to notify task component
 }
