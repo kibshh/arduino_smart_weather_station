@@ -77,7 +77,7 @@ typedef struct
 typedef struct
 {
     control_data_ts data;             /**< The fetched data for output forwarding. */
-    control_error_ts error_msg; /**< The error message for the Error Manager. */
+    control_error_ts error_msg;       /**< The error message for the Error Manager. */
 } control_input_data_ts;
 
 /**

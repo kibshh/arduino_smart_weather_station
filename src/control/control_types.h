@@ -8,6 +8,12 @@
 /* Represents an unused or invalid input ID */
 #define ERROR_INPUT_ID_UNUSED (uint8_t)(0xFF)
 
+/* Flag indicating error happened in input component */
+#define CONTROL_INPUT_ERROR   (bool)(true)
+
+/* Flag indicating error happened in output component */
+#define CONTROL_OUTPUT_ERROR  (bool)(false)
+
 /**
  * Enum listing all available inputs.
  *
@@ -100,11 +106,13 @@ typedef union
  * Members:
  *  - error_code: The error code identifying the specific type of error.
  *  - component: Contains detailed information about the affected input/output component.
+ *  - io_flag: Flag which indicates if error is input or output type.
  */
 typedef struct
 {
     control_error_code_te error_code; /**< The specific error code. */
     control_error_type_tu component;  /**< Detailed information about the error source. */
+    bool io_flag;                     /**< Flag which indicates if error is input or output type. */
 } control_error_ts;
 
 /**

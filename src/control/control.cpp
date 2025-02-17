@@ -239,6 +239,13 @@ static void initSensor(uint8_t sensor)
     {
         components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].sensors_status |= (1 << sensor);
     }
+    else
+    {
+        error_msg.io_flag = CONTROL_INPUT_ERROR;
+        error_msg.component.input_error.input_component = INPUT_SENSORS;
+        error_msg.component.input_error.input_id = sensor;
+        control_handleError(error_msg);
+    }
 }
 
 static components_status_ts selectUninitialized()
@@ -261,6 +268,10 @@ static components_status_ts selectUninitialized()
 
 static bool control_initialize(bool reinit)
 {
+    control_error_ts error_msg;
+    error_msg.error_code = ERROR_CODE_INIT_FAILED;
+
+
     // Re-check uninitialized components if reinitializing
     components_status_ts uninitialized_components;
     if (CONTROL_REINIT == reinit)
@@ -276,6 +287,12 @@ static bool control_initialize(bool reinit)
         {
             components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].outputs_status |= (1 << SERIAL_CONSOLE_COMPONENT);
         }
+        else
+        {
+            error_msg.io_flag = CONTROL_OUTPUT_ERROR;
+            error_msg.component.output_error.output_component = OUTPUT_SERIAL_CONSOLE;
+            control_handleError(error_msg);
+        }
     }
 #endif  
 
@@ -287,6 +304,12 @@ static bool control_initialize(bool reinit)
         {
             components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].outputs_status |= (1 << LCD_DISPLAY_COMPONENT);
         }
+        else
+        {
+            error_msg.io_flag = CONTROL_OUTPUT_ERROR;
+            error_msg.component.output_error.output_component = OUTPUT_DISPLAY;
+            control_handleError(error_msg);
+        }
     }
 #endif  
 
@@ -297,6 +320,12 @@ static bool control_initialize(bool reinit)
         if (ERROR_CODE_NO_ERROR == rtc_init())
         {
             components_status[CONTROL_COMPONENTS_STATUS_WORKING_INDEX].other_inputs_status |= (1 << RTC_COMPONENT);
+        }
+        else
+        {
+            error_msg.io_flag = CONTROL_INPUT_ERROR;
+            error_msg.component.input_error.input_component = INPUT_RTC;
+            control_handleError(error_msg);
         }
     }
 #endif  
