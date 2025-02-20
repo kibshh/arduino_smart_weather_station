@@ -109,7 +109,9 @@ const sensors_metadata_catalog_ts sensors_metadata_catalog[] PROGMEM =
   },
 #endif
 };
+/* *************************************** */
 
+/* EXPORTED FUNCTIONS */
 bool sensors_metadata_getSensorFromCatalog(uint8_t id, sensors_metadata_catalog_ts * current_sensor)
 {
   bool success_status = SENSORS_METADATA_RETRIEVE_FAILED;
@@ -151,4 +153,5 @@ uint8_t sensors_metadata_sensorIndexToId(uint8_t index)
   }
   return sensor_id;
 }
+/* *************************************** */
 

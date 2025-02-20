@@ -2,31 +2,22 @@
 #define MQ135_H
 
 #include <Arduino.h>
-#include "../../sensorsconfig.h"
-#ifdef SENSORS_MQ135_CALIBRATION_ENABLED
-#include "../../../functionality/calibration/calibration_types.h"
-#endif
-
+#include "../sensors_config.h"
 
 /* Load resistance in ohms which is connected to from analog output of sensor to ground (default value for the module) */
-#define MQ135_LOAD_RESISTANCE_VAL           (10000)
+#define MQ135_LOAD_RESISTANCE_VAL           (float)(10000)
 
 /* Maximum and minimum analog values (10-bit ADC resolution) */
-#define MQ135_ANALOG_INPUT_MAX              (1023)
-#define MQ135_ANALOG_INPUT_MIN              (0)
+#define MQ135_ANALOG_INPUT_MAX              (int)(1023)
+#define MQ135_ANALOG_INPUT_MIN              (int)(0)
 
 /* Minimum valid analog value to avoid division by zero */
-#define MQ135_ANALOG_INPUT_MIN_VALID        (1)
+#define MQ135_ANALOG_INPUT_MIN_VALID        (int)(1)
 
 /* Minimum valid sensor resistance (R0) in ohms */
-#define MQ135_R_ZERO_MINIMUM                (1u)
+#define MQ135_R_ZERO_MINIMUM                (float)(1u)
 
-/**
- * @brief Defines the invalid value for the MQ135 sensor readings.
- * 
- * This macro represents a "Not a Number" (NAN) value, which is used to indicate 
- * invalid readings for the MQ135 sensor.
- */
+/* Defines the invalid value for the MQ135 sensor readings */
 #define MQ135_INVALID_VALUE                 (NAN)
 
 /**
@@ -49,7 +40,6 @@ void mq135_init();
  */
 float mq135_readPPM();
 
-#ifdef SENSORS_MQ135_CALIBRATION_ENABLED
 /**
  * @brief Calculates the sensor's \( R0 \) value during calibration.
  * 
@@ -64,8 +54,6 @@ float mq135_readPPM();
  * 
  * @return float - The calculated \( R0 \) resistance (Ohms) or NAN if the input reading is invalid.
  */
-float mq135_calculateResistanceForCalibration();
-#endif
-
+float mq135_readResistanceForCalibration();
 
 #endif

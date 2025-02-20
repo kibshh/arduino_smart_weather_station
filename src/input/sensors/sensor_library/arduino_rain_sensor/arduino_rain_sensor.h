@@ -2,14 +2,14 @@
 #define ARDUINO_RAIN_SENSOR_H
 
 #include <Arduino.h>
-#include "../../sensorsconfig.h"
+#include "../sensors_config.h"
 
-// Define the digital output value indicating rain detected by the sensor, used in digital read mode.
-// NOTE: The sensor uses reverse logic — 0 means rain is detected, and 1 means no rain.
-#define ARDUINO_RAIN_SENSOR_RAIN_DETECTED    (0)
+/* Define the digital output value indicating rain detected by the sensor, used in digital read mode */
+/* NOTE: The sensor uses reverse logic — 0 means rain is detected, and 1 means no rain */
+#define ARDUINO_RAIN_SENSOR_RAIN_DETECTED    (int)(0)
 
-// Define the threshold value for analog readings; values below this indicate rain
-#define ARDUINO_RAIN_SENSOR_ANALOG_THRESHOLD (500u)
+/* Define the threshold value for analog readings; values below this indicate rain */
+#define ARDUINO_RAIN_SENSOR_ANALOG_THRESHOLD (int)(500u)
 
 /**
  * @brief Initializes the rain sensor.
@@ -23,20 +23,5 @@ void arduino_rain_sensor_init();
  * @return true if rain is detected, false otherwise.
  */
 bool arduino_rain_sensor_readRaining();
-
-
-#ifdef ARDUINO_RAIN_SENSOR_ANALOG_MEASUREMENT
-/**
- * @brief Checks rain status using an analog rain sensor pin.
- * @return true if the analog reading is below the threshold, false otherwise.
- */
-bool arduino_rain_sensor_isRainingAnalog();
-#else
-/**
- * @brief Checks rain status using a digital rain sensor pin.
- * @return true if rain is detected (LOW signal), false otherwise (HIGH signal).
- */
-bool arduino_rain_sensor_isRainingDigital();
-#endif
 
 #endif
