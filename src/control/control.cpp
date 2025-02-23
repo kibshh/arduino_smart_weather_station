@@ -6,23 +6,6 @@ static components_status_ts components_status[CONTROL_COMPONENTS_STATUS_SIZE] = 
 
 /* STATIC FUNCTION PROTOTYPES */
 /**
- * @brief error to the specified output component.
- *
- * This function forwards error recieved from an input component to one of the
- * defined output components. It returns an error code that can be passed
- * to the Error Manager for handling.
- *
- * @param output_component The ID of the output component to which the error
- *                         is forwarded (e.g., display, serial console).
- * @param error_msg        Pointer to structure containing the information about the error.
- *
- * @return An error message of type `control_error_ts` indicating the
- *         status of the routing operation.
- */
-static control_error_ts routeErrorToOutput(control_io_t output_component,
-                                           const control_error_ts *error_msg);
-
-/**
  * @brief Initializes input return data structure.
  *
  * Sets up the return data structure with the specified input component 
@@ -146,10 +129,17 @@ control_input_data_ts control_fetchDataFromInput(const control_device_ts *input_
 
 void control_handleError(const control_error_ts *error)
 {
-    control_error_ts error_msg_serial = routeErrorToOutput(OUTPUT_SERIAL_CONSOLE, error);
-    if (error_msg_serial.error_code != ERROR_CODE_NO_ERROR)
+    control_data_ts data;
+    control_device_ts error_input = {INPUT_ERROR, CONTROL_ID_UNUSED}; // Initialize input type
+
+    // Initialize error data
+    data.input_return.error_msg = *error;
+    data.input = error_input;
+
+    // Attempt to send error data to serial console; if it fails, fallback to display
+    if (ERROR_CODE_NO_ERROR != control_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, &data))
     {
-        (void)routeErrorToOutput(OUTPUT_DISPLAY, &error_msg_serial);
+        (void)control_routeDataToOutput(OUTPUT_DISPLAY, &data);
     }
 }
 /* *************************************** */
@@ -157,40 +147,6 @@ void control_handleError(const control_error_ts *error)
 // TODO: CHANGE THIS FUNC TO RETURN ERROR CODE ONLY
 
 /* STATIC FUNCTIONS IMPLEMENTATIONS */
-static control_error_ts routeErrorToOutput(control_io_t output_component, const control_error_ts *error_msg)
-{
-    // Pack the error to the error struct
-    control_device_ts error_device = {INPUT_ERROR, CONTROL_ID_UNUSED};
-    control_data_ts data = {*error_msg, error_device};
-
-    //
-    control_device_ts output_device = {IO_UNUSED, CONTROL_ID_UNUSED};
-    control_error_ts error_return = {ERROR_CODE_NO_ERROR, output_device};
-
-    switch (output_component)
-    {
-    case OUTPUT_DISPLAY:
-        // Route data to display and update error code
-        error_return.error_code = display_displayData(&data);
-        output_device.io_component = OUTPUT_DISPLAY;
-        break;
-
-    case OUTPUT_SERIAL_CONSOLE:
-        // Route data to serial console and update error code
-        error_return.error_code = serial_console_displayData(&data);
-        output_device.io_component = OUTPUT_SERIAL_CONSOLE;
-        break;
-
-    default:
-        // Set error code for invalid output
-        error_return.error_code = ERROR_CODE_INVALID_OUTPUT;
-        break;
-    }
-
-    error_return.component = output_device;
-    return error_return;
-}
-
 static control_input_data_ts initializeInputReturnData(const control_device_ts *input_device)
 {
     control_input_data_ts return_data;

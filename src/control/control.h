@@ -118,14 +118,13 @@ control_error_code_te control_routeDataToOutput(control_io_t output_component,
 control_input_data_ts control_fetchDataFromInput(const control_device_ts *input_device);
 
 /**
- * @brief Handles errors by routing them to appropriate output components.
+ * @brief Handles and routes error messages to the appropriate output.
  *
- * This function packages the error details and attempts to route the error message  
- * to the serial console for logging. If routing to the serial console fails,  
- * the error message is forwarded to the display as a fallback.
+ * This function takes an error message, packages it into a control data structure, 
+ * and attempts to route it to the serial console first. If that fails, it falls back 
+ * to routing the error message to the display output.
  *
- * @param error Pointer to struct with error code and another struct 
- *              representing the component associated with the error.
+ * @param error Pointer to the error message structure to be handled.
  */
 void control_handleError(const control_error_ts *error);
 
