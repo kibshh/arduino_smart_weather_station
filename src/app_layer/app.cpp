@@ -2,17 +2,28 @@
 #include "app_common.h"
 
 /* EXPORTED FUNCTIONS */
-void checkForErrors(control_error_code_te error_code, control_component_te component, uint8_t component_id)
+void checkForErrors(const control_error_ts *error)
 {
     // If an error occurred, handle it
-    if(ERROR_CODE_NO_ERROR != error_code)
+    if(ERROR_CODE_NO_ERROR != error->error_code)
     {
-        control_handleError(error_code, component, component_id);
+        control_handleError(error);
     }
 }
 
 output_destination_t filterOutTimeDependentOutputs(output_destination_t output)
 {
     return (output & ALL_TIME_INDEPENDENT_OUTPUTS);
+}
+
+void sendToOutputAndCheckForErrors(control_io_t output, const control_data_ts *data)
+{
+    control_error_ts error;
+    // Define output component
+    control_device_ts output_component = {output, CONTROL_ID_UNUSED};
+
+    error.component = output_component;
+    error.error_code = control_routeDataToOutput(output, data);
+    checkForErrors(&error);
 }
 /* *************************************** */

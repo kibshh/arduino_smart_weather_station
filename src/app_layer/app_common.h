@@ -17,13 +17,9 @@ typedef uint16_t output_destination_t;
  * - ALL_OUTPUTS combines both time-independent and time-dependent outputs (16 bits in total).
  */
 /* Output option for serial console(can show all at once or sequentially) */
-#define SERIAL_CONSOLE                 (output_destination_t)(1 << 0)
-/* 7 bytes reserved for the future */
-
+#define SERIAL_CONSOLE                 (output_destination_t)(1 << 0) /* 7 bytes reserved for the future outputs */
 /* Output option for displays(cannot show all at once) */
-#define LCD_DISPLAY                    (output_destination_t)(1 << 8)
-/* 7 bytes reserved for the future */
-
+#define LCD_DISPLAY                    (output_destination_t)(1 << 8) /* 7 bytes reserved for the future outputs */
 /* Outputs that can be sent independently of time constraints(all at once) */
 #define ALL_TIME_INDEPENDENT_OUTPUTS   (output_destination_t)(0x00FF)
 /* Outputs that require time constraints (e.g., display) */
@@ -47,11 +43,10 @@ typedef enum
  * calls the error handling mechanism with the corresponding component and ID.  
  * It ensures that errors are properly processed and logged for diagnostics.
  *
- * @param error_code   The error code to check.
- * @param component    The component associated with the error.
- * @param component_id The unique identifier of the component.
+ * @param error Pointer to struct with error code and another struct 
+ *              representing the component associated with the error.
  */
-void checkForErrors(control_error_code_te error_code, control_component_te component, uint8_t component_id);
+void checkForErrors(const control_error_ts *error);
 
 
 /**
@@ -65,5 +60,18 @@ void checkForErrors(control_error_code_te error_code, control_component_te compo
  * @return output_destination_t The filtered output destination.
  */
 output_destination_t filterOutTimeDependentOutputs(output_destination_t output);
+
+/**
+ * @brief Routes data to the specified output component and checks for errors.
+ *
+ * This function attempts to send the provided data to the specified output component (e.g., LCD display, serial console).
+ * It then checks for any errors encountered during the operation by calling `checkForErrors`.
+ *
+ * @param output The output component to send the data to (e.g., OUTPUT_DISPLAY, OUTPUT_SERIAL_CONSOLE).
+ * @param data A pointer to the data to be sent to the output component.
+ * 
+ * @note The `CONTROL_ID_UNUSED` is used to indicate that the device ID is not used in this operation.
+ */
+void sendToOutputAndCheckForErrors(control_io_t output, const control_data_ts *data);
 
 #endif

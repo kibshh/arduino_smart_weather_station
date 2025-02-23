@@ -43,7 +43,7 @@ control_error_code_te display_init();
  * calls the appropriate display function to show the corresponding data 
  * (such as sensor readings, RTC readings, I2C scan results) on the LCD.
  * 
- * @param data A structure containing the data to be displayed, with the input type 
+ * @param data A pointer to structure containing the data to be displayed, with the input type 
  *             and the corresponding data based on that type.
  * 
  * @return control_error_code_te Returns an error code:
@@ -51,6 +51,6 @@ control_error_code_te display_init();
  *         - Any other error codes returned from the respective display functions 
  *           (e.g., for sensor, RTC, I2C scan).
  **/
-control_error_code_te display_displayData(control_data_ts data);
+control_error_code_te display_displayData(const control_data_ts *data);
 
 #endif

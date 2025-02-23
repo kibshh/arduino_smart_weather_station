@@ -7,13 +7,13 @@
  * This function retrieves sensor metadata and formats the sensor readings
  * for display on the serial console, including the sensor type, value, and unit.
  *
- * @param control_data_ts Data containing sensor reading with value, and measurement type switch and sensor ID.
+ * @param control_data_ts Pointer to data containing sensor reading with value, and measurement type switch and sensor ID.
  * @return control_error_code_te
  * - ERROR_CODE_NO_ERROR: Sensor data displayed successfully.
- * - ERROR_CODE_SERIAL_CONSOLE_SENSOR_NOT_CONFIGURED: Sensor metadata retrieval failed.
- * - ERROR_CODE_SERIAL_CONSOLE_INVALID_MEASUREMENT_TYPE: Invalid measurement type.
+ * - ERROR_CODE_SENSOR_NOT_CONFIGURED: Sensor metadata retrieval failed.
+ * - ERROR_CODE_INVALID_SENSOR_MEASUREMENT_TYPE: Invalid measurement type.
  */
-static control_error_code_te serial_console_displaySensorMeasurement(control_data_ts data);
+static control_error_code_te serial_console_displaySensorMeasurement(const control_data_ts *data);
 
 /**
  * @brief Displays the current RTC time on the serial console.
@@ -21,11 +21,11 @@ static control_error_code_te serial_console_displaySensorMeasurement(control_dat
  * This function formats and displays the current time data, including
  * hours, minutes, seconds, day, month, and year.
  *
- * @param control_data_ts Data containing RTC reading with the current time (year, month, day, hour, minutes, seconds).
+ * @param control_data_ts Pointer to data containing RTC reading with the current time (year, month, day, hour, minutes, seconds).
  * @return control_error_code_te
  * - ERROR_CODE_NO_ERROR: Time data displayed successfully.
  */
-static control_error_code_te serial_console_displayTime(control_data_ts data);
+static control_error_code_te serial_console_displayTime(const control_data_ts *data);
 
 /**
  * @brief Displays I2C scan results on the serial console.
@@ -33,12 +33,12 @@ static control_error_code_te serial_console_displayTime(control_data_ts data);
  * This function formats and displays I2C scan results, including the
  * detected device address and its communication status.
  *
- * @param control_data_ts Data containing I2C scanning data that contains the device address and scan status.
+ * @param control_data_ts Pointer to data containing I2C scanning data that contains the device address and scan status.
  * @return control_error_code_te
  * - ERROR_CODE_NO_ERROR: I2C data displayed successfully.
- * - ERROR_CODE_SERIAL_CONSOLE_UNKNOWN_I2C_DEVICE_STATUS: Unknown device status during communication.
+ * - ERROR_CODE_UNKNOWN_I2C_DEVICE_STATUS: Unknown device status during communication.
  */
-static control_error_code_te serial_console_displayI2cScan(control_data_ts data);
+static control_error_code_te serial_console_displayI2cScan(const control_data_ts *data);
 /* *************************************** */
 
 /* EXPORTED FUNCTIONS */
@@ -56,12 +56,12 @@ control_error_code_te serial_console_init()
     return ERROR_CODE_NO_ERROR;
 }
 
-control_error_code_te serial_console_displayData(control_data_ts data)
+control_error_code_te serial_console_displayData(const control_data_ts *data)
 {
   // Default error code for invalid input type
   control_error_code_te error_code = ERROR_CODE_INVALID_INPUT_TYPE;
 
-  switch(data.input_type)
+  switch(data->input.io_component)
   {
     case INPUT_SENSORS:
       error_code = serial_console_displaySensorMeasurement(data); // Display sensor data
@@ -85,10 +85,10 @@ control_error_code_te serial_console_displayData(control_data_ts data)
 /* *************************************** */
 
 /* STATIC FUNCTIONS IMPLEMENTATIONS */
-static control_error_code_te serial_console_displaySensorMeasurement(control_data_ts data)
+static control_error_code_te serial_console_displaySensorMeasurement(const control_data_ts *data)
 {
-  sensor_reading_ts sensor_data = data.input_return.sensor_reading;
-  uint8_t sensor_id = data.input_id;
+  sensor_reading_ts sensor_data = data->input_return.sensor_reading;
+  uint8_t sensor_id = data->input.device_id;
 
   control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
@@ -123,7 +123,7 @@ static control_error_code_te serial_console_displaySensorMeasurement(control_dat
     else
     {
       // Set error code for invalid measurement type
-      error_code = ERROR_CODE_SERIAL_CONSOLE_INVALID_MEASUREMENT_TYPE;
+      error_code = ERROR_CODE_INVALID_SENSOR_MEASUREMENT_TYPE;
       proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
     }
     // Format and display the sensor data if everything is okay
@@ -135,14 +135,14 @@ static control_error_code_te serial_console_displaySensorMeasurement(control_dat
   }
   else
   {
-    error_code = ERROR_CODE_SERIAL_CONSOLE_SENSOR_NOT_CONFIGURED;
+    error_code = ERROR_CODE_SENSOR_NOT_CONFIGURED;
   }
   return error_code;
 }
 
-static control_error_code_te serial_console_displayTime(control_data_ts data)
+static control_error_code_te serial_console_displayTime(const control_data_ts *data)
 {
-  rtc_reading_ts time_data = data.input_return.rtc_reading;
+  rtc_reading_ts time_data = data->input_return.rtc_reading;
 
   // Extract time components
   uint16_t year = time_data.year;
@@ -166,9 +166,9 @@ static control_error_code_te serial_console_displayTime(control_data_ts data)
   return ERROR_CODE_NO_ERROR;
 }
 
-static control_error_code_te serial_console_displayI2cScan(control_data_ts data)
+static control_error_code_te serial_console_displayI2cScan(const control_data_ts *data)
 {
-  i2c_scan_reading_ts i2c_scan_data = data.input_return.i2c_scan_reading;
+  i2c_scan_reading_ts i2c_scan_data = data->input_return.i2c_scan_reading;
 
   control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
@@ -208,7 +208,7 @@ static control_error_code_te serial_console_displayI2cScan(control_data_ts data)
         strncpy(status_msg, "Unknown error occurred during communication", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
         break;
       default:
-        error_code = ERROR_CODE_SERIAL_CONSOLE_UNKNOWN_I2C_DEVICE_STATUS;
+        error_code = ERROR_CODE_UNKNOWN_I2C_DEVICE_STATUS;
         proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
         break;
     }

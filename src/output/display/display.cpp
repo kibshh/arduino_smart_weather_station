@@ -10,38 +10,38 @@ static LiquidCrystal_I2C lcd(DISPLAY_LCD_I2C_ADDDR, DISPLAY_LCD_WIDTH, DISPLAY_L
  * It retrieves the metadata for the sensor, formats the sensor value, and updates the display. 
  * If the measurement type is invalid or metadata is not found, the function returns an error code.
  *
- * @param control_data_ts Data containing sensor reading with value, and measurement type switch and sensor ID.
+ * @param control_data_ts Pointer to data containing sensor reading with value, and measurement type switch and sensor ID.
  * 
  * @return control_error_code_te Returns an error code based on the display process:
  *         - ERROR_CODE_NO_ERROR if the sensor data is successfully displayed.
- *         - ERROR_CODE_DISPLAY_INVALID_MEASUREMENT_TYPE if the measurement type is invalid.
- *         - ERROR_CODE_DISPLAY_SENSOR_NOT_CONFIGURED if the sensor metadata is not found.
+ *         - ERROR_CODE_INVALID_SENSOR_MEASUREMENT_TYPE if the measurement type is invalid.
+ *         - ERROR_CODE_SENSOR_NOT_CONFIGURED if the sensor metadata is not found.
  **/
-static control_error_code_te display_displaySensorMeasurement(control_data_ts data);
+static control_error_code_te display_displaySensorMeasurement(const control_data_ts *data);
 
 /** 
  * @brief Displays the current time on the LCD, formatted to fit a 16-character wide display.
  * This function formats the time and date values from the RTC reading and displays it.
  *
- * @param control_data_ts Data containing RTC reading with the current time (year, month, day, hour, minutes, seconds).
+ * @param control_data_ts Pointer to data containing RTC reading with the current time (year, month, day, hour, minutes, seconds).
  * 
  * @return control_error_code_te Returns an error code:
  *         - ERROR_CODE_NO_ERROR indicating successful execution.
  **/
-static control_error_code_te display_displayTime(control_data_ts data);
+static control_error_code_te display_displayTime(const control_data_ts *data);
 
 /** 
  * @brief Displays the results of an I2C bus scan on the LCD. 
  * If scanning all devices, it will show a scanning message, otherwise it displays the status 
  * of the specific device address being scanned.
  *
- * @param control_data_ts Data containing I2C scanning data that contains the device address and scan status.
+ * @param control_data_ts Pointer to data containing I2C scanning data that contains the device address and scan status.
  * 
  * @return control_error_code_te Returns an error code:
  *         - ERROR_CODE_NO_ERROR for a successful display update.
- *         - ERROR_CODE_DISPLAY_UNKNOWN_I2C_DEVICE_STATUS for unknown device statuses.
+ *         - ERROR_CODE_UNKNOWN_I2C_DEVICE_STATUS for unknown device statuses.
  **/
-static control_error_code_te display_displayI2cScan(control_data_ts data);
+static control_error_code_te display_displayI2cScan(const control_data_ts *data);
 
 /**
  * @brief Formats sensor data for display on an LCD screen.
@@ -73,11 +73,11 @@ control_error_code_te display_init()
   return ERROR_CODE_NO_ERROR;
 }
 
-control_error_code_te display_displayData(control_data_ts data)
+control_error_code_te display_displayData(const control_data_ts *data)
 {
   control_error_code_te error_code = ERROR_CODE_INVALID_INPUT_TYPE; // Error code if input type is invalid
 
-  switch(data.input_type)
+  switch(data->input.io_component)
   {
     case INPUT_SENSORS:
       error_code = display_displaySensorMeasurement(data);
@@ -104,10 +104,10 @@ control_error_code_te display_displayData(control_data_ts data)
 /* *************************************** */
 
 /* STATIC FUNCTIONS IMPLEMENTATIONS */
-static control_error_code_te display_displaySensorMeasurement(control_data_ts data)
+static control_error_code_te display_displaySensorMeasurement(const control_data_ts *data)
 {
-  sensor_reading_ts sensor_data = data.input_return.sensor_reading;
-  uint8_t sensor_id = data.input_id;
+  sensor_reading_ts sensor_data = data->input_return.sensor_reading;
+  uint8_t sensor_id = data->input.device_id;
 
   control_error_code_te error_code = ERROR_CODE_NO_ERROR; // Default Error code
   bool proceed_with_display = DISPLAY_DONT_PROCEED_WITH_DISPLAY; // Flag to determine if the display should be updated
@@ -139,12 +139,12 @@ static control_error_code_te display_displaySensorMeasurement(control_data_ts da
     }
     else
     {
-      error_code = ERROR_CODE_DISPLAY_INVALID_MEASUREMENT_TYPE; // Return an error if types mismatch
+      error_code = ERROR_CODE_INVALID_SENSOR_MEASUREMENT_TYPE; // Return an error if types mismatch
     }
   }
   else
   {
-    error_code = ERROR_CODE_DISPLAY_SENSOR_NOT_CONFIGURED; // Error code in case sensor metadata is not found
+    error_code = ERROR_CODE_SENSOR_NOT_CONFIGURED; // Error code in case sensor metadata is not found
   }
 
   // Display the formatted value if valid, otherwise clear the display row
@@ -161,9 +161,9 @@ static control_error_code_te display_displaySensorMeasurement(control_data_ts da
   return error_code;
 }
 
-static control_error_code_te display_displayTime(control_data_ts data)
+static control_error_code_te display_displayTime(const control_data_ts *data)
 {
-  rtc_reading_ts time_data = data.input_return.rtc_reading;
+  rtc_reading_ts time_data = data->input_return.rtc_reading;
 
   lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_TIME_ROW);
 
@@ -183,9 +183,9 @@ static control_error_code_te display_displayTime(control_data_ts data)
   return ERROR_CODE_NO_ERROR; // Return success error code
 }
 
-static control_error_code_te display_displayI2cScan(control_data_ts data)
+static control_error_code_te display_displayI2cScan(const control_data_ts *data)
 {
-  i2c_scan_reading_ts i2c_scan_data = data.input_return.i2c_scan_reading;
+  i2c_scan_reading_ts i2c_scan_data = data->input_return.i2c_scan_reading;
 
   control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
@@ -234,7 +234,7 @@ static control_error_code_te display_displayI2cScan(control_data_ts data)
         break;
 
       default:
-        error_code = ERROR_CODE_DISPLAY_UNKNOWN_I2C_DEVICE_STATUS;
+        error_code = ERROR_CODE_UNKNOWN_I2C_DEVICE_STATUS;
         proceed_with_display = DISPLAY_DONT_PROCEED_WITH_DISPLAY;
         break;
     }

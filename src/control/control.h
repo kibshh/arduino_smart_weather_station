@@ -91,14 +91,14 @@ bool control_reinit();
  *
  * @param output_component The ID of the output component to which the data
  *                         is forwarded (e.g., display, serial console).
- * @param data             The actual data to be forwarded, which must match
+ * @param data             Pointer to the actual data to be forwarded, which must match
  *                         the format/type of data part returned by the data fetch function.
  *
- * @return An error message of type `control_output_data_ts` indicating the
+ * @return An error code of type `control_error_code_te` indicating the
  *         status of the routing operation.
  */
-control_output_data_ts control_routeDataToOutput(control_component_te output_component,
-                                                 control_data_ts data);
+control_error_code_te control_routeDataToOutput(control_io_t output_component,
+                                                const control_data_ts *data);
 
 /**
  * @brief Fetches data from the specified input component.
@@ -107,17 +107,15 @@ control_output_data_ts control_routeDataToOutput(control_component_te output_com
  * and returns it as a structured result. One part of the fetched data can then be used by
  * output components and the other can be forwarded to an Error manager.
  *
- * @param input_component The ID of the input component from which data is fetched
- *                        (e.g., sensors, RTC).
- * @param component_id    The specific ID within the input component (e.g., sensor ID).
+ * @param input_device Pointer to structure with ID of the input component from which data is fetched
+ *         (e.g., sensors, RTC) and the specific ID within the input component (e.g., sensor ID).
  *
  * @return A structure of type `control_input_data_ts` has two parts.
  *         `data` - containing the fetched data, input type, and component ID.
  *         `error_msg` - containing error code, flag for input/output and the details of the
  *         component( ID, etc.)
  */
-control_input_data_ts control_fetchDataFromInput(control_component_te input_component,
-                                                 uint8_t component_id);
+control_input_data_ts control_fetchDataFromInput(const control_device_ts *input_device);
 
 /**
  * @brief Handles errors by routing them to appropriate output components.
@@ -126,11 +124,9 @@ control_input_data_ts control_fetchDataFromInput(control_component_te input_comp
  * to the serial console for logging. If routing to the serial console fails,  
  * the error message is forwarded to the display as a fallback.
  *
- * @param error_code   The error code indicating the type of error.
- * @param component    The component where the error occurred.
- * @param component_id The unique identifier of the component.
+ * @param error Pointer to struct with error code and another struct 
+ *              representing the component associated with the error.
  */
-void control_handleError(control_error_code_te error_code, control_component_te component, uint8_t component_id);
-
+void control_handleError(const control_error_ts *error);
 
 #endif

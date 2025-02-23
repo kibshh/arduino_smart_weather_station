@@ -14,13 +14,13 @@ static components_status_ts components_status[CONTROL_COMPONENTS_STATUS_SIZE] = 
  *
  * @param output_component The ID of the output component to which the error
  *                         is forwarded (e.g., display, serial console).
- * @param error_msg            A structure containing the information about the error.
+ * @param error_msg        Pointer to structure containing the information about the error.
  *
  * @return An error message of type `control_error_ts` indicating the
  *         status of the routing operation.
  */
-static control_error_ts routeErrorToOutput(control_component_te output_component,
-                                           control_error_ts error_msg);
+static control_error_ts routeErrorToOutput(control_io_t output_component,
+                                           const control_error_ts *error_msg);
 
 /**
  * @brief Initializes input return data structure.
@@ -28,22 +28,10 @@ static control_error_ts routeErrorToOutput(control_component_te output_component
  * Sets up the return data structure with the specified input component 
  * and ID, initializing error handling fields to indicate an invalid input by default.
  *
- * @param input_component The input component type.
- * @param component_id The unique identifier of the input component.
+ * @param input_device Pointer to struct with input component and unique identifier of the input component.
  * @return control_input_data_ts The initialized return data structure.
  */
-static control_input_data_ts initializeInputReturnData(control_component_te input_component, uint8_t component_id);
-
-/**
- * @brief Initializes an error message for output routing failures.
- *
- * Sets up the error message structure with a default error code and 
- * associates it with the specified output component and input data details.
- *
- * @param output_component The output component where the error occurred.
- * @return control_output_data_ts The initialized output error message structure.
- */
-static control_output_data_ts initializeOutputReturnErrorMsg(control_component_te output_component);
+static control_input_data_ts initializeInputReturnData(const control_device_ts *input_device);
 
 /**
  * @brief Initializes a sensor and updates its status.
@@ -100,58 +88,52 @@ bool control_reinit()
     return control_initialize(CONTROL_REINIT);
 }
 
-control_output_data_ts control_routeDataToOutput(control_component_te output_component, control_data_ts data)
+control_error_code_te control_routeDataToOutput(control_io_t output_component, const control_data_ts *data)
 {
-    // Initialize error message with default values
-    control_output_data_ts error_msg = initializeOutputReturnErrorMsg(output_component);
-
+    // Initialize error code
+    control_error_code_te error_code = ERROR_CODE_INVALID_OUTPUT;
+    
     switch (output_component)
     {
     case OUTPUT_DISPLAY:
         // Route data to display and update error code
-        error_msg.error_code = display_displayData(data);
+        error_code = display_displayData(data);
         break;
 
     case OUTPUT_SERIAL_CONSOLE:
         // Route data to serial console and update error code
-        error_msg.error_code = serial_console_displayData(data);
+        error_code = serial_console_displayData(data);
         break;
     }
     // Default error code is set to ERROR_CODE_INVALID_OUTPUT so there is no need to set it in default.
-    return error_msg;
+    return error_code;
 }
 
-control_input_data_ts control_fetchDataFromInput(control_component_te input_component, uint8_t component_id)
+control_input_data_ts control_fetchDataFromInput(const control_device_ts *input_device)
 {
     // Initialize input return data with defaults
-    control_input_data_ts return_data = initializeInputReturnData(input_component, component_id);
+    control_input_data_ts return_data = initializeInputReturnData(input_device);
 
-    switch (input_component)
+    switch (input_device->io_component)
     {
     case INPUT_SENSORS:
         // Fetch sensor reading and update return data
-        sensor_return_ts sensor_return = sensors_getReading(component_id);
+        sensor_return_ts sensor_return = sensors_getReading(input_device->device_id);
         return_data.error_code = sensor_return.error_code;
-        return_data.data.input_type = INPUT_SENSORS;
-        return_data.data.input_id = component_id;
         return_data.data.input_return.sensor_reading = sensor_return.sensor_reading;
         break;
 
     case INPUT_RTC:
         // Fetch RTC data and update return data
-        rtc_return_ts rtc_return = rtc_getTime(component_id);
+        rtc_return_ts rtc_return = rtc_getTime(input_device->device_id);
         return_data.error_code = rtc_return.error_code;
-        return_data.data.input_type = INPUT_RTC;
-        return_data.data.input_id = component_id;
         return_data.data.input_return.rtc_reading = rtc_return.rtc_reading;
         break;
 
     case INPUT_I2C_SCAN:
         // Fetch I2C scan data and update return data
-        i2c_scan_return_ts i2c_scan_return = i2c_scan_getReading(component_id);
+        i2c_scan_return_ts i2c_scan_return = i2c_scan_getReading(input_device->device_id);
         return_data.error_code = i2c_scan_return.error_code;
-        return_data.data.input_type = INPUT_I2C_SCAN;
-        return_data.data.input_id = component_id;
         return_data.data.input_return.i2c_scan_reading = i2c_scan_return.i2c_scan_reading;
         break;
 
@@ -162,69 +144,64 @@ control_input_data_ts control_fetchDataFromInput(control_component_te input_comp
     return return_data;
 }
 
-void control_handleError(control_error_code_te error_code, control_component_te component, uint8_t component_id)
+void control_handleError(const control_error_ts *error)
 {
-    control_error_ts error_package = {error_code, component, component_id};
-    control_error_ts error_msg_serial = routeErrorToOutput(OUTPUT_SERIAL_CONSOLE, error_package);
+    control_error_ts error_msg_serial = routeErrorToOutput(OUTPUT_SERIAL_CONSOLE, error);
     if (error_msg_serial.error_code != ERROR_CODE_NO_ERROR)
     {
-        routeErrorToOutput(OUTPUT_DISPLAY, error_package);
+        (void)routeErrorToOutput(OUTPUT_DISPLAY, &error_msg_serial);
     }
 }
 /* *************************************** */
 
+// TODO: CHANGE THIS FUNC TO RETURN ERROR CODE ONLY
+
 /* STATIC FUNCTIONS IMPLEMENTATIONS */
-static control_error_ts routeErrorToOutput(control_component_te output_component, control_error_ts error_msg)
+static control_error_ts routeErrorToOutput(control_io_t output_component, const control_error_ts *error_msg)
 {
-    control_data_ts data;
-    data.input_id = CONTROL_ID_UNUSED;
-    data.input_type = INPUT_ERROR;
-    data.input_return.error_msg = error_msg;
+    // Pack the error to the error struct
+    control_device_ts error_device = {INPUT_ERROR, CONTROL_ID_UNUSED};
+    control_data_ts data = {*error_msg, error_device};
+
+    //
+    control_device_ts output_device = {IO_UNUSED, CONTROL_ID_UNUSED};
+    control_error_ts error_return = {ERROR_CODE_NO_ERROR, output_device};
 
     switch (output_component)
     {
     case OUTPUT_DISPLAY:
         // Route data to display and update error code
-        error_msg.error_code = display_displayData(data);
-        error_msg.component = OUTPUT_DISPLAY;
-        error_msg.component_id = CONTROL_ID_UNUSED;
+        error_return.error_code = display_displayData(&data);
+        output_device.io_component = OUTPUT_DISPLAY;
         break;
 
     case OUTPUT_SERIAL_CONSOLE:
-        // Serial console output not implemented yet
+        // Route data to serial console and update error code
+        error_return.error_code = serial_console_displayData(&data);
+        output_device.io_component = OUTPUT_SERIAL_CONSOLE;
         break;
 
     default:
         // Set error code for invalid output
-        error_msg.error_code = ERROR_CODE_INVALID_OUTPUT;
+        error_return.error_code = ERROR_CODE_INVALID_OUTPUT;
         break;
     }
 
-    return error_msg;
+    error_return.component = output_device;
+    return error_return;
 }
 
-static control_input_data_ts initializeInputReturnData(control_component_te input_component, uint8_t component_id)
+static control_input_data_ts initializeInputReturnData(const control_device_ts *input_device)
 {
     control_input_data_ts return_data;
 
     // Initialize data part
-    return_data.data.input_type = input_component;
-    return_data.data.input_id = component_id;
+    return_data.data.input = *input_device;
 
     // Initialize error part
     return_data.error_code = ERROR_CODE_INVALID_INPUT;
 
     return return_data;
-}
-
-static control_output_data_ts initializeOutputReturnErrorMsg(control_component_te output_component)
-{
-    // Initialize the error message with default values
-    control_output_data_ts error_msg;
-    error_msg.error_code = ERROR_CODE_INVALID_OUTPUT;
-    error_msg.output_type = output_component;
-
-    return error_msg;
 }
 
 static void initSensor(uint8_t sensor)
@@ -237,7 +214,9 @@ static void initSensor(uint8_t sensor)
     }
     else
     {
-        control_handleError(error_code, INPUT_SENSORS, sensor);
+        control_device_ts sensor_device = {INPUT_SENSORS, sensor};
+        control_error_ts error = {error_code, sensor_device};
+        control_handleError(&error);
     }
 }
 
@@ -262,6 +241,8 @@ static components_status_ts selectUninitialized()
 static bool control_initialize(bool reinit)
 {
     control_error_code_te error_code = ERROR_CODE_INIT_FAILED;
+    control_device_ts device_to_init = {IO_UNUSED, CONTROL_ID_UNUSED};
+    control_error_ts error = {error_code, device_to_init};
 
     // Re-check uninitialized components if reinitializing
     components_status_ts uninitialized_components;
@@ -283,7 +264,9 @@ static bool control_initialize(bool reinit)
         }
         else
         {
-            control_handleError(error_code, OUTPUT_SERIAL_CONSOLE, CONTROL_ID_UNUSED);
+            device_to_init = {OUTPUT_SERIAL_CONSOLE, CONTROL_ID_UNUSED};
+            error = {error_code, device_to_init};
+            control_handleError(&error);
         }
     }
 #endif  
@@ -301,7 +284,9 @@ static bool control_initialize(bool reinit)
         }
         else
         {
-            control_handleError(error_code, OUTPUT_DISPLAY, CONTROL_ID_UNUSED);
+            device_to_init = {OUTPUT_DISPLAY, CONTROL_ID_UNUSED};
+            error = {error_code, device_to_init};
+            control_handleError(&error);
         }
     }
 #endif  
@@ -319,7 +304,9 @@ static bool control_initialize(bool reinit)
         }
         else
         {
-            control_handleError(error_code, INPUT_RTC, RTC_DEFAULT_RTC);
+            device_to_init = {INPUT_RTC, RTC_DEFAULT_RTC};
+            error = {error_code, device_to_init};
+            control_handleError(&error);
         }
     }
 #endif  
@@ -370,11 +357,12 @@ static bool control_initialize(bool reinit)
     // Check initialization status
     uninitialized_components = selectUninitialized();
     if (uninitialized_components.outputs_status == CONTROL_ALL_INITIALIZED &&
-            uninitialized_components.other_inputs_status == CONTROL_ALL_INITIALIZED &&
-            uninitialized_components.sensors_status == CONTROL_ALL_INITIALIZED)
+        uninitialized_components.other_inputs_status == CONTROL_ALL_INITIALIZED &&
+        uninitialized_components.sensors_status == CONTROL_ALL_INITIALIZED)
     {
         return CONTROL_INITIALIZATION_SUCCESSFUL;
     }
+
     return CONTROL_INITIALIZATION_FAILED;
 }
 /* *************************************** */

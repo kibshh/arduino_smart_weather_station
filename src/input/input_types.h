@@ -111,6 +111,8 @@ typedef struct
 /* I2C SCAN COMPONENT */
 /* Forward declaration of the structure */
 struct i2c_scan_reading;
+/* Define typedef for the function pointer */
+typedef bool (*update_i2c_address_fn)(struct i2c_scan_reading *i2c_scan_data);
 /**
  * Structure representing the result of an I2C scan operation.
  * 
@@ -134,7 +136,7 @@ typedef struct i2c_scan_reading
   uint8_t addresses[I2C_SCAN_ARRAY_SIZE];
   uint8_t single_device_status;
   uint8_t device_address;
-  bool (*update_i2c_address)(struct i2c_scan_reading *i2c_scan_data);
+  update_i2c_address_fn update_i2c_address;
   uint8_t current_i2c_addr;
 } i2c_scan_reading_ts;
 

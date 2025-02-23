@@ -47,11 +47,11 @@ control_error_code_te serial_console_init();
  * This function handles data routing and invokes specific display functions
  * based on the type of input provided (e.g., sensor data, RTC time, or I2C scan results).
  *
- * @param data The data structure containing the input type and associated readings.
+ * @param data Pointer to data structure containing the input type and associated readings.
  * @return control_error_code_te
  * - ERROR_CODE_NO_ERROR: Data displayed successfully.
  * - ERROR_CODE_INVALID_INPUT_TYPE: Invalid input type specified.
  */
-control_error_code_te serial_console_displayData(control_data_ts data);
+control_error_code_te serial_console_displayData(const control_data_ts *data);
 
 #endif

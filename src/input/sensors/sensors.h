@@ -88,10 +88,10 @@ control_error_code_te sensors_init(uint8_t sensor);
  *         - Sensor reading (value or indication).
  *         - Error code indicating success or failure:
  *           - ERROR_CODE_NO_ERROR: Reading successful.
- *           - ERROR_CODE_SENSORS_NO_SENSORS_CONFIGURED: No sensors are configured.
- *           - ERROR_CODE_SENSORS_SENSOR_NOT_FOUND: Sensor ID is not found in the configuration.
- *           - ERROR_CODE_SENSORS_ABNORMAL_VALUE: Sensor value is outside configured thresholds.
- *           - ERROR_CODE_SENSORS_INVALID_VALUE_FROM_SENSOR: Sensor returned an invalid value.
+ *           - ERROR_CODE_NO_SENSORS_CONFIGURED: No sensors are configured.
+ *           - ERROR_CODE_SENSOR_NOT_FOUND: Sensor ID is not found in the configuration.
+ *           - ERROR_CODE_ABNORMAL_VALUE_FROM_SENSOR: Sensor value is outside configured thresholds.
+ *           - ERROR_CODE_INVALID_VALUE_FROM_SENSOR: Sensor returned an invalid value.
  *           - ERROR_CODE_SENSORS_MEASUREMENT_TYPE_MISSING_FUNCTION: No valid function for the sensor.
  *
  * @note The function verifies whether the requested sensor ID exists in the configuration.

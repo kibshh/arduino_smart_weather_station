@@ -150,7 +150,7 @@ control_error_code_te sensors_init(uint8_t sensor)
 sensor_return_ts sensors_getReading(uint8_t id)
 {
   sensor_return_ts return_data;
-  return_data.error_code = ERROR_CODE_SENSORS_NO_SENSORS_CONFIGURED; // Set default error code to indicate no sensors are configured
+  return_data.error_code = ERROR_CODE_NO_SENSORS_CONFIGURED; // Set default error code to indicate no sensors are configured
 
   size_t catalog_len = sensors_interface_getSensorsLen(); // Get the length of the sensor configuration array
   if(SENSORS_INTERFACE_NO_SENSORS_CONFIGURED != catalog_len) // Check if any sensors are configured
@@ -186,12 +186,12 @@ sensor_return_ts sensors_getReading(uint8_t id)
           }
           else
           {
-            return_data.error_code = ERROR_CODE_SENSORS_ABNORMAL_VALUE; // Value is outside the range
+            return_data.error_code = ERROR_CODE_ABNORMAL_VALUE_FROM_SENSOR; // Value is outside the range
           }
         }
         else
         {
-          return_data.error_code = ERROR_CODE_SENSORS_INVALID_VALUE_FROM_SENSOR; // Sensor returned an invalid value
+          return_data.error_code = ERROR_CODE_INVALID_VALUE_FROM_SENSOR; // Sensor returned an invalid value
         }
       }
       else if(SENSORS_NO_INDICATION_FUNCTION != current_sensor.sensor_indication_function) // Check if the sensor has an indication function defined
@@ -207,7 +207,7 @@ sensor_return_ts sensors_getReading(uint8_t id)
     }
     else
     {
-      return_data.error_code = ERROR_CODE_SENSORS_SENSOR_NOT_FOUND; // Error: Sensor ID not found in the configuration
+      return_data.error_code = ERROR_CODE_SENSOR_NOT_FOUND; // Error: Sensor ID not found in the configuration
     }
   }
   return return_data;
