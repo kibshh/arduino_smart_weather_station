@@ -5,41 +5,47 @@
 #include <avr/pgmspace.h>
 #include "../input_types.h"
 #include "sensors_interface/sensors_interface.h"
-#if defined(DHT11_TEMPERATURE) || defined(DHT11_HUMIDITY)
+#ifdef DHT11_COMPONENT
 #include "sensor_library/dht11/dht11.h"
 #endif
-#if defined(BMP280_PRESSURE) || defined(BMP280_TEMPERATURE) || defined(BMP280_ALTITUDE)
+#ifdef BMP280_COMPONENT
 #include "sensor_library/bmp280/bmp280.h"
 #endif
-#if defined(BH1750_LUMINANCE)
+#ifdef BH1750_COMPONENT
 #include "sensor_library/bh1750/bh1750.h"
 #endif
-#if defined(GYML8511_UV)
+#ifdef GYML8511_COMPONENT
 #include "sensor_library/gy_ml8511/gy_ml8511.h"
 #endif
-#if defined(MQ135_PPM)
+#ifdef MQ135_COMPONENT
 #include "sensor_library/mq135/mq135.h"
 #endif
-#if defined(MQ7_COPPM)
+#ifdef MQ7_COMPONENT
 #include "sensor_library/mq7/mq7.h"
 #endif
-#if defined(ARDUINORAIN_RAINING)
+#ifdef ARDUINORAIN_COMPONENT
 #include "sensor_library/arduino_rain_sensor/arduino_rain_sensor.h"
 #endif
 
-#define SENSORS_FIRST_SENSOR_INDEX            (0u)      // The index of the first sensor in the configuration
+/* The index of the first sensor in the configuration */
+#define SENSORS_FIRST_SENSOR_INDEX            (uint8_t)(0u)
 
-#define SENSORS_NO_INDICATION_FUNCTION        (nullptr) // Placeholder for sensors without an indication function
-#define SENSORS_NO_VALUE_FUNCTION             (nullptr) // Placeholder for sensors without a value function
+/* Placeholder for sensors without an indication function */
+#define SENSORS_NO_INDICATION_FUNCTION        (nullptr)
+/* Placeholder for sensors without a value function */
+#define SENSORS_NO_VALUE_FUNCTION             (nullptr)
 
-// Placeholders for min_value and max_value in indication sensors
-#define SENSORS_INDICATION_NO_MIN             (0)       
-#define SENSORS_INDICATION_NO_MAX             (0)
+/* Placeholders for min_value and max_value in indication sensors */
+#define SENSORS_INDICATION_NO_MIN             (float)(0)       
+#define SENSORS_INDICATION_NO_MAX             (float)(0)
 
-#define SENSORS_SENSOR_CONFIGURED             (true)    // Flag indicating the sensor is configured in functional catalog
+/* Flag indicating the sensor is configured in functional catalog */
+#define SENSORS_SENSOR_CONFIGURED             (bool)(true)
 
-typedef float (*sensors_sensor_value_function_t)();     // Function pointer type for sensors returning a float value
-typedef bool (*sensors_sensor_indication_function_t)(); // Function pointer type for sensors returning a bool indication
+/* Function pointer type for sensors returning a float value */
+typedef float (*sensors_sensor_value_function_t)();
+/* Function pointer type for sensors returning a bool indication */
+typedef bool (*sensors_sensor_indication_function_t)();
 
 /**
  * @brief Defines the functional properties of a sensor.
@@ -49,27 +55,27 @@ typedef bool (*sensors_sensor_indication_function_t)(); // Function pointer type
  */
 typedef struct
 {
-  float min_value; // The minimum valid value for the sensor's reading. Values below this are considered invalid.
-  float max_value; // The maximum valid value for the sensor's reading. Values above this are considered invalid.
-  sensors_sensor_value_function_t sensor_value_function; // Function pointer for obtaining a numerical reading from the sensor. Optional.
-  sensors_sensor_indication_function_t sensor_indication_function; // Function pointer for obtaining a boolean status/indication from the sensor. Optional.
-  uint8_t sensor_id; // Unique identifier for the sensor. Used to reference the sensor. From config file.
+  float min_value;                                                 /* The minimum valid value for the sensor's reading. Values below this are considered invalid. */
+  float max_value;                                                 /* The maximum valid value for the sensor's reading. Values above this are considered invalid. */
+  sensors_sensor_value_function_t sensor_value_function;           /* Function pointer for obtaining a numerical reading from the sensor. Optional. */
+  sensors_sensor_indication_function_t sensor_indication_function; /* Function pointer for obtaining a boolean status/indication from the sensor. Optional. */
+  uint8_t sensor_id;                                               /* Unique identifier for the sensor. Used to reference the sensor. From config file. */
 } sensors_functional_catalog_ts;
 
 /**
- * @brief Initializes all configured sensors based on their compile-time definitions.
+ * @brief Initializes a specific sensor.
  *
- * This function checks which sensors are defined at compile time and initializes them.
- * If an initialization function fails, an appropriate error code is returned.
+ * This function initializes a sensor.
+ * If the initialization fails for certain sensors (e.g., BMP280, BH1750), 
+ * an error code is returned. Otherwise, it returns a success code.
  *
- * @return error_manager_error_code_te
- * - ERROR_CODE_NO_ERROR: All sensors initialized successfully.
+ * @param sensor Sensor to initialize.
  *
- * @note
- * - Each sensor has its own initialization function.
- * - Sensors are included based on preprocessor definitions.
+ * @return control_error_code_te 
+ *         - ERROR_CODE_NO_ERROR if initialization succeeds.
+ *         - ERROR_CODE_INIT_FAILED if initialization fails.
  */
-error_manager_error_code_te sensors_init();
+control_error_code_te sensors_init(uint8_t sensor);
 
 /**
  * Retrieves a sensor reading based on the provided sensor ID.
@@ -82,10 +88,10 @@ error_manager_error_code_te sensors_init();
  *         - Sensor reading (value or indication).
  *         - Error code indicating success or failure:
  *           - ERROR_CODE_NO_ERROR: Reading successful.
- *           - ERROR_CODE_SENSORS_NO_SENSORS_CONFIGURED: No sensors are configured.
- *           - ERROR_CODE_SENSORS_SENSOR_NOT_FOUND: Sensor ID is not found in the configuration.
- *           - ERROR_CODE_SENSORS_ABNORMAL_VALUE: Sensor value is outside configured thresholds.
- *           - ERROR_CODE_SENSORS_INVALID_VALUE_FROM_SENSOR: Sensor returned an invalid value.
+ *           - ERROR_CODE_NO_SENSORS_CONFIGURED: No sensors are configured.
+ *           - ERROR_CODE_SENSOR_NOT_FOUND: Sensor ID is not found in the configuration.
+ *           - ERROR_CODE_ABNORMAL_VALUE_FROM_SENSOR: Sensor value is outside configured thresholds.
+ *           - ERROR_CODE_INVALID_VALUE_FROM_SENSOR: Sensor returned an invalid value.
  *           - ERROR_CODE_SENSORS_MEASUREMENT_TYPE_MISSING_FUNCTION: No valid function for the sensor.
  *
  * @note The function verifies whether the requested sensor ID exists in the configuration.
@@ -98,7 +104,7 @@ sensor_return_ts sensors_getReading(uint8_t id);
  * @brief Handles periodic tasks for sensors in the main loop.
  *
  * This function manages sensor-related operations, including handling 
- * time-based processes and calibration routines. It should be called 
+ * time-based processes. It should be called 
  * periodically in the main loop with the current time in milliseconds.
  *
  * @param current_millis The current time in milliseconds (e.g., from millis()).

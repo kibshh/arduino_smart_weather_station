@@ -1,11 +1,15 @@
 #include "app_sensors.h"
 
 /* STATIC FUNCTION PROTOTYPES */
-/***
- * Updates the sensor index cyclically.
+/**
+ * @brief Updates the sensor index for periodic readings.
+ *
+ * Increments the current sensor index and resets it if it exceeds 
+ * the total number of sensors, ensuring continuous cyclic updates.
+ *
  * @param current_index The current sensor index.
- * @param number_of_sensors The total number of sensors.
- * @return The updated sensor index.
+ * @param number_of_sensors Total number of sensors in the system.
+ * @return uint8_t The updated sensor index.
  */
 static uint8_t readAllSensorsPeriodicUpdateSensorIndex(uint8_t current_index, size_t number_of_sensors);
 /* *************************************** */
@@ -13,17 +17,24 @@ static uint8_t readAllSensorsPeriodicUpdateSensorIndex(uint8_t current_index, si
 /* EXPORTED FUNCTIONS */
 task_status_te app_readSpecificSensor(uint8_t sensor_id, output_destination_t output)
 {
-    data_router_input_data_ts sensor_reading_result = data_router_fetchDataFromInput(INPUT_SENSORS, sensor_id); // Fetch data from the sensor
-    checkForErrors(sensor_reading_result.error_msg);
-    if(IS_OUTPUT_INCLUDED(output, LCD_DISPLAY))
+    // Define input component and fetch sensor data
+    control_device_ts sensor_to_read = {INPUT_SENSORS, sensor_id};
+    control_input_data_ts sensor_reading_result = control_fetchDataFromInput(&sensor_to_read);
+    // Handle input errors
+    control_error_ts error = {sensor_reading_result.error_code, sensor_to_read};
+    checkForErrors(&error);
+
+    if (IS_OUTPUT_INCLUDED(output, LCD_DISPLAY))
     {
-        checkForErrors(data_router_routeDataToOutput(OUTPUT_DISPLAY, sensor_reading_result)); // Send sensor data to display output
+        sendToOutputAndCheckForErrors(OUTPUT_DISPLAY, &(sensor_reading_result.data));
     }
-    if(IS_OUTPUT_INCLUDED(output, SERIAL_CONSOLE))
+
+    if (IS_OUTPUT_INCLUDED(output, SERIAL_CONSOLE))
     {
-        checkForErrors(data_router_routeDataToOutput(OUTPUT_SERIAL_CONSOLE, sensor_reading_result)); // Send sensor data to serial console output
+        sendToOutputAndCheckForErrors(OUTPUT_SERIAL_CONSOLE, &(sensor_reading_result.data));
     }
-    return FINISHED; // Return value is used to notify task component
+
+    return FINISHED;  // Notify that task is finished
 }
 
 task_status_te app_readAllSensorsPeriodic(output_destination_t output, sensor_reading_context_ts *context)

@@ -4,15 +4,17 @@
 #include <Arduino.h>
 #include "../app_common.h"
 
-#define I2C_SCANER_RUN       (true)  // Enable the I2C scanner operation
-#define I2C_SCANER_DONT_RUN  (false) // Disable the I2C scanner operation, used while data is still being displayed or processed
+/* Enable the I2C scanner operation */
+#define I2C_SCANER_RUN       (bool)(true)
+/* Disable the I2C scanner operation, used while data is still being displayed or processed */
+#define I2C_SCANER_DONT_RUN  (bool)(false)
 
 /* Context structure to manage the state of the I2C scanner operation */
 typedef struct
 {
-    data_router_input_data_ts i2c_scan_return; // Stores the result of the I2C scan operation
-    bool run_i2c_scanner;                      // Flag indicating whether the I2C scanner should be run
-} i2cScan_reading_context_ts;
+    control_input_data_ts i2c_scan_return; // Stores the result of the I2C scan operation
+    bool run_i2c_scanner;                  // Flag indicating whether the I2C scanner should be run
+} i2c_scan_reading_context_ts;
 
 /**
  * @brief Periodically scans and reads I2C addresses.
@@ -24,7 +26,7 @@ typedef struct
  * @param context The I2C scan reading context containing the scan data.
  * @return task_status_te - `NOT_FINISHED` if there are more addresses to process, `FINISHED` otherwise.
  */
-task_status_te app_readAllI2CAddressesPeriodic(output_destination_t output, i2cScan_reading_context_ts *context);
+task_status_te app_readAllI2CAddressesPeriodic(output_destination_t output, i2c_scan_reading_context_ts *context);
 
 /**
  * @brief Reads all I2C addresses at once by performing a scan and routing the results to specified outputs.
@@ -62,11 +64,11 @@ task_status_te app_readI2CDeviceStatus(uint8_t device_address, output_destinatio
  * @brief Initializes and returns a new I2C scan reading context.
  *
  * This function initializes the I2C scan reading context with default values.
- * The function pointer `update_i2c_address` is explicitly set to `I2CSCAN_NO_ADDRESS_UPDATE_FUNCTION`,
+ * The function pointer `update_i2c_address` is explicitly set to `I2C_SCAN_NO_ADDRESS_UPDATE_FUNCTION`,
  * which serves as the key check for determining if address updates should occur.
  *
- * @return i2cScan_reading_context_ts - A half initialized I2C scan reading context.
+ * @return i2c_scan_reading_context_ts - A half initialized I2C scan reading context.
  */
-i2cScan_reading_context_ts app_createI2CScanReadingContext();
+i2c_scan_reading_context_ts app_createI2CScanReadingContext();
 
 #endif

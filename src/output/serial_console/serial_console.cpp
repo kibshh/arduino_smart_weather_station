@@ -1,6 +1,48 @@
 #include "serial_console.h"
 
-error_manager_error_code_te serial_console_init()
+/* STATIC FUNCTION PROTOTYPES */
+/**
+ * @brief Displays sensor measurements on the serial console.
+ *
+ * This function retrieves sensor metadata and formats the sensor readings
+ * for display on the serial console, including the sensor type, value, and unit.
+ *
+ * @param control_data_ts Pointer to data containing sensor reading with value, and measurement type switch and sensor ID.
+ * @return control_error_code_te
+ * - ERROR_CODE_NO_ERROR: Sensor data displayed successfully.
+ * - ERROR_CODE_SENSOR_NOT_CONFIGURED: Sensor metadata retrieval failed.
+ * - ERROR_CODE_INVALID_SENSOR_MEASUREMENT_TYPE: Invalid measurement type.
+ */
+static control_error_code_te serial_console_displaySensorMeasurement(const control_data_ts *data);
+
+/**
+ * @brief Displays the current RTC time on the serial console.
+ *
+ * This function formats and displays the current time data, including
+ * hours, minutes, seconds, day, month, and year.
+ *
+ * @param control_data_ts Pointer to data containing RTC reading with the current time (year, month, day, hour, minutes, seconds).
+ * @return control_error_code_te
+ * - ERROR_CODE_NO_ERROR: Time data displayed successfully.
+ */
+static control_error_code_te serial_console_displayTime(const control_data_ts *data);
+
+/**
+ * @brief Displays I2C scan results on the serial console.
+ *
+ * This function formats and displays I2C scan results, including the
+ * detected device address and its communication status.
+ *
+ * @param control_data_ts Pointer to data containing I2C scanning data that contains the device address and scan status.
+ * @return control_error_code_te
+ * - ERROR_CODE_NO_ERROR: I2C data displayed successfully.
+ * - ERROR_CODE_UNKNOWN_I2C_DEVICE_STATUS: Unknown device status during communication.
+ */
+static control_error_code_te serial_console_displayI2cScan(const control_data_ts *data);
+/* *************************************** */
+
+/* EXPORTED FUNCTIONS */
+control_error_code_te serial_console_init()
 {
     // Begin serial communication with the defined baud rate.
     Serial.begin(SERIAL_CONSOLE_BAUDRATE);
@@ -8,33 +50,30 @@ error_manager_error_code_te serial_console_init()
     // Check if serial is available but don't block program execution.
     if (!Serial) {
         // Return an error code if serial is not available.
-        return ERROR_CODE_SERIAL_CONSOLE_INIT_FAILED;
+        return ERROR_CODE_INIT_FAILED;
     }
     // If no error occurred during initialization, return success code.
     return ERROR_CODE_NO_ERROR;
 }
 
-error_manager_error_code_te serial_console_displayData(data_router_data_ts data)
+control_error_code_te serial_console_displayData(const control_data_ts *data)
 {
   // Default error code for invalid input type
-  error_manager_error_code_te error_code = ERROR_CODE_INVALID_INPUT_TYPE;
+  control_error_code_te error_code = ERROR_CODE_INVALID_INPUT_TYPE;
 
-  switch(data.input_type)
+  switch(data->input.io_component)
   {
     case INPUT_SENSORS:
-      error_code = serial_console_displaySensorMeasurement(data.input_return.sensor_reading); // Display sensor data
+      error_code = serial_console_displaySensorMeasurement(data); // Display sensor data
       break;
 
     case INPUT_RTC:
-      error_code = serial_console_displayTime(data.input_return.rtc_reading); // Display RTC time data 
+      error_code = serial_console_displayTime(data); // Display RTC time data 
       break;
 
     case INPUT_I2C_SCAN:
-      error_code = serial_console_displayI2cScan(data.input_return.i2cScan_reading); // Display I2C scan results
+      error_code = serial_console_displayI2cScan(data); // Display I2C scan results
       break;
-
-    case INPUT_CALIBRATION:
-      error_code = serial_console_displayCalibrationResults(data.input_return.calib_reading); // Display calibration results
 
     default:
       // No action, error code is already set
@@ -43,13 +82,18 @@ error_manager_error_code_te serial_console_displayData(data_router_data_ts data)
 
   return error_code;
 }
+/* *************************************** */
 
-error_manager_error_code_te serial_console_displaySensorMeasurement(sensor_reading_ts sensor_data)
+/* STATIC FUNCTIONS IMPLEMENTATIONS */
+static control_error_code_te serial_console_displaySensorMeasurement(const control_data_ts *data)
 {
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
+  sensor_reading_ts sensor_data = data->input_return.sensor_reading;
+  uint8_t sensor_id = data->input.device_id;
+
+  control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
   // Retrieve sensor metadata
-  sensors_interface_metadata_ts sensor_metadata = sensors_interface_getSensorMetadata(sensor_data.sensor_id);
+  sensors_interface_metadata_ts sensor_metadata = sensors_interface_getSensorMetadata(sensor_id);
 
   // Check if metadata retrieval was successful
   if(SENSORS_INTERFACE_STATUS_SUCCESS == sensor_metadata.success_status)
@@ -79,7 +123,7 @@ error_manager_error_code_te serial_console_displaySensorMeasurement(sensor_readi
     else
     {
       // Set error code for invalid measurement type
-      error_code = ERROR_CODE_SERIAL_CONSOLE_INVALID_MEASUREMENT_TYPE;
+      error_code = ERROR_CODE_INVALID_SENSOR_MEASUREMENT_TYPE;
       proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
     }
     // Format and display the sensor data if everything is okay
@@ -91,13 +135,15 @@ error_manager_error_code_te serial_console_displaySensorMeasurement(sensor_readi
   }
   else
   {
-    error_code = ERROR_CODE_SERIAL_CONSOLE_SENSOR_NOT_CONFIGURED;
+    error_code = ERROR_CODE_SENSOR_NOT_CONFIGURED;
   }
   return error_code;
 }
 
-error_manager_error_code_te serial_console_displayTime(rtc_reading_ts time_data)
+static control_error_code_te serial_console_displayTime(const control_data_ts *data)
 {
+  rtc_reading_ts time_data = data->input_return.rtc_reading;
+
   // Extract time components
   uint16_t year = time_data.year;
   uint8_t month = time_data.month;
@@ -120,9 +166,11 @@ error_manager_error_code_te serial_console_displayTime(rtc_reading_ts time_data)
   return ERROR_CODE_NO_ERROR;
 }
 
-error_manager_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c_scan_data)
+static control_error_code_te serial_console_displayI2cScan(const control_data_ts *data)
 {
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
+  i2c_scan_reading_ts i2c_scan_data = data->input_return.i2c_scan_reading;
+
+  control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
   bool proceed_with_display = SERIAL_CONSOLE_PROCEED_WITH_DISPLAY;
 
@@ -130,7 +178,7 @@ error_manager_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c
   char addr_string[SERIAL_CONSOLE_HEX_ADDR_STRING_LEN]; // Buffer for hexadecimal address representation
 
   // Handle scan for all devices mode
-  if(I2CSCAN_MODE_SCAN_FOR_ALL_DEVICES == i2c_scan_data.device_address)
+  if(I2C_SCAN_MODE_SCAN_FOR_ALL_DEVICES == i2c_scan_data.device_address)
   {
     snprintf(addr_string, sizeof(addr_string), "%02X", i2c_scan_data.current_i2c_addr);
     snprintf(display_string, sizeof(display_string), "I2C scan - I2C device found at address: 0x%s", addr_string);
@@ -144,23 +192,23 @@ error_manager_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c
     // Interpret and append the device status
     switch (i2c_scan_data.single_device_status)
     {
-      case I2CSCAN_TRANSMISSION_RESULT_SUCCESS:
+      case I2C_SCAN_TRANSMISSION_RESULT_SUCCESS:
         strncpy(status_msg, "Successful transmission", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
         break;
-      case I2CSCAN_TRANSMISSION_RESULT_TOOLONG:
+      case I2C_SCAN_TRANSMISSION_RESULT_TOOLONG:
         strncpy(status_msg, "Data too long to fit in transmit buffer", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
         break;
-      case I2CSCAN_TRANSMISSION_RESULT_NACKADR:
+      case I2C_SCAN_TRANSMISSION_RESULT_NACKADR:
         strncpy(status_msg, "Received NACK on transmit of the address", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
         break;
-      case I2CSCAN_TRANSMISSION_RESULT_NACKDAT:
+      case I2C_SCAN_TRANSMISSION_RESULT_NACKDAT:
         strncpy(status_msg, "Received NACK on transmit of the data", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
         break;
-      case I2CSCAN_TRANSMISSION_RESULT_UNKNOWN:
+      case I2C_SCAN_TRANSMISSION_RESULT_UNKNOWN:
         strncpy(status_msg, "Unknown error occurred during communication", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
         break;
       default:
-        error_code = ERROR_CODE_SERIAL_CONSOLE_UNKNOWN_I2C_DEVICE_STATUS;
+        error_code = ERROR_CODE_UNKNOWN_I2C_DEVICE_STATUS;
         proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
         break;
     }
@@ -170,7 +218,7 @@ error_manager_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c
       strncat(display_string, status_msg, sizeof(display_string) - strlen(display_string) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
     }
   }
-  /* IMPORTANT: Check of invalid I2C address is done on I2C scanner side and it should not arrive on the Serial Console */
+  // IMPORTANT: Check of invalid I2C address is done on I2C scanner side and it should not arrive on the Serial Console
   // Display the formatted string if no error occurred
   if(SERIAL_CONSOLE_PROCEED_WITH_DISPLAY == proceed_with_display)
   {
@@ -179,89 +227,4 @@ error_manager_error_code_te serial_console_displayI2cScan(i2cScan_reading_ts i2c
 
   return error_code;
 }
-
-error_manager_error_code_te serial_console_displayCalibrationResults(calibration_reading_ts calibration_data)
-{
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
-
-  // Fetch metadata for the given calibration ID
-  calibration_interface_metadata_ts calib_metadata = calibration_interface_getCalibrationMetadata(calibration_data.calibration_id);
-
-  // Proceed only if calibration metadata is successfully retrieved
-  if(CALIBRATION_INTERFACE_STATUS_SUCCESS == calib_metadata.success_status)
-  {
-    bool proceed_with_display = SERIAL_CONSOLE_PROCEED_WITH_DISPLAY;
-
-    // Extract metadata fields
-    const char* calibration_type = calib_metadata.metadata.calibration_type;
-    const char* calibration_unit = calib_metadata.metadata.calibration_unit;
-    uint8_t num_of_measurements_type = calib_metadata.metadata.num_of_measurements_type;
-    uint8_t num_of_decimals = calib_metadata.metadata.num_of_decimals;
-
-    // Buffer for formatted display string
-    char display_string[SERIAL_CONSOLE_STRING_RESERVED_GIANT]; // Enough space for formatted output
-
-    if(CALIBRATION_MULTIPLE_MEASUREMENTS == num_of_measurements_type)
-    {
-      switch (calibration_data.current_calibration_status)
-      {
-        case CALIBRATION_STATE_IDLE:
-          // Should never occur since calibration at least goes to 'in progress'
-          snprintf(display_string, sizeof(display_string), "%s: No calibration active", calibration_type);
-          break;
-
-        case CALIBRATION_STATE_IN_PROGRESS:
-          snprintf(display_string, sizeof(display_string), "%s: Calibration in progress...", calibration_type);
-          break;
-
-        case CALIBRATION_STATE_FINISHED:
-        {
-          // Convert float value to string with proper decimal places
-          char val[SERIAL_CONSOLE_DTOSTRF_BUFFER_SIZE]; // Temporary buffer for float conversion
-          dtostrf(calibration_data.value, SERIAL_CONSOLE_MIN_FLOAT_STRING_LEN, num_of_decimals, val); // Convert float to string
-
-          snprintf(display_string, sizeof(display_string), "Calibration for %s: %s%s", calibration_type, val, calibration_unit);
-          break;
-        }
-
-        default:
-          error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_STATUS;
-          proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
-          break;
-      }
-    }
-    else if(CALIBRATION_SINGLE_MEASUREMENT == num_of_measurements_type)
-    {
-      if (CALIBRATION_STATE_FINISHED == calibration_data.current_calibration_status)
-      {
-        // Convert float value to string with proper decimal places
-        char val[SERIAL_CONSOLE_DTOSTRF_BUFFER_SIZE]; // Temporary buffer for float conversion
-        dtostrf(calibration_data.value, SERIAL_CONSOLE_MIN_FLOAT_STRING_LEN, num_of_decimals, val);
-
-        snprintf(display_string, sizeof(display_string), "Calibration for %s: %s%s", calibration_type, val, calibration_unit);
-      }
-      else
-      {
-        error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_STATUS;
-        proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
-      }
-    }
-    else
-    {
-      error_code = ERROR_CODE_DISPLAY_INVALID_CALIBRATION_NUM_OF_MEASUREMENTS_TYPE_CONFIGURED;
-      proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
-    }
-    // Display the message only if there is no error
-    if(SERIAL_CONSOLE_PROCEED_WITH_DISPLAY == proceed_with_display)
-    {
-      Serial.println(display_string);
-    }
-  }
-  else
-  {
-    // Calibration metadata retrieval failed
-    error_code = ERROR_CODE_CALIBRATION_CALIB_NOT_CONFIGURED;
-  }
-
-  return error_code;
-}
+/* *************************************** */

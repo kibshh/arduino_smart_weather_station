@@ -1,20 +1,21 @@
 #include "rtc.h"
 
-//GLOBAL VARIABLES
-RTC_DS3231 rtc;
+/* STATIC GLOBAL VARIABLES */
+static RTC_DS3231 rtc;
+/* *************************************** */
 
-error_manager_error_code_te rtc_init()
+/* EXPORTED FUNCTIONS */
+control_error_code_te rtc_init()
 {
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
+  control_error_code_te error_code = ERROR_CODE_NO_ERROR;
 
   if (!rtc.begin()) 
   {
-    error_code = ERROR_CODE_RTC_INIT_FAILED;
+    error_code = ERROR_CODE_INIT_FAILED;
   }
 
   if (rtc.lostPower()) // When time needs to be set on a new device, or after a power loss
   {
-    // Serial.println("RTC lost power, setting the time...");
     rtc.adjust(DateTime(F(RTC_COMPILE_DATE), F(RTC_COMPILE_TIME))); // Set to the compile time
   }
 }
@@ -22,7 +23,7 @@ error_manager_error_code_te rtc_init()
 rtc_return_ts rtc_getTime(uint8_t id)
 {
   rtc_return_ts new_reading;
-  new_reading.error_code = ERROR_CODE_RTC_RTC_NOT_FOUND;
+  new_reading.error_code = ERROR_CODE_RTC_NOT_FOUND;
 
   if(id == RTC_DEFAULT_RTC)
   {
@@ -47,3 +48,4 @@ rtc_return_ts rtc_getTime(uint8_t id)
   }
   return new_reading;
 }
+/* *************************************** */

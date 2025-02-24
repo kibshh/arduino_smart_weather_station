@@ -1,6 +1,7 @@
 #include "mq135.h"
 
 
+/* EXPORTED FUNCTIONS */
 void mq135_init()
 {
   pinMode(SENSORS_MQ135_PIN_ANALOG, INPUT);
@@ -27,10 +28,9 @@ float mq135_readPPM()
   return ppm; // Return calculated PPM or invalid value
 }
 
-#ifdef SENSORS_MQ135_CALIBRATION_ENABLED
-float mq135_calculateResistanceForCalibration()
+float mq135_readResistanceForCalibration()
 {
-  float calculated_resistance = CALIBRATION_INVALID_VALUE; // If analog read is not valid
+  float calculated_resistance = MQ135_INVALID_VALUE; // If analog read is not valid
 
   int sensor_analog_reading = analogRead(SENSORS_MQ135_PIN_ANALOG);
   if(MQ135_ANALOG_INPUT_MIN <= sensor_analog_reading && MQ135_ANALOG_INPUT_MAX >= sensor_analog_reading) // Check for valid analog read
@@ -43,5 +43,5 @@ float mq135_calculateResistanceForCalibration()
   }
   return calculated_resistance;
 }
-#endif
+/* *************************************** */
 

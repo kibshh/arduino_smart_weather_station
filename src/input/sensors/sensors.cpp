@@ -95,46 +95,62 @@ const sensors_functional_catalog_ts sensors_functional_catalog[] PROGMEM =
   },
 #endif
 };
+/* *************************************** */
 
-error_manager_error_code_te sensors_init()
+/* EXPORTED FUNCTIONS */
+control_error_code_te sensors_init(uint8_t sensor)
 {
-  error_manager_error_code_te error_code = ERROR_CODE_NO_ERROR;
-
-#if defined(DHT11_TEMPERATURE) || defined(DHT11_HUMIDITY)
-  dht11_init();
-#endif
-#if defined(BMP280_PRESSURE) || defined(BMP280_TEMPERATURE) || defined(BMP280_ALTITUDE)
-  if(!bmp280_init())
+  switch(sensor)
   {
-    error_code = ERROR_CODE_SENSORS_INIT_BMP280;
-  }
-#endif
-#if defined(BH1750_LUMINANCE)
-  if(!bh1750_init())
-  {
-    error_code = ERROR_CODE_SENSORS_INIT_BH1750;
-  }
-#endif
-#if defined(MQ135_PPM)
-  mq135_init();
-#endif
-#if defined(MQ7_COPPM)
-  mq7_init();
-#endif
-#if defined(GYML8511_UV)
-  gy_ml8511_init();
-#endif
-#if defined(ARDUINORAIN_RAINING)
-  arduino_rain_sensor_init();
-#endif
+    // DHT11
+    case DHT11_COMPONENT:
+      dht11_init();
+      return ERROR_CODE_NO_ERROR;
 
-  return error_code;
+    // BMP280
+    case BMP280_COMPONENT:
+      if(!bmp280_init())
+      {
+        return ERROR_CODE_INIT_FAILED;
+      }
+      return ERROR_CODE_NO_ERROR;
+    
+    // BH1750
+    case BH1750_COMPONENT:
+      if(!bh1750_init())
+      {
+        return ERROR_CODE_INIT_FAILED;
+      }
+      return ERROR_CODE_NO_ERROR;
+
+    // MQ135
+    case MQ135_COMPONENT:
+      mq135_init();
+      return ERROR_CODE_NO_ERROR;
+
+    // MQ7
+    case MQ7_COMPONENT:
+      mq7_init();
+      return ERROR_CODE_NO_ERROR;
+
+    // GYML8511
+    case GYML8511_COMPONENT:
+      gy_ml8511_init();
+      return ERROR_CODE_NO_ERROR;
+
+    // ARDUINO RAIN SENSOR
+    case ARDUINORAIN_COMPONENT:
+      arduino_rain_sensor_init();
+      return ERROR_CODE_NO_ERROR;
+  }
+
+  return ERROR_CODE_INIT_FAILED;
 }
 
 sensor_return_ts sensors_getReading(uint8_t id)
 {
   sensor_return_ts return_data;
-  return_data.error_code = ERROR_CODE_SENSORS_NO_SENSORS_CONFIGURED; // Set default error code to indicate no sensors are configured
+  return_data.error_code = ERROR_CODE_NO_SENSORS_CONFIGURED; // Set default error code to indicate no sensors are configured
 
   size_t catalog_len = sensors_interface_getSensorsLen(); // Get the length of the sensor configuration array
   if(SENSORS_INTERFACE_NO_SENSORS_CONFIGURED != catalog_len) // Check if any sensors are configured
@@ -156,7 +172,6 @@ sensor_return_ts sensors_getReading(uint8_t id)
     {
       sensors_functional_catalog_ts current_sensor;
       memcpy_P(&current_sensor, &sensors_functional_catalog[sensor_index], sizeof(sensors_functional_catalog_ts)); // Copy the sensor configuration from program memory to a local structure
-      return_data.sensor_reading.sensor_id = id;
 
       if(SENSORS_NO_VALUE_FUNCTION != current_sensor.sensor_value_function) // Check if the sensor has a value function defined
       {
@@ -171,12 +186,12 @@ sensor_return_ts sensors_getReading(uint8_t id)
           }
           else
           {
-            return_data.error_code = ERROR_CODE_SENSORS_ABNORMAL_VALUE; // Value is outside the range
+            return_data.error_code = ERROR_CODE_ABNORMAL_VALUE_FROM_SENSOR; // Value is outside the range
           }
         }
         else
         {
-          return_data.error_code = ERROR_CODE_SENSORS_INVALID_VALUE_FROM_SENSOR; // Sensor returned an invalid value
+          return_data.error_code = ERROR_CODE_INVALID_VALUE_FROM_SENSOR; // Sensor returned an invalid value
         }
       }
       else if(SENSORS_NO_INDICATION_FUNCTION != current_sensor.sensor_indication_function) // Check if the sensor has an indication function defined
@@ -192,7 +207,7 @@ sensor_return_ts sensors_getReading(uint8_t id)
     }
     else
     {
-      return_data.error_code = ERROR_CODE_SENSORS_SENSOR_NOT_FOUND; // Error: Sensor ID not found in the configuration
+      return_data.error_code = ERROR_CODE_SENSOR_NOT_FOUND; // Error: Sensor ID not found in the configuration
     }
   }
   return return_data;
@@ -202,8 +217,6 @@ void sensors_loop(unsigned long current_millis)
 {
 #ifdef MQ7_COPPM
   mq7_heatingCycle(current_millis);
-#ifdef SENSORS_MQ7_CALIBRATION_ENABLED
-  mq7_calibratingLoopFunction(current_millis);
-#endif
 #endif
 }
+/* *************************************** */
