@@ -72,6 +72,15 @@ static String formatDisplaySensorData(sensors_metadata_catalog_ts sensor_metadat
  * @param row The row index to clear.
  */
 static void displayEmptyLine(uint8_t row);
+
+/**
+ * @brief Pads a string with ' ' characters, to be displayed on the LCD.
+ * NOTE: Caller must initialize the string with large enough buffer size
+ * (DISPLAY_MAX_STRING_LEN).
+ *
+ * @param string The string to pad.
+ */
+static void padString(char *string);
 /* *************************************** */
 
 /* EXPORTED FUNCTIONS */
@@ -260,10 +269,7 @@ static control_error_code_te display_displayI2cScan(const control_data_ts *data)
       // Print device status based on scan result
       lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_I2C_SCAN_ADDR_ROW);
       // Print the status on LCD with padding
-      while (strlen(status_string) < DISPLAY_LCD_WIDTH)
-      {
-        strcat(status_string, " "); // Pad the string with spaces
-      }
+      padString(status_string);
       lcd.print(status_string);
     }
   }
@@ -280,16 +286,14 @@ static control_error_code_te display_displayError(const control_data_ts *data)
   char error_string[DISPLAY_MAX_STRING_LEN];
 
   snprintf(error_string, sizeof(error_string), "Error Code: %d", error_data.error_code);
+  padString(error_string);
   lcd.print(error_string); // In case of print error we do not need an error message,
                            // since this is a last resort operation. If error message write
                            // to LCD fails, we just discard.
   lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_ERROR_COMPONENT_INFO_ROW);
   snprintf(error_string, sizeof(error_string), "ID: %u", error_data.component.device_id);
 
-  while (strlen(error_string) < DISPLAY_LCD_WIDTH)
-  {
-    strcat(error_string, " "); // Pad the string with spaces
-  }
+  padString(error_string);
   lcd.print(error_string);
 
   return ERROR_CODE_NO_ERROR; // Return success error code
@@ -303,12 +307,7 @@ static String formatDisplaySensorData(sensors_metadata_catalog_ts sensor_metadat
   snprintf(display_string, sizeof(display_string), "%s: %s%s", sensor_metadata.sensor_type, val, sensor_metadata.measurement_unit);
 
   // Ensure the string fits the display by padding with spaces
-  int len = strlen(display_string);
-  for (int i = len; i < DISPLAY_LCD_WIDTH; ++i)
-  {
-    display_string[i] = ' ';
-  }
-  display_string[DISPLAY_LCD_WIDTH] = '\0'; // Null-terminate the string
+  padString(display_string);
 
   return String(display_string); // Return the formatted string as a String object
 }
@@ -320,5 +319,15 @@ static void displayEmptyLine(uint8_t row)
   {
     lcd.print(" ");
   }
+}
+
+static void padString(char *string)
+{
+  size_t len = strlen(string);
+  for (size_t i = len; i < DISPLAY_LCD_WIDTH; ++i)
+  {
+    string[i] = ' ';
+  }
+  string[DISPLAY_MAX_STRING_LEN] = '\0'; // Null-terminate the string
 }
 /* *************************************** */
