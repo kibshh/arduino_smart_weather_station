@@ -72,6 +72,6 @@ float mq7_readResistanceForCalibration();
  * 
  * @param current_millis The current time in milliseconds (e.g., from millis()).
  */
-void mq7_heatingCycle(unsigned long current_millis);
+void mq7_heatingCycle(const uint32_t *current_millis);
 
 #endif

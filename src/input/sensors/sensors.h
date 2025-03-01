@@ -109,6 +109,6 @@ sensor_return_ts sensors_getReading(uint8_t id);
  *
  * @param current_millis The current time in milliseconds (e.g., from millis()).
  */
-void sensors_loop(unsigned long current_millis);
+void sensors_loop(const uint32_t *current_millis);
 
 #endif

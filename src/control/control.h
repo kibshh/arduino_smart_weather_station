@@ -128,4 +128,6 @@ control_input_data_ts control_fetchDataFromInput(const control_device_ts *input_
  */
 void control_handleError(const control_error_ts *error);
 
+void control_loop(const uint32_t *current_time);
+
 #endif

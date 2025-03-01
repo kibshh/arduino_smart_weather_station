@@ -78,6 +78,16 @@ const sensors_metadata_catalog_ts sensors_metadata_catalog[] PROGMEM =
     SENSORS_DISPLAY_9_LETTERS
   },
 #endif  
+#ifdef MQ135_CALIBRATION_RESISTANCE
+  {
+    "MQ135R0 resistance",       
+    "",    
+    MQ135_CALIBRATION_RESISTANCE,           
+    SENSORS_MEASUREMENT_TYPE_VALUE,
+    SENSORS_DISPLAY_0_DECIMALS,
+    SENSORS_DISPLAY_7_LETTERS
+  },
+#endif  
 #ifdef MQ7_COPPM
   {
     "CO PPM",          
@@ -86,6 +96,16 @@ const sensors_metadata_catalog_ts sensors_metadata_catalog[] PROGMEM =
     SENSORS_MEASUREMENT_TYPE_VALUE,
     SENSORS_DISPLAY_0_DECIMALS,
     SENSORS_DISPLAY_6_LETTERS
+  },
+#endif  
+#ifdef MQ7_CALIBRATION_RESISTANCE
+  {
+    "MQ7R0 resistance",       
+    "",    
+    MQ7_CALIBRATION_RESISTANCE,           
+    SENSORS_MEASUREMENT_TYPE_VALUE,
+    SENSORS_DISPLAY_0_DECIMALS,
+    SENSORS_DISPLAY_5_LETTERS
   },
 #endif  
 #ifdef GYML8511_UV

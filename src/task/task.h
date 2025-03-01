@@ -4,47 +4,56 @@
 #include <Arduino.h>
 #include "../app_layer/app.h"
 
-#define MS_PER_SECOND   ((uint32_t)1000u)
-#define MS_PER_MINUTE   (60u * MS_PER_SECOND)
-#define MS_PER_HOUR     (60u * MS_PER_MINUTE)
+#define MS_PER_SECOND              ((uint32_t)(1000u))
+#define MS_PER_MINUTE              ((uint32_t)(60u * MS_PER_SECOND))
+#define MS_PER_HOUR                ((uint32_t)(60u * MS_PER_MINUTE))
 
-#define TIME_HOURS(h)   ((h) * MS_PER_HOUR)
-#define TIME_MINS(m)    ((m) * MS_PER_MINUTE)
-#define TIME_SECS(s)    ((s) * MS_PER_SECOND)
+#define TIME_HOURS(h)              ((uint32_t)((h) * MS_PER_HOUR))
+#define TIME_MINS(m)               ((uint32_t)((m) * MS_PER_MINUTE))
+#define TIME_SECS(s)               ((uint32_t)((s) * MS_PER_SECOND))
+#define TIME_MSECS(m)              ((uint32_t)(m))
 
-#define TASK_CALIBRATING_TIMER     (TIME_SECS(1))
-#define TASK_TIME_READ_TIMER       (TIME_SECS(1))
-#define TASK_SENSOR_READ_TIMER     (TIME_SECS(2))
-#define TASK_I2C_ADDR_READ_TIMER   (TIME_SECS(2))
-
-#define TASK_CALIBRATING           (0u)
-#define TASK_TIME_READ             (1u)
-#define TASK_SENSOR_READ           (2u)
-#define TASK_I2C_ADDR_READ         (3u)
-
-#define CYCLIC_TASK_DELAY_MS       ((uint32_t)50u)
-
-#define TASK_NO_TASKS              (0u)
-#define TASK_FIRST_TASK_INDEX      (0u)
-#define TASK_INVALID_INDEX         (127u)
+#define TASK_NO_TASKS              (size_t)(0u)
+#define TASK_FIRST_TASK_INDEX      (uint8_t)(0u)
+#define TASK_INVALID_INDEX         (uint8_t)(127u)
 
 #define INTERVAL_PASSED            (true)
 #define INTERVAL_NOT_PASSED        (false)
 
+#define CYCLIC_TASK_DELAY_MS       (TIME_MSECS(50))
+
+#define PERIOD_REINIT              (TIME_SECS(5))
+#define PERIOD_CALIBRATION         (TIME_SECS(3))
+#define PERIOD_I2C_SCANNING        (TIME_SECS(2))
+#define PERIOD_SHOW_TIME           (TIME_SECS(1))
+#define PERIOD_SENSOR_READ         (TIME_SECS(3))
+
 typedef enum
 {
-    STATE_SCANNING_FOR_I2C_ADDRESSES,
-    STATE_CYCLIC_SENSOR_AND_TIME_READING
-} task_state_machine_te;
+    TASK_REINIT,
+    TASK_CALIBRATION,
+    TASK_I2C_SCANNING,
+    TASK_SHOW_TIME,
+    TASK_SENSOR_READ
+} task_id_te;
 
 typedef struct
 {
-    uint32_t previous_millis;
-    uint32_t task_period;
-    uint8_t task_id;
+  uint32_t task_period;
+  uint32_t time_elapsed;
+  uint8_t task_id;
 } tasks_config_ts;
 
-void task_initTask();
+typedef enum
+{
+    STATE_IDLE,
+    STATE_I2C_SCANNING,
+    STATE_CALIBRATING_MQ135,
+    STATE_CALIBRATING_MQ7,
+    STATE_MAIN_FUNCTION
+} task_state_machine_states_te;
+
 void task_cyclicTask();
+void task_mainTask();
 
 #endif

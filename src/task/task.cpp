@@ -1,62 +1,100 @@
 #include "task.h"
 
-static tasks_config_ts tasks_config[] =
-{
-  {millis(), TASK_I2C_ADDR_READ_TIMER, TASK_I2C_ADDR_READ},
-  {millis(), TASK_SENSOR_READ_TIMER, TASK_SENSOR_READ},
-  {millis(), TASK_TIME_READ_TIMER, TASK_TIME_READ}
-};
 
 static bool intervalPassed(uint8_t task_id);
 static uint8_t findTaskIndex(uint8_t task_id);
 static size_t getNumOfTasks();
+static uint32_t currentTime();
 
-void task_initTask()
+static tasks_config_ts tasks_config[] = 
 {
-
-}
+  {PERIOD_REINIT,        currentTime(), TASK_REINIT},
+  {PERIOD_CALIBRATION,   currentTime(), TASK_CALIBRATION},
+  {PERIOD_I2C_SCANNING,  currentTime(), TASK_I2C_SCANNING},
+  {PERIOD_SHOW_TIME,     currentTime(), TASK_SHOW_TIME},
+  {PERIOD_SENSOR_READ,   currentTime(), TASK_SENSOR_READ},
+};
 
 void task_cyclicTask()
 {
-  static i2c_scan_reading_context_ts context_i2c_scan = app_createI2CScanReadingContext();
-  static sensor_reading_context_ts context_sensor_reading = app_createNewSensorsReadingContext();
-  static task_state_machine_te current_state = STATE_SCANNING_FOR_I2C_ADDRESSES;
+  uint32_t current_time = currentTime();
+  control_loop(&current_time);
+}
 
-  if(STATE_SCANNING_FOR_I2C_ADDRESSES == current_state)
+void task_mainTask()
+{
+  static uint8_t current_state = STATE_IDLE;
+
+  static bool all_components_initialized = control_init();
+  if(CONTROL_INITIALIZATION_FAILED == all_components_initialized && INTERVAL_PASSED == intervalPassed(TASK_REINIT))
   {
-    if(INTERVAL_PASSED == intervalPassed(TASK_I2C_ADDR_READ))
-    {
-      if(FINISHED == app_readAllI2CAddressesPeriodic(ALL_OUTPUTS, &context_i2c_scan))
+    all_components_initialized = control_reinit();
+  }
+  
+  switch(current_state)
+  {
+    case STATE_IDLE:
+      // Should send some introductory message here
+      current_state = STATE_I2C_SCANNING;
+      break;
+
+    case STATE_I2C_SCANNING:
+      static i2c_scan_reading_context_ts i2c_scan_reading_context = app_createI2CScanReadingContext();
+      if(INTERVAL_PASSED == intervalPassed(TASK_I2C_SCANNING))
       {
-        current_state = STATE_CYCLIC_SENSOR_AND_TIME_READING;
+        if(FINISHED == app_readAllI2CAddressesPeriodic(ALL_OUTPUTS, &i2c_scan_reading_context))
+        {
+          current_state = STATE_CALIBRATING_MQ135;
+        }
       }
-    }
-  }
-  else if(STATE_CYCLIC_SENSOR_AND_TIME_READING == current_state)
-  {
-    if(INTERVAL_PASSED == intervalPassed(TASK_SENSOR_READ))
-    {
-      (void)app_readAllSensorsPeriodic(ALL_OUTPUTS, &context_sensor_reading);
-    }
-    if(INTERVAL_PASSED == intervalPassed(TASK_TIME_READ))
-    {
-      (void)app_readCurrentRtcTime(LCD_DISPLAY);
-    }
-  }
+      break;
 
-  delay(CYCLIC_TASK_DELAY_MS);
+    case STATE_CALIBRATING_MQ135:
+      static uint8_t mq135_calibration_counter = 0;
+      if(INTERVAL_PASSED == intervalPassed(TASK_CALIBRATION))
+      {
+        if(FINISHED == app_readSpecificSensor(MQ135_CALIBRATION_RESISTANCE, ALL_OUTPUTS) && mq135_calibration_counter >= SENSORS_MQ135_NUM_OF_CALIBRATIONS)
+        {
+          current_state = STATE_CALIBRATING_MQ7;
+        }
+      }
+      break;
+
+    case STATE_CALIBRATING_MQ7:
+      static uint8_t mq7_calibration_counter = 0;
+      if(INTERVAL_PASSED == intervalPassed(TASK_CALIBRATION))
+      {
+        if(FINISHED == app_readSpecificSensor(MQ7_CALIBRATION_RESISTANCE, ALL_OUTPUTS) && mq7_calibration_counter >= SENSORS_MQ7_NUM_OF_CALIBRATIONS)
+        {
+          current_state = STATE_MAIN_FUNCTION;
+        }
+      }
+      break;
+
+    case STATE_MAIN_FUNCTION:
+      if(INTERVAL_PASSED == intervalPassed(TASK_SHOW_TIME))
+      {
+        (void)app_readCurrentRtcTime(LCD_DISPLAY);
+      }
+      if(INTERVAL_PASSED == intervalPassed(TASK_SENSOR_READ))
+      {
+        static sensor_reading_context_ts sensor_reading_context = app_createNewSensorsReadingContext();
+        (void)app_readAllSensorsPeriodic(ALL_OUTPUTS, &sensor_reading_context);
+      }
+      break;
+  }
 }
 
 static bool intervalPassed(uint8_t task_id)
 {
-  uint32_t current_milis = millis();
-  tasks_config_ts current_task;
   uint8_t task_index = findTaskIndex(task_id);
   if(TASK_INVALID_INDEX != task_index)
   {
-    if(current_milis - tasks_config[task_index].previous_millis >= tasks_config[task_index].task_period)
+    uint32_t current_time = currentTime();
+    
+    if(current_time - tasks_config[task_index].time_elapsed >= tasks_config[task_index].task_period)
     {
-      tasks_config[task_index].previous_millis = current_milis;
+      tasks_config[task_index].time_elapsed = current_time;
       return INTERVAL_PASSED;
     }
   }
@@ -89,4 +127,9 @@ static size_t getNumOfTasks()
     num_of_tasks = sizeof(tasks_config) / sizeof(tasks_config[TASK_FIRST_TASK_INDEX]);
   }
   return num_of_tasks;
+}
+
+static uint32_t currentTime()
+{
+  return millis();
 }
