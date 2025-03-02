@@ -290,13 +290,44 @@ static control_error_code_te display_displayError(const control_data_ts *data)
   lcd.print(error_string); // In case of print error we do not need an error message,
                            // since this is a last resort operation. If error message write
                            // to LCD fails, we just discard.
-  lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_ERROR_COMPONENT_INFO_ROW);
-  snprintf(error_string, sizeof(error_string), "ID: %u", error_data.component.device_id);
+  control_error_code_te error_code = ERROR_CODE_NO_ERROR;
+  bool proceed_with_display = DISPLAY_PROCEED_WITH_DISPLAY;
 
-  padString(error_string);
-  lcd.print(error_string);
+  switch (error_data.component.io_component)
+  {
+  case INPUT_SENSORS:
+    snprintf(error_string, sizeof(error_string), "Sensor ID:%u", error_data.component.device_id);
+    break;
 
-  return ERROR_CODE_NO_ERROR; // Return success error code
+  case INPUT_RTC:
+    snprintf(error_string, sizeof(error_string), "RTC ID:%u", error_data.component.device_id);
+    break;
+
+  case INPUT_I2C_SCAN:
+    snprintf(error_string, sizeof(error_string), "I2C Scan");
+    break;
+
+  case OUTPUT_SERIAL_CONSOLE:
+    snprintf(error_string, sizeof(error_string), "Serial Console");
+    break;
+
+  case OUTPUT_DISPLAY:
+    snprintf(error_string, sizeof(error_string), "LCD Display");
+    break;
+
+  default:
+    proceed_with_display = DISPLAY_DONT_PROCEED_WITH_DISPLAY;
+    break;
+  }
+
+  if (DISPLAY_PROCEED_WITH_DISPLAY == proceed_with_display)
+  {
+    lcd.setCursor(DISPLAY_START_COLUMN, DISPLAY_ERROR_COMPONENT_INFO_ROW);
+    padString(error_string);
+    lcd.print(error_string);
+  }
+
+  return error_code; // Return success error code
 }
 
 static String formatDisplaySensorData(sensors_metadata_catalog_ts sensor_metadata, char *val)
