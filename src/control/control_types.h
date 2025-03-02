@@ -27,21 +27,21 @@ typedef uint8_t control_io_t;
  */
 typedef enum
 {   
-    INPUT_SENSORS,          /**< Input for sensors. */
+    INPUT_SENSORS,          /* Input for sensors. */
 
 #ifdef RTC_COMPONENT
-    INPUT_RTC,              /**< Input for the Real-Time Clock (RTC). */
+    INPUT_RTC,              /* Input for the Real-Time Clock (RTC). */
 #endif
 
-    INPUT_I2C_SCAN,         /**< Input for I2C address scanning. */
-    INPUT_ERROR,            /**< Input for error. */
+    INPUT_I2C_SCAN,         /* Input for I2C address scanning. */
+    INPUT_ERROR,            /* Input for error. */
 
 #ifdef LCD_DISPLAY_COMPONENT
-    OUTPUT_DISPLAY,         /**< Output component for a display device. */
+    OUTPUT_DISPLAY,         /* Output component for a display device. */
 #endif
 
 #ifdef SERIAL_CONSOLE_COMPONENT
-    OUTPUT_SERIAL_CONSOLE,  /**< Output component for the serial console. */
+    OUTPUT_SERIAL_CONSOLE,  /* Output component for the serial console. */
 #endif
 
     IO_UNUSED = 0xFF
@@ -74,8 +74,8 @@ typedef struct
  */
 typedef struct
 {
-    control_error_code_te error_code; /**< The specific error code. */
-    control_device_ts component;      /**< Detailed information about the error source and the ID of the component */
+    control_error_code_te error_code; /* The specific error code. */
+    control_device_ts component;      /* Detailed information about the error source and the ID of the component */
 } control_error_ts;
 
 /**
@@ -97,10 +97,10 @@ typedef struct
  */
 typedef union
 {
-    sensor_reading_ts sensor_reading;       /**< Data structure for sensor readings. */
-    rtc_reading_ts rtc_reading;             /**< Data structure for RTC readings. */
-    i2c_scan_reading_ts i2c_scan_reading;   /**< Data structure for I2C scan readings. */
-    control_error_ts error_msg;             /**< Data structure for error message. */
+    sensor_reading_ts sensor_reading;       /* Data structure for sensor readings. */
+    rtc_reading_ts rtc_reading;             /* Data structure for RTC readings. */
+    i2c_scan_reading_ts i2c_scan_reading;   /* Data structure for I2C scan readings. */
+    control_error_ts error_msg;             /* Data structure for error message. */
 } input_return_tu;
 
 /**
@@ -119,8 +119,8 @@ typedef union
  */
 typedef struct
 {
-    input_return_tu input_return;    /**< Union holding the returned input data. */
-    control_device_ts input;         /**< Structure with input type and ID. */
+    input_return_tu input_return;    /* Union holding the returned input data. */
+    control_device_ts input;         /* Structure with input type and ID. */
 } control_data_ts;
 
 /**
@@ -139,8 +139,8 @@ typedef struct
  */
 typedef struct
 {
-    control_data_ts data;             /**< The fetched data for output forwarding. */
-    control_error_code_te error_code;  /**< The error code for the Error Handler. */
+    control_data_ts data;              /* The fetched data for output forwarding. */
+    control_error_code_te error_code;  /* The error code for the Error Handler. */
 } control_input_data_ts;
 
 #endif

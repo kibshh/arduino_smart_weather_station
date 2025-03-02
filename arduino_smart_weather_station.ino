@@ -8,4 +8,5 @@ void loop()
 {
   task_mainTask();
   task_cyclicTask();
+  delay(CYCLIC_DELAY_MS);
 }
