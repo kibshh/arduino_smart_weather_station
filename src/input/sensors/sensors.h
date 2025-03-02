@@ -107,8 +107,8 @@ sensor_return_ts sensors_getReading(uint8_t id);
  * time-based processes. It should be called 
  * periodically in the main loop with the current time in milliseconds.
  *
- * @param current_millis The current time in milliseconds (e.g., from millis()).
+ * @param current_time Pointer to the current time in milliseconds.
  */
-void sensors_loop(const uint32_t *current_millis);
+void sensors_loop(const uint32_t *current_time);
 
 #endif

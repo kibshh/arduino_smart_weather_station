@@ -128,6 +128,15 @@ control_input_data_ts control_fetchDataFromInput(const control_device_ts *input_
  */
 void control_handleError(const control_error_ts *error);
 
+/** 
+ * @brief Executes the control loop for sensors.
+ * 
+ * This function serves as the main control loop, passing the current time 
+ * to the sensor loop for processing. It ensures that sensor-related operations 
+ * are performed periodically based on the provided time.
+ * 
+ * @param current_time Pointer to the current system time in milliseconds.
+ */
 void control_loop(const uint32_t *current_time);
 
 #endif

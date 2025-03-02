@@ -92,13 +92,13 @@ void mq7_heatingCycle(const uint32_t *current_time)
   if (elapsed_time >= SENSORS_MQ7_HEATER_HIGH_TIMEOUT_MS && MQ7_HEATER_IS_ON == mq7_is_heater_hot) // Case heater 
   {
     mq7_is_heater_hot = heaterOff(); // Turn the heater off
-    previous_time = current_time; // Update the last transition time
+    previous_time = *current_time; // Update the last transition time
   } 
   // If the heater has been in the low state for the specified duration and is currently off
   else if (elapsed_time >= SENSORS_MQ7_HEATER_LOW_TIMEOUT_MS && MQ7_HEATER_IS_OFF == mq7_is_heater_hot) 
   {
     mq7_is_heater_hot = heaterOn(); // Turn the heater on
-    previous_time = current_time; // Update the last transition time
+    previous_time = *current_time; // Update the last transition time
   }
 }
 /* *************************************** */

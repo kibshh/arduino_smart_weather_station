@@ -231,10 +231,10 @@ sensor_return_ts sensors_getReading(uint8_t id)
   return return_data;
 }
 
-void sensors_loop(const uint32_t *current_millis)
+void sensors_loop(const uint32_t *current_time)
 {
 #ifdef MQ7_COPPM
-  mq7_heatingCycle(current_millis);
+  mq7_heatingCycle(current_time);
 #endif
 }
 /* *************************************** */
