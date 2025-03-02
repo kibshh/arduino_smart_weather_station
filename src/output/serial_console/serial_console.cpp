@@ -39,21 +39,35 @@ static control_error_code_te serial_console_displayTime(const control_data_ts *d
  * - ERROR_CODE_UNKNOWN_I2C_DEVICE_STATUS: Unknown device status during communication.
  */
 static control_error_code_te serial_console_displayI2cScan(const control_data_ts *data);
+
+/**
+ * @brief Displays error message on the serial console.
+ *
+ * This function formats and displays the error message, including the
+ * error code and component information.
+ *
+ * @param control_data_ts Pointer to data containing error data that contains the error message and component info.
+ * @return control_error_code_te
+ * - ERROR_CODE_NO_ERROR: Error message displayed successfully.
+ */
+static control_error_code_te serial_console_displayError(const control_data_ts *data);
 /* *************************************** */
 
 /* EXPORTED FUNCTIONS */
-control_error_code_te serial_console_init()
+control_error_code_te
+serial_console_init()
 {
-    // Begin serial communication with the defined baud rate.
-    Serial.begin(SERIAL_CONSOLE_BAUDRATE);
+  // Begin serial communication with the defined baud rate.
+  Serial.begin(SERIAL_CONSOLE_BAUDRATE);
 
-    // Check if serial is available but don't block program execution.
-    if (!Serial) {
-        // Return an error code if serial is not available.
-        return ERROR_CODE_INIT_FAILED;
-    }
-    // If no error occurred during initialization, return success code.
-    return ERROR_CODE_NO_ERROR;
+  // Check if serial is available but don't block program execution.
+  if (!Serial)
+  {
+    // Return an error code if serial is not available.
+    return ERROR_CODE_INIT_FAILED;
+  }
+  // If no error occurred during initialization, return success code.
+  return ERROR_CODE_NO_ERROR;
 }
 
 control_error_code_te serial_console_displayData(const control_data_ts *data)
@@ -61,23 +75,25 @@ control_error_code_te serial_console_displayData(const control_data_ts *data)
   // Default error code for invalid input type
   control_error_code_te error_code = ERROR_CODE_INVALID_INPUT_TYPE;
 
-  switch(data->input.io_component)
+  switch (data->input.io_component)
   {
-    case INPUT_SENSORS:
-      error_code = serial_console_displaySensorMeasurement(data); // Display sensor data
-      break;
+  case INPUT_SENSORS:
+    error_code = serial_console_displaySensorMeasurement(data); // Display sensor data
+    break;
 
-    case INPUT_RTC:
-      error_code = serial_console_displayTime(data); // Display RTC time data 
-      break;
+  case INPUT_RTC:
+    error_code = serial_console_displayTime(data); // Display RTC time data
+    break;
 
-    case INPUT_I2C_SCAN:
-      error_code = serial_console_displayI2cScan(data); // Display I2C scan results
-      break;
+  case INPUT_I2C_SCAN:
+    error_code = serial_console_displayI2cScan(data); // Display I2C scan results
+    break;
 
-    default:
-      // No action, error code is already set
-      break;
+  case INPUT_ERROR:
+    error_code = serial_console_displayError(data); // Display error
+  default:
+    // No action, error code is already set
+    break;
   }
 
   return error_code;
@@ -96,26 +112,26 @@ static control_error_code_te serial_console_displaySensorMeasurement(const contr
   sensors_interface_metadata_ts sensor_metadata = sensors_interface_getSensorMetadata(sensor_id);
 
   // Check if metadata retrieval was successful
-  if(SENSORS_INTERFACE_STATUS_SUCCESS == sensor_metadata.success_status)
+  if (SENSORS_INTERFACE_STATUS_SUCCESS == sensor_metadata.success_status)
   {
     // Extract metadata fields (display_num_of_letters is not needed in this case since everything is displayed)
-    const char* sensor_type = sensor_metadata.metadata.sensor_type;
-    const char* measurement_unit = sensor_metadata.metadata.measurement_unit;
+    const char *sensor_type = sensor_metadata.metadata.sensor_type;
+    const char *measurement_unit = sensor_metadata.metadata.measurement_unit;
     uint8_t measurement_type = sensor_metadata.metadata.measurement_type;
     uint8_t num_of_decimals = sensor_metadata.metadata.num_of_decimals;
 
     char display_string[SERIAL_CONSOLE_STRING_RESERVED_LARGE]; // Buffer for output string
-    char val[SERIAL_CONSOLE_DTOSTRF_BUFFER_SIZE]; // Buffer for value string
+    char val[SERIAL_CONSOLE_DTOSTRF_BUFFER_SIZE];              // Buffer for value string
 
     bool proceed_with_display = SERIAL_CONSOLE_PROCEED_WITH_DISPLAY;
 
     // Handle value-based measurements
-    if(SENSORS_MEASUREMENT_TYPE_VALUE == sensor_data.measurement_type_switch && SENSORS_MEASUREMENT_TYPE_VALUE == measurement_type)
+    if (SENSORS_MEASUREMENT_TYPE_VALUE == sensor_data.measurement_type_switch && SENSORS_MEASUREMENT_TYPE_VALUE == measurement_type)
     {
       dtostrf(sensor_data.value, SERIAL_CONSOLE_MIN_FLOAT_STRING_LEN, num_of_decimals, val); // Convert float to char array
     }
     // Handle indication-based measurements
-    else if(SENSORS_MEASUREMENT_TYPE_INDICATION == sensor_data.measurement_type_switch && SENSORS_MEASUREMENT_TYPE_INDICATION == measurement_type)
+    else if (SENSORS_MEASUREMENT_TYPE_INDICATION == sensor_data.measurement_type_switch && SENSORS_MEASUREMENT_TYPE_INDICATION == measurement_type)
     {
       strncpy(val, (sensor_data.indication ? "yes" : "no"), sizeof(val) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
       val[sizeof(val) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE] = '\0'; // Ensure null termination
@@ -127,7 +143,7 @@ static control_error_code_te serial_console_displaySensorMeasurement(const contr
       proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
     }
     // Format and display the sensor data if everything is okay
-    if(SERIAL_CONSOLE_PROCEED_WITH_DISPLAY == proceed_with_display)
+    if (SERIAL_CONSOLE_PROCEED_WITH_DISPLAY == proceed_with_display)
     {
       snprintf(display_string, sizeof(display_string), "%s: %s%s", sensor_type, val, measurement_unit);
       Serial.println(display_string);
@@ -156,8 +172,8 @@ static control_error_code_te serial_console_displayTime(const control_data_ts *d
   char time_string[SERIAL_CONSOLE_STRING_RESERVED_MEDIUM]; // Ensures enough space
 
   // Format the time string with zero-padding
-  snprintf(time_string, sizeof(time_string), 
-           "Current time: %02u:%02u %02u/%02u/%u", 
+  snprintf(time_string, sizeof(time_string),
+           "Current time: %02u:%02u %02u/%02u/%u",
            hour, mins, day, month, year);
 
   // Display the formatted time
@@ -175,10 +191,10 @@ static control_error_code_te serial_console_displayI2cScan(const control_data_ts
   bool proceed_with_display = SERIAL_CONSOLE_PROCEED_WITH_DISPLAY;
 
   char display_string[SERIAL_CONSOLE_STRING_RESERVED_GIANT]; // Allocate a reasonable buffer
-  char addr_string[SERIAL_CONSOLE_HEX_ADDR_STRING_LEN]; // Buffer for hexadecimal address representation
+  char addr_string[SERIAL_CONSOLE_HEX_ADDR_STRING_LEN];      // Buffer for hexadecimal address representation
 
   // Handle scan for all devices mode
-  if(I2C_SCAN_MODE_SCAN_FOR_ALL_DEVICES == i2c_scan_data.device_address)
+  if (I2C_SCAN_MODE_SCAN_FOR_ALL_DEVICES == i2c_scan_data.device_address)
   {
     snprintf(addr_string, sizeof(addr_string), "%02X", i2c_scan_data.current_i2c_addr);
     snprintf(display_string, sizeof(display_string), "I2C scan - I2C device found at address: 0x%s", addr_string);
@@ -192,25 +208,25 @@ static control_error_code_te serial_console_displayI2cScan(const control_data_ts
     // Interpret and append the device status
     switch (i2c_scan_data.single_device_status)
     {
-      case I2C_SCAN_TRANSMISSION_RESULT_SUCCESS:
-        strncpy(status_msg, "Successful transmission", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
-        break;
-      case I2C_SCAN_TRANSMISSION_RESULT_TOOLONG:
-        strncpy(status_msg, "Data too long to fit in transmit buffer", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
-        break;
-      case I2C_SCAN_TRANSMISSION_RESULT_NACKADR:
-        strncpy(status_msg, "Received NACK on transmit of the address", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
-        break;
-      case I2C_SCAN_TRANSMISSION_RESULT_NACKDAT:
-        strncpy(status_msg, "Received NACK on transmit of the data", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
-        break;
-      case I2C_SCAN_TRANSMISSION_RESULT_UNKNOWN:
-        strncpy(status_msg, "Unknown error occurred during communication", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
-        break;
-      default:
-        error_code = ERROR_CODE_UNKNOWN_I2C_DEVICE_STATUS;
-        proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
-        break;
+    case I2C_SCAN_TRANSMISSION_RESULT_SUCCESS:
+      strncpy(status_msg, "Successful transmission", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
+      break;
+    case I2C_SCAN_TRANSMISSION_RESULT_TOOLONG:
+      strncpy(status_msg, "Data too long to fit in transmit buffer", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
+      break;
+    case I2C_SCAN_TRANSMISSION_RESULT_NACKADR:
+      strncpy(status_msg, "Received NACK on transmit of the address", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
+      break;
+    case I2C_SCAN_TRANSMISSION_RESULT_NACKDAT:
+      strncpy(status_msg, "Received NACK on transmit of the data", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
+      break;
+    case I2C_SCAN_TRANSMISSION_RESULT_UNKNOWN:
+      strncpy(status_msg, "Unknown error occurred during communication", sizeof(status_msg) - SERIAL_CONSOLE_NULL_TERMINATOR_SIZE);
+      break;
+    default:
+      error_code = ERROR_CODE_UNKNOWN_I2C_DEVICE_STATUS;
+      proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
+      break;
     }
 
     if (SERIAL_CONSOLE_PROCEED_WITH_DISPLAY == proceed_with_display)
@@ -220,11 +236,62 @@ static control_error_code_te serial_console_displayI2cScan(const control_data_ts
   }
   // IMPORTANT: Check of invalid I2C address is done on I2C scanner side and it should not arrive on the Serial Console
   // Display the formatted string if no error occurred
-  if(SERIAL_CONSOLE_PROCEED_WITH_DISPLAY == proceed_with_display)
+  if (SERIAL_CONSOLE_PROCEED_WITH_DISPLAY == proceed_with_display)
   {
     Serial.println(display_string);
   }
 
   return error_code;
+}
+
+static control_error_code_te serial_console_displayError(const control_data_ts *data)
+{
+  control_error_ts error_data = data->input_return.error_msg;
+
+  // Buffer for formatted error string
+  char error_string[SERIAL_CONSOLE_STRING_RESERVED_SMALL]; // Ensures enough space
+
+  // Format the error string
+  snprintf(error_string, sizeof(error_string), "Error Code: %d", error_data.error_code);
+
+  // Display the formatted error code
+  Serial.println(error_string);
+
+  bool proceed_with_display = SERIAL_CONSOLE_PROCEED_WITH_DISPLAY;
+
+  switch (error_data.component.io_component)
+  {
+  case INPUT_SENSORS:
+    snprintf(error_string, sizeof(error_string), "Sensor ID:%u", error_data.component.device_id);
+    break;
+
+  case INPUT_RTC:
+    snprintf(error_string, sizeof(error_string), "RTC ID:%u", error_data.component.device_id);
+    break;
+
+  case INPUT_I2C_SCAN:
+    snprintf(error_string, sizeof(error_string), "I2C Scan");
+    break;
+
+  case OUTPUT_SERIAL_CONSOLE:
+    snprintf(error_string, sizeof(error_string), "Serial Console");
+    break;
+
+  case OUTPUT_DISPLAY:
+    snprintf(error_string, sizeof(error_string), "LCD Display");
+    break;
+
+  default:
+    proceed_with_display = SERIAL_CONSOLE_DONT_PROCEED_WITH_DISPLAY;
+    break;
+  }
+
+  if (proceed_with_display == SERIAL_CONSOLE_PROCEED_WITH_DISPLAY)
+  {
+    // Display the formatted error component info
+    Serial.println(error_string);
+  }
+
+  return ERROR_CODE_NO_ERROR;
 }
 /* *************************************** */
