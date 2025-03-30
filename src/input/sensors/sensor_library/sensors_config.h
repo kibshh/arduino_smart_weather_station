@@ -27,24 +27,30 @@
 #define SENSORS_BH1750_LUMINANCE_MAX                  (float)(150000)  /** Maximum luminance for BH1750 sensor */
 
 /* MQ135 */
-#define SENSORS_MQ135_PIN_ANALOG                      (A0)      /** Analog pin for MQ135 sensor */
+#define SENSORS_MQ135_PIN_ANALOG                      (A0)             /** Analog pin for MQ135 sensor */
 #define SENSORS_MQ135_PPM_MIN                         (float)(0)       /** Minimum PPM for MQ135 sensor */
 #define SENSORS_MQ135_PPM_MAX                         (float)(10000)   /** Maximum PPM for MQ135 sensor */
+#define SENSORS_MQ135_CALIBRATION_RESISTANCE_MIN      (float)(1000)    /** Minimum R0 resistance for MQ135 sensor */
+#define SENSORS_MQ135_CALIBRATION_RESISTANCE_MAX      (float)(100000)  /** Maximum R0 resistance for MQ135 sensor */
 #define SENSORS_MQ135_PARAMETER_A                     (float)(116.60)  /** Parameter A for MQ135 sensor calibration */
 #define SENSORS_MQ135_PARAMETER_B                     (float)(2.77)    /** Parameter B for MQ135 sensor calibration */
 #define SENSORS_MQ135_R_ZERO                          (float)(10000)   /** R-zero for MQ135 sensor */
+#define SENSORS_MQ135_NUM_OF_CALIBRATIONS             (uint8_t)(20u)   /** Number of calibrations for MQ135 sensor */
 
 /* MQ7 */
 #define SENSORS_MQ7_PIN_ANALOG                        (A1)                     /** Analog pin for MQ7 sensor */
 #define SENSORS_MQ7_PIN_PWM_HEATER                    (uint8_t)(9u)            /** PWM pin for MQ7 heater */
 #define SENSORS_MQ7_PPM_MIN                           (float)(10)              /** Minimum PPM for MQ7 sensor */
 #define SENSORS_MQ7_PPM_MAX                           (float)(1000)            /** Maximum PPM for MQ7 sensor */
+#define SENSORS_MQ7_CALIBRATION_RESISTANCE_MIN        (float)(1000)            /** Minimum R0 resistance for MQ7 sensor */
+#define SENSORS_MQ7_CALIBRATION_RESISTANCE_MAX        (float)(100000)          /** Maximum R0 resistance for MQ7 sensor */
 #define SENSORS_MQ7_R_ZERO                            (float)(10000)           /** R-zero for MQ7 sensor calibration */
 #define SENSORS_MQ7_CALCULATION_CONSTANT_1            (float)(0.5)             /** Constant 1 for MQ7 sensor calculation */
 #define SENSORS_MQ7_CALCULATION_CONSTANT_2            (float)(-0.27)           /** Constant 2 for MQ7 sensor calculation */
 #define SENSORS_MQ7_CLEAR_AIR_FACTOR                  (float)(9.83)            /** Clear air factor for MQ7 sensor */
-#define SENSORS_MQ7_HEATER_LOW_TIMEOUT_MS             (unsigned long)(90000u)  /** Low timeout for MQ7 heater */
-#define SENSORS_MQ7_HEATER_HIGH_TIMEOUT_MS            (unsigned long)(60000u)  /** High timeout for MQ7 heater */
+#define SENSORS_MQ7_HEATER_LOW_TIMEOUT_MS             (uint32_t)(90000u)  /** Low timeout for MQ7 heater */
+#define SENSORS_MQ7_HEATER_HIGH_TIMEOUT_MS            (uint32_t)(60000u)  /** High timeout for MQ7 heater */
+#define SENSORS_MQ7_NUM_OF_CALIBRATIONS               (uint8_t)(20u)           /** Number of calibrations for MQ7 sensor */
 
 /* GY-ML8511 */
 #define SENSORS_GY_ML8511_PIN_ANALOG                  (A2)  /** Analog pin for GY-ML8511 sensor */

@@ -70,8 +70,8 @@ float mq7_readResistanceForCalibration();
  * Alternates between heating (high state) and cooling (low state) phases based on time intervals.
  * NEEDS TO BE CALLED IN A LOOP.
  * 
- * @param current_millis The current time in milliseconds (e.g., from millis()).
+ * @param current_time Pointer to the current time in milliseconds.
  */
-void mq7_heatingCycle(unsigned long current_millis);
+void mq7_heatingCycle(const uint32_t *current_time);
 
 #endif

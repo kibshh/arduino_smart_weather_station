@@ -142,10 +142,12 @@ void control_handleError(const control_error_ts *error)
         (void)control_routeDataToOutput(OUTPUT_DISPLAY, &data);
     }
 }
+
+void control_loop(const uint32_t *current_time)
+{
+    sensors_loop(current_time);
+}
 /* *************************************** */
-
-// TODO: CHANGE THIS FUNC TO RETURN ERROR CODE ONLY
-
 /* STATIC FUNCTIONS IMPLEMENTATIONS */
 static control_input_data_ts initializeInputReturnData(const control_device_ts *input_device)
 {

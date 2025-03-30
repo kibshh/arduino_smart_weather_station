@@ -83,22 +83,22 @@ float mq7_readResistanceForCalibration()
 }
 
 // Needs to be called in loop
-void mq7_heatingCycle(unsigned long current_millis) 
+void mq7_heatingCycle(const uint32_t *current_time) 
 {
-  static unsigned long previous_millis = 0;
-  unsigned long elapsed_time = current_millis - previous_millis; // Elapsed time between last transition from high to low or low to high till now
+  static uint32_t previous_time = 0;
+  uint32_t elapsed_time = *current_time - previous_time; // Elapsed time between last transition from high to low or low to high till now
 
   // If the heater has been in the high state for the specified duration and is currently hot
   if (elapsed_time >= SENSORS_MQ7_HEATER_HIGH_TIMEOUT_MS && MQ7_HEATER_IS_ON == mq7_is_heater_hot) // Case heater 
   {
     mq7_is_heater_hot = heaterOff(); // Turn the heater off
-    previous_millis = current_millis; // Update the last transition time
+    previous_time = *current_time; // Update the last transition time
   } 
   // If the heater has been in the low state for the specified duration and is currently off
   else if (elapsed_time >= SENSORS_MQ7_HEATER_LOW_TIMEOUT_MS && MQ7_HEATER_IS_OFF == mq7_is_heater_hot) 
   {
     mq7_is_heater_hot = heaterOn(); // Turn the heater on
-    previous_millis = current_millis; // Update the last transition time
+    previous_time = *current_time; // Update the last transition time
   }
 }
 /* *************************************** */

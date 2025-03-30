@@ -67,6 +67,15 @@ const sensors_functional_catalog_ts sensors_functional_catalog[] PROGMEM =
     MQ135_PPM
   },
 #endif  
+#ifdef MQ135_CALIBRATION_RESISTANCE
+  { 
+    SENSORS_MQ135_CALIBRATION_RESISTANCE_MIN,             
+    SENSORS_MQ135_CALIBRATION_RESISTANCE_MAX,            
+    mq135_readResistanceForCalibration,                  
+    SENSORS_NO_INDICATION_FUNCTION,  
+    MQ135_CALIBRATION_RESISTANCE
+  },
+#endif  
 #ifdef MQ7_COPPM
   { 
     SENSORS_MQ7_PPM_MIN,               
@@ -76,6 +85,15 @@ const sensors_functional_catalog_ts sensors_functional_catalog[] PROGMEM =
     MQ7_COPPM
   },
 #endif  
+#ifdef MQ7_CALIBRATION_RESISTANCE
+  { 
+    SENSORS_MQ7_CALIBRATION_RESISTANCE_MIN,               
+    SENSORS_MQ7_CALIBRATION_RESISTANCE_MAX,              
+    mq7_readResistanceForCalibration,                    
+    SENSORS_NO_INDICATION_FUNCTION,  
+    MQ7_CALIBRATION_RESISTANCE
+  },
+#endif 
 #ifdef GYML8511_UV
   { 
     SENSORS_GYML8511_UV_MIN,           
@@ -213,10 +231,10 @@ sensor_return_ts sensors_getReading(uint8_t id)
   return return_data;
 }
 
-void sensors_loop(unsigned long current_millis)
+void sensors_loop(const uint32_t *current_time)
 {
 #ifdef MQ7_COPPM
-  mq7_heatingCycle(current_millis);
+  mq7_heatingCycle(current_time);
 #endif
 }
 /* *************************************** */
