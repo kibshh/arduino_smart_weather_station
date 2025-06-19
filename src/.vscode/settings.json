@@ -1,0 +1,11 @@
+{
+    "editor.fontFamily": "JetBrains Mono",
+    "editor.fontLigatures": true,
+    "terminal.integrated.env.windows": {},
+    "workbench.colorTheme": "Houston",
+    "workbench.iconTheme": "vscode-icons",
+    "files.autoSave": "afterDelay",
+    "terminal.integrated.fontSize": 14,
+    "terminal.integrated.fontFamily": "Consolas"
+}
+
