@@ -1,30 +1,30 @@
-#include "project_configs/project_configs.h"
+#include "src/project_configs/project_configs.h"
 #ifdef CONFIGS_ARDUINO_RAIN_SENSOR_INCLUDED
-#include "project_sensors/arduino_rain_sensor/arduino_rain_sensor.h"
+#include "src/project_sensors/arduino_rain_sensor/arduino_rain_sensor.h"
 #endif
 #ifdef CONFIGS_BH1750_SENSOR_INCLUDED
-#include "project_sensors/bh1750_sensor/bh1750_sensor.h"
+#include "src/project_sensors/bh1750_sensor/bh1750_sensor.h"
 #endif
 #ifdef CONFIGS_BMP280_SENSOR_INCLUDED
-#include "project_sensors/bmp280_sensor/bmp280_sensor.h"
+#include "src/project_sensors/bmp280_sensor/bmp280_sensor.h"
 #endif
 #ifdef CONFIGS_DHT11_SENSOR_INCLUDED
-#include "project_sensors/dht11_sensor/dht11_sensor.h"
+#include "src/project_sensors/dht11_sensor/dht11_sensor.h"
 #endif
 #ifdef CONFIGS_GY_ML8511_SENSOR_INCLUDED
-#include "project_sensors/gy_ml8511_sensor/gy_ml8511_sensor.h"
+#include "src/project_sensors/gy_ml8511_sensor/gy_ml8511_sensor.h"
 #endif
 #ifdef CONFIGS_MQ7_SENSOR_INCLUDED
-#include "project_sensors/mq7_sensor/mq7_sensor.h"
+#include "src/project_sensors/mq7_sensor/mq7_sensor.h"
 #endif
 #ifdef CONFIGS_MQ135_SENSOR_INCLUDED
-#include "project_sensors/mq135_sensor/mq135_sensor.h"
+#include "src/project_sensors/mq135_sensor/mq135_sensor.h"
 #endif
 #ifdef CONFIGS_I2C_SCANNER_INCLUDED
-#include "project_utilities/i2c_scanner/i2c_scanner.h"
+#include "src/project_utilities/i2c_scanner/i2c_scanner.h"
 #endif
 #ifdef CONFIGS_RTC_INCLUDED
-#include "project_utilities/rtc/rtc.h"
+#include "src/project_utilities/rtc/rtc.h"
 #endif
 
 //#define MODE_GET_I2C_ADDR
