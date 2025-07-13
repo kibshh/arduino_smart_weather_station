@@ -1,20 +1,25 @@
 #include "arduino_rain_sensor.h"
 
-bool ArduinoRainSensor_Init()
+static bool ArduinoRainSensor_ReadRainingStatus();
+
+bool ArduinoRainSensor_Init(CurrentReading_t *init_func, uint8_t *current_index)
 {
 #if ARDUINO_RAIN_SENSOR_MEASUREMENT_MODE_ANALOG == ARDUINO_RAIN_SENSOR_MEASUREMENT_MODE
   pinMode(ARDUINO_RAIN_SENSOR_PIN_ANALOG, INPUT);
 #else
   pinMode(ARDUINO_RAIN_SENSOR_PIN_DIGITAL, INPUT);
 #endif
+  init_func[*current_index] = ArduinoRainSensor_ReadRainingStatus;
+  (*current_index)++;
   return true;
 }
 
-bool ArduinoRainSensor_ReadRainingStatus()
+static bool ArduinoRainSensor_ReadRainingStatus()
 {
 #if ARDUINO_RAIN_SENSOR_MEASUREMENT_MODE_ANALOG == ARDUINO_RAIN_SENSOR_MEASUREMENT_MODE
     uint16_t analog_reading = (uint16_t)analogRead(ARDUINO_RAIN_SENSOR_PIN_ANALOG);
-    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("                ");
     lcd.setCursor(0, 0);
     if(ARDUINO_RAIN_SENSOR_ANALOG_THRESHOLD >= analog_reading)
     {
@@ -28,7 +33,8 @@ bool ArduinoRainSensor_ReadRainingStatus()
     }
 #else
     uint8_t digital_reading = (uint8_t)digitalRead(ARDUINO_RAIN_SENSOR_PIN_DIGITAL);
-    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("                ");
     lcd.setCursor(0, 0);
     if(HIGH == digital_reading)
     {
@@ -41,5 +47,5 @@ bool ArduinoRainSensor_ReadRainingStatus()
         lcd.print("Not Raining");
     }
 #endif
-    return true
+    return true;
 }

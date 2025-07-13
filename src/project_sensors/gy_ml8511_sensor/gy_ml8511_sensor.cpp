@@ -1,12 +1,16 @@
 #include "gy_ml8511_sensor.h"
 
-bool GyMl8511Sensor_Init()
+static bool GyMl8511Sensor_ReadUv();
+
+bool GyMl8511Sensor_Init(CurrentReading_t *init_func, uint8_t *current_index)
 {
-    pinMode(GY_ML8511_SENSOR_PIN, INPUT);
-    return true;
+  pinMode(GY_ML8511_SENSOR_PIN, INPUT);
+  init_func[*current_index] = GyMl8511Sensor_ReadUv;
+  (*current_index)++;
+  return true;
 }
 
-bool GyMl8511Sensor_ReadUv()
+static bool GyMl8511Sensor_ReadUv()
 {
   float analog_reading = (float)analogRead(GY_ML8511_SENSOR_PIN);
   float uv_voltage = (analog_reading / GY_ML8511_SENSOR_ANALOG_INPUT_MAX) * GY_ML8511_SENSOR_VCC_VOLTAGE;  /* Convert to voltage */
@@ -29,7 +33,8 @@ bool GyMl8511Sensor_ReadUv()
     calculated_uv = uv_voltage * (GY_ML8511_SENSOR_OUTPUT_INTENSITY_MAX / (GY_ML8511_SENSOR_OUTPUT_VOLTAGE_MAX - GY_ML8511_SENSOR_OUTPUT_VOLTAGE_MIN));
   }
 
-  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("                ");
   lcd.setCursor(0, 0);
   String uv_formatted = String(calculated_uv, CONFIGS_DISPLAY_1_DECIMAL);
 

@@ -1,9 +1,11 @@
 #include "bh1750_sensor.h"
 #include <BH1750.h>
 
+static bool Bh1750Sensor_ReadLuminance();
+
 static BH1750 light_meter;
 
-bool Bh1750Sensor_Init()
+bool Bh1750Sensor_Init(CurrentReading_t *init_func, uint8_t *current_index)
 {
     if(!light_meter.begin())
     {
@@ -12,14 +14,17 @@ bool Bh1750Sensor_Init()
     }
     else
     {
-        return true;
+      init_func[*current_index] = Bh1750Sensor_ReadLuminance;
+      (*current_index)++;
+      return true;
     }
 }
 
-bool Bh1750Sensor_ReadLuminance()
+static bool Bh1750Sensor_ReadLuminance()
 {
   float luminance = light_meter.readLightLevel();
-  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("                ");
   lcd.setCursor(0, 0);
 
   if(!isnan(luminance))
@@ -30,11 +35,11 @@ bool Bh1750Sensor_ReadLuminance()
 
         Serial.print("Luminance: ");
         Serial.print(luminance_formatted);
-        Serial.println("lx\n");
+        Serial.println(" lux\n");
 
-        lcd.print("Luminance: ");
+        lcd.print("Lum: ");
         lcd.print(luminance_formatted);
-        lcd.print("lx");   
+        lcd.print(" lux");   
 
         return true;
     }

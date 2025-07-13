@@ -11,7 +11,6 @@
 #define GY_ML8511_SENSOR_OUTPUT_INTENSITY_MAX  (float)(15.0f)
 #define GY_ML8511_SENSOR_OUTPUT_INTENSITY_MIN  (float)(0.0f)
 
-bool GyMl8511Sensor_Init();
-bool GyMl8511Sensor_ReadUv();
+bool GyMl8511Sensor_Init(CurrentReading_t *init_func, uint8_t *current_index);
 
 #endif

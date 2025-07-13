@@ -11,13 +11,11 @@
 #define DHT11_SENSOR_DHT_TYPE     DHT11
 
 /* Min and Max values */
-#define DHT11_SENSOR_TEMPERATURE_MIN  (int32_t)(-20)
-#define DHT11_SENSOR_TEMPERATURE_MAX  (int32_t)(50)
-#define DHT11_SENSOR_HUMIDITY_MIN     (int32_t)(0)
-#define DHT11_SENSOR_HUMIDITY_MAX     (int32_t)(100)
+#define DHT11_SENSOR_TEMPERATURE_MIN  (float)(-20.0f)
+#define DHT11_SENSOR_TEMPERATURE_MAX  (float)(50.0f)
+#define DHT11_SENSOR_HUMIDITY_MIN     (float)(0.0f)
+#define DHT11_SENSOR_HUMIDITY_MAX     (float)(100.0f)
 
-bool Dht11Sensor_Init();
-bool Dht11Sensor_ReadTemperature();
-bool Dht11Sensor_ReadHumidity();
+bool Dht11Sensor_Init(CurrentReading_t *init_func, uint8_t *current_index);
 
 #endif

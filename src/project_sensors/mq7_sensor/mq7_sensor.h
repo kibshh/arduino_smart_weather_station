@@ -14,13 +14,12 @@
 #define MQ7_SENSOR_ANALOG_INPUT_MAX              (uint16_t)(1023u)
 #define MQ7_SENSOR_LOAD_RESISTANCE_VAL           (uint16_t)(10000u) /* Load resistance in ohms which is connected to from analog output of sensor to ground */
 #define MQ7_SENSOR_CALCULATION_POW_BASE_CONSTANT (uint8_t)(10u)
-#define MQ7_SENSOR_CALCULATION_CONSTANT_1        (float)(0.5f)   /* By datasheet */
-#define MQ7_SENSOR_CALCULATION_CONSTANT_2        (float)(-0.27f) /* By datasheet */
-#define MQ7_SENSOR_PPM_MINIMUM                   (float)(10.0f)
+#define MQ7_SENSOR_CALCULATION_INTERCEPT         (float)(0.5f)   /* By datasheet, represents intercept in a graph */
+#define MQ7_SENSOR_CALCULATION_SLOPE             (float)(-0.27f) /* By datasheet, represents slope in a graph */
+#define MQ7_SENSOR_PPM_MINIMUM                   (float)(0.0f)
 #define MQ7_SENSOR_PPM_MAXIMUM                   (float)(1000.0f)  
 
-bool Mq7Sensor_Init();
+bool Mq7Sensor_Init(CurrentReading_t *init_func, uint8_t *current_index);
 void Mq7Sensor_HeatingCycle();
-bool Mq7Sensor_ReadPpm();
 
 #endif

@@ -11,7 +11,6 @@
 #define BH1750_SENSOR_LUMINANCE_MAX     (float)(150000.0f)
 #define BH1750_SENSOR_LUMINANCE_MIN     (float)(0.0f)
 
-bool Bh1750Sensor_Init();
-bool Bh1750Sensor_ReadLuminance()
+bool Bh1750Sensor_Init(CurrentReading_t *init_func, uint8_t *current_index);
 
 #endif

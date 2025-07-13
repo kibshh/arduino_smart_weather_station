@@ -1,17 +1,25 @@
 #include "dht11_sensor.h"
 
+static bool Dht11Sensor_ReadTemperature();
+static bool Dht11Sensor_ReadHumidity();
+
 static DHT dht(DHT11_SENSOR_PIN, DHT11_SENSOR_DHT_TYPE);
 
-bool Dht11Sensor_Init()
+bool Dht11Sensor_Init(CurrentReading_t *init_func, uint8_t *current_index)
 {
-    dht.begin();
-    return true;
+  dht.begin();
+  init_func[*current_index] = Dht11Sensor_ReadTemperature;
+  (*current_index)++;
+  init_func[*current_index] = Dht11Sensor_ReadHumidity;
+  (*current_index)++;
+  return true;
 }
 
-bool Dht11Sensor_ReadTemperature()
+static bool Dht11Sensor_ReadTemperature()
 {
-  int32_t temperature = dht.readTemperature(); /* Celsius */
-  lcd.clear();
+  float temperature = dht.readTemperature(); /* Celsius */
+  lcd.setCursor(0, 0);
+  lcd.print("                ");
   lcd.setCursor(0, 0);
 
   if(temperature > DHT11_SENSOR_TEMPERATURE_MIN && temperature < DHT11_SENSOR_TEMPERATURE_MAX)
@@ -32,10 +40,11 @@ bool Dht11Sensor_ReadTemperature()
   return false;
 }
 
-bool Dht11Sensor_ReadHumidity()
+static bool Dht11Sensor_ReadHumidity()
 {
-  int32_t humidity = dht.readHumidity(); /* Percent */
-  lcd.clear();
+  float humidity = dht.readHumidity(); /* Percent */
+  lcd.setCursor(0, 0);
+  lcd.print("                ");
   lcd.setCursor(0, 0);
 
   if(humidity > DHT11_SENSOR_HUMIDITY_MIN && humidity < DHT11_SENSOR_HUMIDITY_MAX)

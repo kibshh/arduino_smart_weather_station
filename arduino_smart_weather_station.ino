@@ -27,43 +27,62 @@
 #include "src/project_utilities/rtc/rtc.h"
 #endif
 
-//#define MODE_GET_I2C_ADDR
-// #define BAUDRATE 9600
+static uint8_t current_readfunction_idx = 0;
+static uint8_t num_of_reading_functions = 0;
+static uint64_t previous_millis = 0;
+static CurrentReading_t current_reading[CONFIGS_MAX_NUM_OF_MEASUREMENTS] = {0};
 
-// int current_display_function = 0;
-// unsigned long previous_millis = 0;
+void setup() 
+{
+  wdt_enable(CONFIGS_WATCHDOG_TIMEOUT); /* Watchdog: 2 seconds timeout */
 
-// void setup() {
-//   Wire.begin();
-//   Serial.begin(BAUDRATE);
-//   display_init();
-//   sensors_init();
-//   rtc_init();
-//   while (!Serial); // Wait for the serial port to connect
+  (void)ProjectConfigs_Init();
+#ifdef CONFIGS_ARDUINO_RAIN_SENSOR_INCLUDED
+  (void)ArduinoRainSensor_Init(current_reading, &num_of_reading_functions);
+#endif
+#ifdef CONFIGS_BH1750_SENSOR_INCLUDED
+  (void)Bh1750Sensor_Init(current_reading, &num_of_reading_functions);
+#endif
+#ifdef CONFIGS_BMP280_SENSOR_INCLUDED
+  (void)Bmp280Sensor_Init(current_reading, &num_of_reading_functions);
+#endif
+#ifdef CONFIGS_DHT11_SENSOR_INCLUDED
+  (void)Dht11Sensor_Init(current_reading, &num_of_reading_functions);
+#endif
+#ifdef CONFIGS_GY_ML8511_SENSOR_INCLUDED
+  (void)GyMl8511Sensor_Init(current_reading, &num_of_reading_functions);
+#endif
+#ifdef CONFIGS_MQ7_SENSOR_INCLUDED
+  (void)Mq7Sensor_Init(current_reading, &num_of_reading_functions);
+#endif
+#ifdef CONFIGS_MQ135_SENSOR_INCLUDED
+  (void)Mq135Sensor_init(current_reading, &num_of_reading_functions);
+#endif
+#ifdef CONFIGS_RTC_INCLUDED
+  (void)Rtc_Init(current_reading, &num_of_reading_functions);
+#endif
 
-//   #ifdef MODE_GET_I2C_ADDR
-//     Serial.println("\nI2C Scanner");
-//   #else
-//     Serial.println("\nWeather Station");
-//   #endif
-// }
+  Serial.println("\nWeather Station");
 
-// void loop() {
-//   unsigned long current_millis = millis();
+#ifdef CONFIGS_I2C_SCANNER_INCLUDED
+  (void)I2cScanner_ReadConnectedI2cDevices();
+#endif
+}
 
-//   #ifdef MODE_GET_I2C_ADDR
-//     if(current_millis - previous_millis >= (unsigned long)I2CSCAN_I2CSCAN_INTERVAL_MS)
-//     {
-//       previous_millis = current_millis;
-//       i2cScan_scanForAdress();
-//     }
-//   #else
-//     if(current_millis - previous_millis >= (unsigned long)DISPLAY_DISPLAY_INTERVAL_MS)
-//     {
-//       previous_millis = current_millis;
-//       display_functions[current_display_function]();
-//       current_display_function++;
-//       current_display_function %= display_functions_size;
-//     }
-//   #endif
-// }
+void loop() 
+{
+#ifdef CONFIGS_MQ7_SENSOR_INCLUDED
+  Mq7Sensor_HeatingCycle();
+#endif
+
+  uint64_t current_millis = (uint64_t)millis();
+  if(current_millis - previous_millis >= CONFIGS_READ_INTERVAL_MS)
+  {
+    previous_millis = current_millis;
+    current_reading[current_readfunction_idx]();
+    current_readfunction_idx++;
+    current_readfunction_idx %= num_of_reading_functions;
+  }
+  delay(CONFIGS_LOOP_FREQUENCY_MS);
+  wdt_reset();  /* Feed the watchdog */
+}

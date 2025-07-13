@@ -48,11 +48,8 @@
 #define BMP280_SENSOR_HPA_DIVIDER              (float)(100.0f)
 
 /* Pressure at the sea level height */
-#define BMP280_SENSOR_SEA_LEVEL_PRESSURE       (float)(1013.25f)
+#define BMP280_SENSOR_SEA_LEVEL_PRESSURE       (float)(1015.5f) /* Local sea level pressure for Novi Sad, Serbia */
 
-bool Bmp280Sensor_Init();
-bool Bmp280Sensor_ReadPressure();
-bool Bmp280Sensor_ReadTemperature();
-bool Bmp280Sensor_ReadAltitude();
+bool Bmp280Sensor_Init(CurrentReading_t *init_func, uint8_t *current_index);
 
 #endif

@@ -2,23 +2,37 @@
 
 static Adafruit_BMP280 bmp;
 
-bool Bmp280Sensor_Init()
+static bool Bmp280Sensor_ReadPressure();
+static bool Bmp280Sensor_ReadTemperature();
+static bool Bmp280Sensor_ReadAltitude();
+
+bool Bmp280Sensor_Init(CurrentReading_t *init_func, uint8_t *current_index)
 {
   if(!bmp.begin(BMP280_SENSOR_I2C_ADDDR))
   {
     Serial.println("Error in initialization of BMP280 sensor");
+    return false;
   }
   bmp.setSampling(BMP280_SENSOR_MODE_NORMAL,     /* Operating Mode */
                   BMP280_SENSOR_SAMPLING_X2,     /* Temperature oversampling(takes 2 samples) */
                   BMP280_SENSOR_SAMPLING_X16,    /* Pressure oversampling(takes 16 samples)->more accurrate */
                   BMP280_SENSOR_FILTER_X16,      /* Filtering */
                   BMP280_SENSOR_WAIT_MS_500);    /* Standby time between readings */
+
+  init_func[*current_index] = Bmp280Sensor_ReadPressure;
+  (*current_index)++;
+  init_func[*current_index] = Bmp280Sensor_ReadTemperature;
+  (*current_index)++;
+  init_func[*current_index] = Bmp280Sensor_ReadAltitude;
+  (*current_index)++;
+  return true;
 }
 
-bool Bmp280Sensor_ReadPressure()
+static bool Bmp280Sensor_ReadPressure()
 {
   float pressure = bmp.readPressure() / BMP280_SENSOR_HPA_DIVIDER; /* Converting to hPa */
-  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("                ");
   lcd.setCursor(0, 0);
 
   if(!isnan(pressure))
@@ -42,10 +56,11 @@ bool Bmp280Sensor_ReadPressure()
   return false; 
 }
 
-bool Bmp280Sensor_ReadTemperature()
+static bool Bmp280Sensor_ReadTemperature()
 {
   float temperature = bmp.readTemperature(); /* Celsius */
-  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("                ");
   lcd.setCursor(0, 0);
 
   if(!isnan(temperature))
@@ -69,10 +84,11 @@ bool Bmp280Sensor_ReadTemperature()
   return false;  
 }
 
-bool Bmp280Sensor_ReadAltitude()
+static bool Bmp280Sensor_ReadAltitude()
 {
   float altitude = bmp.readAltitude(BMP280_SENSOR_SEA_LEVEL_PRESSURE);
-  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("                ");
   lcd.setCursor(0, 0);
 
   if(!isnan(altitude))
